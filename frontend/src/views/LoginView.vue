@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import LoginForm from "@/containers/Form/LoginForm.vue";
+</script>
+
 <template>
-  <p>test page</p>
+  <LoginForm></LoginForm>
 </template>
