@@ -1,31 +1,43 @@
 <script setup lang="ts">
-import Logo from '@/basic/Logo.vue';
-import SiteTitle from '@/basic/SiteTitle.vue';
-import NavItem from '@/components/nav-items/NavItem.vue';
-import LoginButton from '@/basic/LoginButton.vue';
-import { ref } from 'vue';
+import Logo from '@/basic/Logo.vue'
+import SiteTitle from '@/basic/SiteTitle.vue'
+import NavItem from '@/components/Sidebar/NavItem.vue'
+import LoginButton from '@/basic/LoginButton.vue'
+import { ref } from 'vue'
 
-const drawer = ref(false);
+interface Emits {
+  (event: 'onClickLoginButton'): void
+  (event: 'onClickSiteLogo'): void
+}
+
+const emit = defineEmits<Emits>()
+
+const drawer = ref(false)
+
+//ログインボタンが押された
+const onClickLoginButton = (): void => {
+  emit('onClickLoginButton')
+}
+
+//サイトのロゴが押された
+const onClickSiteLogo = (): void => {
+  emit('onClickSiteLogo')
+}
 </script>
 
 <template>
-    <v-app-bar color="green">
-        <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-        <Logo></Logo>
-        <SiteTitle></SiteTitle>
+  <v-app-bar color="green">
+    <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
-        <LoginButton></LoginButton>
-    </v-app-bar>
+      <Logo></Logo>
+      <SiteTitle @clickSiteTitle="onClickSiteLogo"></SiteTitle>
 
-    <v-navigation-drawer
-    v-model="drawer"
-        absolute
-        temporary
-    >
-        <v-list nav dense>
-            <NavItem label="ログアウト"></NavItem>
+    <LoginButton @clickLoginButton="onClickLoginButton"></LoginButton>
+  </v-app-bar>
 
-        </v-list>
-    </v-navigation-drawer>
-
+  <v-navigation-drawer v-model="drawer" absolute temporary>
+    <v-list nav dense>
+      <NavItem label="ログアウト"></NavItem>
+    </v-list>
+  </v-navigation-drawer>
 </template>
