@@ -1,31 +1,51 @@
 <script setup lang="ts">
 import SubmitButton from "@/basic/SubmitButton.vue";
+import GoogleLogin from "@/basic/GoogleLoginButton.vue";
 
 const submitButton = (): void => {
     console.log("submit");
+};
+
+const clickGoogleLoginButton = (): void => {
+    console.log("google");
 };
 </script>
 
 <template>
     <v-container>
-        <v-sheet width="450" class="mx-auto px-6 py-6 form">
-            <v-form>
-                 <v-row>
-                    <v-col cols="12" class="pb-0">
-                        <p>ログインIDとパスワードを入力してください</p>
+        <v-row>
+            <v-sheet width="450" class="mx-auto px-6 py-6 form">
+                <v-form>
+                     <v-row>
+                        <v-col cols="12" class="pb-0">
+                            <p>ログインIDとパスワードを入力してください</p>
+                        </v-col>
+                        <v-col cols="12">
+                            <input type="text" class="input-form ps-2">
+                        </v-col>
+                        <v-col cols="12">
+                            <input type="password" class="input-form ps-2">
+                        </v-col>
+                        <v-col cols="12">
+                            <SubmitButton @submitButton="submitButton"></SubmitButton>
+                        </v-col>
+                    </v-row>
+                </v-form>
+            </v-sheet>
+        </v-row>
+        <v-row>
+            <v-sheet width="450" class="form mx-auto">
+                <v-divider></v-divider>
+                <v-row class="px-6 pb-6 pt-3">
+                    <v-col cols="12">
+                        <p>他サービスでログイン</p>
                     </v-col>
                     <v-col cols="12">
-                        <input type="text" class="input-form ps-2">
-                    </v-col>
-                    <v-col cols="12">
-                        <input type="password" class="input-form ps-2">
-                    </v-col>
-                    <v-col cols="12">
-                        <SubmitButton @submitButton="submitButton"></SubmitButton>
+                        <GoogleLogin @clickGoogleLoginButton="clickGoogleLoginButton"></GoogleLogin>
                     </v-col>
                 </v-row>
-            </v-form>
-        </v-sheet>
+            </v-sheet>
+        </v-row>
     </v-container>
 </template>
 
