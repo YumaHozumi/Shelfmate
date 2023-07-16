@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import SubmitButton from "@/basic/SubmitButton.vue";
-import GoogleLogin from "@/basic/GoogleLoginButton.vue";
+import SubmitButton from "@/basic//Login/SubmitButton.vue";
+import GoogleLogin from "@/basic/Login/GoogleLoginButton.vue";
+import NewRegisterButton from "@/basic/Login/NewRegisterButton.vue";
 
 const submitButton = (): void => {
     console.log("submit");
@@ -42,6 +43,9 @@ const clickGoogleLoginButton = (): void => {
                     </v-col>
                     <v-col cols="12">
                         <GoogleLogin @clickGoogleLoginButton="clickGoogleLoginButton"></GoogleLogin>
+                    </v-col>
+                    <v-col cols="12" class="d-flex justify-center">
+                        <NewRegisterButton></NewRegisterButton>
                     </v-col>
                 </v-row>
             </v-sheet>
