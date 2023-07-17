@@ -1,3 +1,3 @@
 <template>
-    <RouterLink to="Login">アカウントをお持ちでない方はこちらから</RouterLink>
+    <RouterLink to="Register">アカウントをお持ちでない方はこちらから</RouterLink>
 </template>
