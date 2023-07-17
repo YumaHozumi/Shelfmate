@@ -28,7 +28,7 @@ const clickGoogleLoginButton = (): void => {
                             <input type="password" class="input-form ps-2">
                         </v-col>
                         <v-col cols="12">
-                            <SubmitButton @submitButton="submitButton"></SubmitButton>
+                            <SubmitButton @submitButton="submitButton" text="ログイン"></SubmitButton>
                         </v-col>
                     </v-row>
                 </v-form>
