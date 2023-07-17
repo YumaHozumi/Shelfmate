@@ -6,8 +6,7 @@ import LoginButton from '@/basic/LoginButton.vue'
 import { ref } from 'vue'
 
 interface Emits {
-  (event: 'onClickLoginButton'): void
-  (event: 'onClickSiteLogo'): void
+  (event: 'navigate', name: string): void
 }
 
 const emit = defineEmits<Emits>()
@@ -16,12 +15,12 @@ const drawer = ref(false)
 
 //ログインボタンが押された
 const onClickLoginButton = (): void => {
-  emit('onClickLoginButton')
+  emit('navigate', "Login");
 }
 
 //サイトのロゴが押された
 const onClickSiteLogo = (): void => {
-  emit('onClickSiteLogo')
+  emit("navigate", "AppTop");
 }
 </script>
 

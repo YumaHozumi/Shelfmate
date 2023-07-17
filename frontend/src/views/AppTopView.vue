@@ -2,17 +2,12 @@
 import Header from '@/containers/Header.vue'
 import router from '@/router'
 
-const onClickLoginButton = (): void => {
-  router.push({ name: 'Login' })
-}
-
-const onClickSiteLogo = (): void => {
-  router.push({ name: 'AppTop' })
-  console.log("tes")
+const onNavigate = (name: string): void => {
+  router.push({name: name});
 }
 </script>
 
 <template>
-  <Header @onClickLoginButton="onClickLoginButton" @onClickSiteLogo="onClickSiteLogo"></Header>
+  <Header @navigate="onNavigate"></Header>
   <p>test</p>
 </template>
