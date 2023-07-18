@@ -11,13 +11,14 @@ const submitButton = (): void => {
 
 interface Props {
     text: string;
+    color: string;
 }
 
 defineProps<Props>();
 </script>
 
 <template>
-    <v-btn color="blue" class="submitButton" width="100%" @click="submitButton">
+    <v-btn :color="color" class="submitButton" width="100%" @click="submitButton">
         {{ text }}
     </v-btn>
 </template>
@@ -25,5 +26,6 @@ defineProps<Props>();
 <style scoped>
 .submitButton {
     font-weight: bolder;
+    font-size: 17px;
 }
 </style>
