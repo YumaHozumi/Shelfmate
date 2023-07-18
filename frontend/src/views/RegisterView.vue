@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Header from '@/containers/Header.vue'
+import RegisterForm from '@/containers/Form/RegisterForm.vue';
 import router from '@/router'
-import ProgressBar from '@/containers/ProgressBar.vue';
 
 const onNavigate = (name: string): void => {
   router.push({name: name});
@@ -10,5 +10,5 @@ const onNavigate = (name: string): void => {
 
 <template>
     <Header @navigate="onNavigate"></Header>
-    <ProgressBar></ProgressBar>
+    <RegisterForm></RegisterForm>
 </template>
