@@ -1,8 +1,14 @@
 <script setup lang="ts">
 import SubmitButton from "@/basic//Login/SubmitButton.vue";
 
+interface Emits {
+    (event: "submitButton"): void;
+}
+
+const emit = defineEmits<Emits>();
+
 const submitButton = (): void => {
-    console.log("submit");
+    emit("submitButton");
 };
 </script>
 
