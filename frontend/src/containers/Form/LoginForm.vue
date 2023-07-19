@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import SubmitButton from "@/basic//Login/SubmitButton.vue";
 import GoogleLogin from "@/basic/Login/GoogleLoginButton.vue";
-import NewRegisterLink from "@/basic/Login/NewRegisterLink.vue";
+import Link from "@/basic/Login/Link.vue";
 
 const submitButton = (): void => {
     console.log("submit");
@@ -50,7 +50,7 @@ const clickGoogleLoginButton = (): void => {
         </v-row>
         <v-row>
             <v-sheet width="450" class="mx-auto text-center pt-3">
-                <NewRegisterLink></NewRegisterLink>
+                <Link text="アカウントをお持ちでない方はこちらから" name="Register"></Link>
             </v-sheet>
         </v-row>
     </v-container>

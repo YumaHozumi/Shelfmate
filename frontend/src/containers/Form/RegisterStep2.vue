@@ -2,7 +2,17 @@
 import { ref } from 'vue';
 import SubmitButton from '@/basic/Login/SubmitButton.vue';
 
+interface Emits {
+    (event: "back"): void;
+}
+
+const emit = defineEmits<Emits>();
+
 const address = ref("test@test");
+
+const back = (): void => {
+    emit("back");
+}
 
 const submitButton = (): void => {
     console.log("hoge");
@@ -24,8 +34,14 @@ const submitButton = (): void => {
             <v-col cols="12" class="pa-0 mt-3">
                 <input type="text" class="input-form ps-2 pa-1">
             </v-col>
-            <v-col cols="12" class="pa-0 mt-4 mb-8">
+            <v-col cols="12" class="pa-0 mt-4">
                 <SubmitButton @submitbutton="submitButton" text="次へ" color="red"></SubmitButton>
+            </v-col>
+            <v-col cols="12" class="pa-0 mt-4 mb-6">
+                <v-btn color="blue" @click="back">
+                    <v-icon>mdi-arrow-left-bold</v-icon>
+                    戻る
+                </v-btn>
             </v-col>
         </v-row>
     </v-form>
@@ -46,5 +62,9 @@ const submitButton = (): void => {
     background-color: #F5F5F5;
     word-wrap: break-word;
     line-height: 24px;
+}
+
+.back {
+    color: aqua;
 }
 </style>

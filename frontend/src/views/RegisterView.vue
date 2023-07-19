@@ -16,6 +16,10 @@ const currentCompIndex = ref(0);
 const switchComp = (): void => {
   currentCompIndex.value++;
 }
+
+const back = (): void => {
+  currentCompIndex.value--;
+}
 </script>
 
 <template>
@@ -23,7 +27,7 @@ const switchComp = (): void => {
     <v-sheet width="500" class="mx-auto form px-10 py-3">
         <ProgressBar :currentStep="currentCompIndex"></ProgressBar>
         <RegisterStep1 v-if="currentCompIndex == 0" @submitButton="switchComp"></RegisterStep1>
-        <RegisterStep2 v-if="currentCompIndex == 1"></RegisterStep2>
+        <RegisterStep2 v-if="currentCompIndex == 1" @back="back"></RegisterStep2>
     </v-sheet>
 </template>
 
