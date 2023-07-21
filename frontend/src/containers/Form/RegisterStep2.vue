@@ -4,6 +4,7 @@ import SubmitButton from '@/basic/Login/SubmitButton.vue';
 
 interface Emits {
     (event: "back"): void;
+    (event: "submitButton"): void;
 }
 
 const emit = defineEmits<Emits>();
@@ -15,7 +16,7 @@ const back = (): void => {
 }
 
 const submitButton = (): void => {
-    console.log("hoge");
+    emit("submitButton");
 };
 </script>
 
@@ -35,7 +36,7 @@ const submitButton = (): void => {
                 <input type="text" class="input-form ps-2 pa-1">
             </v-col>
             <v-col cols="12" class="pa-0 mt-4">
-                <SubmitButton @submitbutton="submitButton" text="次へ" color="red"></SubmitButton>
+                <SubmitButton @submitButton="submitButton" text="次へ" color="red"></SubmitButton>
             </v-col>
             <v-col cols="12" class="pa-0 mt-4 mb-6">
                 <v-btn color="blue" @click="back">
