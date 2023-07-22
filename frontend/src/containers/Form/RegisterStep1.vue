@@ -28,7 +28,7 @@ const submitButton = (): void => {
                 <Label text="メールアドレス" class="mb-3"></Label>
                 <input type="text" class="input-form ps-2">
             </v-col>
-            <v-col cols="12">
+            <v-col cols="12" class="mb-3">
                 <SubmitButton @submitButton="submitButton" text="確認コードを送信する"
                 color="red"></SubmitButton>
             </v-col>
