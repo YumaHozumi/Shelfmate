@@ -29,7 +29,7 @@ const onClickSiteLogo = (): void => {
     <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
       <Logo></Logo>
-      <SiteTitle @clickSiteTitle="onClickSiteLogo"></SiteTitle>
+      <SiteTitle @click="onClickSiteLogo"></SiteTitle>
 
     <LoginButton @clickLoginButton="onClickLoginButton"></LoginButton>
   </v-app-bar>
