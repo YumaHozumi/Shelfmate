@@ -11,7 +11,8 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
-const drawer = ref(false)
+const drawer = ref(true)
+const rail = ref(true);
 
 //ログインボタンが押された
 const onClickLoginButton = (): void => {
@@ -26,7 +27,7 @@ const onClickSiteLogo = (): void => {
 
 <template>
   <v-app-bar color="green">
-    <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
+    <v-app-bar-nav-icon @click="rail = !rail"></v-app-bar-nav-icon>
 
       <Logo></Logo>
       <SiteTitle @click="onClickSiteLogo"></SiteTitle>
@@ -34,9 +35,15 @@ const onClickSiteLogo = (): void => {
     <LoginButton @clickLoginButton="onClickLoginButton"></LoginButton>
   </v-app-bar>
 
-  <v-navigation-drawer v-model="drawer" absolute temporary>
-    <v-list nav dense>
-      <NavItem label="ログアウト"></NavItem>
+  <v-navigation-drawer v-model="drawer" permanent :rail="rail" color="green">
+    <v-list nav density="compact" class="list">
+      <NavItem title="本棚" icon="mdi-bookshelf"></NavItem>
     </v-list>
   </v-navigation-drawer>
 </template>
+
+<style scoped lang="scss">
+.list {
+  margin-left: -8px;
+}
+</style>
