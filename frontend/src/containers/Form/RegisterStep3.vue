@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Label from '@/basic/Label.vue';
+import SubmitButton from '@/basic/Login/SubmitButton.vue';
 </script>
 
 <template>
@@ -12,6 +13,9 @@ import Label from '@/basic/Label.vue';
             <v-col cols="12" class="mt-3">
                 <Label text="パスワード" class="mb-3"></Label>
                 <input type="text" class="input-form ps-2 py-1">
+            </v-col>
+            <v-col cols="12" class="mt-3">
+                <SubmitButton text="登録する" color="red" class="mb-3"></SubmitButton>
             </v-col>
         </v-row>
     </v-form>
