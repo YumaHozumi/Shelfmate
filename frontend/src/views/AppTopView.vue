@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import Header from '@/containers/Header.vue'
 import router from '@/router'
-import BookBarContainer from "@/containers/BookBarContainer.vue"
 
 const onNavigate = (name: string): void => {
   router.push({name: name});
@@ -10,5 +9,4 @@ const onNavigate = (name: string): void => {
 
 <template>
   <Header @navigate="onNavigate"></Header>
-  <BookBarContainer></BookBarContainer>
 </template>
