@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Header from '@/containers/Header.vue'
+import Header from '@/containers/GlobalHeader.vue'
 import ProgressBar from '@/containers/ProgressBar.vue';
 import RegisterStep1 from '@/containers/Form/RegisterStep1.vue';
 import RegisterStep2 from '@/containers/Form/RegisterStep2.vue';

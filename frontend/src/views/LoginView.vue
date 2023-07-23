@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import LoginForm from "@/containers/Form/LoginForm.vue";
-import Header from "@/containers/Header.vue";
+import Header from "@/containers/GlobalHeader.vue";
 import router from '@/router'
 
 const onNavigate = (name: string): void => {

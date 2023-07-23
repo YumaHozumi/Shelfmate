@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Logo from '@/basic/Logo.vue'
 import SiteTitle from '@/basic/SiteTitle.vue'
 import NavItem from '@/components/Sidebar/NavItem.vue'
 import LoginButton from '@/basic/LoginButton.vue'
@@ -11,8 +10,7 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
-const drawer = ref(true)
-const rail = ref(true);
+const drawer = ref(false)
 
 //ログインボタンが押された
 const onClickLoginButton = (): void => {
@@ -26,16 +24,15 @@ const onClickSiteLogo = (): void => {
 </script>
 
 <template>
-  <v-app-bar color="green">
-    <v-app-bar-nav-icon @click="rail = !rail"></v-app-bar-nav-icon>
+  <v-app-bar color="green" flat>
+    <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
 
-      <Logo></Logo>
       <SiteTitle @click="onClickSiteLogo"></SiteTitle>
 
     <LoginButton @clickLoginButton="onClickLoginButton"></LoginButton>
   </v-app-bar>
 
-  <v-navigation-drawer v-model="drawer" permanent :rail="rail" color="green">
+  <v-navigation-drawer v-model="drawer" temporary color="green">
     <v-list nav density="compact" class="list">
       <NavItem title="本棚" icon="mdi-bookshelf"></NavItem>
     </v-list>
