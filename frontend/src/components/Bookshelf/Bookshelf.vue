@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import Book from "@/components/Bookshelf/Book.vue"
+import Books from "./Books.vue";
 
 </script>
 
 <template>
     <div class="bookshelf">
-        <Book img="https://iss.ndl.go.jp/thumbnail/9784422311074"></Book>
-        <Book img="https://cover.openbd.jp/9784780802047.jpg"></Book>
+        <Books img="https://iss.ndl.go.jp/thumbnail/9784422311074"></Books>
+        <Books img="https://cover.openbd.jp/9784780802047.jpg"></Books>
         <Book img="https://cover.openbd.jp/9784780802047.jpg"></Book>
         <Book img="https://cover.openbd.jp/9784780802047.jpg"></Book>
         <Book img="https://cover.openbd.jp/9784780802047.jpg"></Book>
