@@ -32,7 +32,7 @@ const onClickSiteLogo = (): void => {
     <LoginButton @clickLoginButton="onClickLoginButton"></LoginButton>
   </v-app-bar>
 
-  <v-navigation-drawer v-model="drawer" temporary color="green">
+  <v-navigation-drawer v-model="drawer" color="green" temporary>
     <v-list nav density="compact" class="list">
       <NavItem title="本棚" icon="mdi-bookshelf"></NavItem>
     </v-list>
