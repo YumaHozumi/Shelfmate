@@ -19,7 +19,9 @@ const routeSettings: RouteRecordRaw[] = [
     component: () => import("@/views/RegisterView.vue")
   },
   {
-    path: "/test",
+    path: "/series/:id",
+    name: "Series",
+    props: true,
     component: () => import("@/views/SeriesView.vue")
   }
 ]
