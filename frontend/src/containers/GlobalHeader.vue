@@ -42,5 +42,6 @@ const onClickSiteLogo = (): void => {
 <style scoped lang="scss">
 .list {
   margin-left: -8px;
+  margin-top: 25px;
 }
 </style>
