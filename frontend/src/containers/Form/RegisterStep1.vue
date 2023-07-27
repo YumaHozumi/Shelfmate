@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import SubmitButton from "@/basic//Login/SubmitButton.vue";
 import Label from "@/basic/Label.vue";
+import { ref } from "vue";
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 
 interface Emits {
     (event: "submitButton"): void;
@@ -8,7 +10,13 @@ interface Emits {
 
 const emit = defineEmits<Emits>();
 
-const submitButton = (): void => {
+const auth = getAuth();
+const email = ref("");
+const password = ref("");
+
+const submitButton = async () => {
+    const cred = await createUserWithEmailAndPassword(auth, email.value, password.value);
+    await sendEmailVerification(cred.user);
     emit("submitButton");
 };
 </script>
@@ -20,16 +28,20 @@ const submitButton = (): void => {
                 <p>ユーザIDとして登録するメールアドレスを入力してください。</p>
             </v-col>
             <v-col cols="12" class="pt-0">
-                <p>入力したメールアドレスに確認コードを送信します。</p>
+                <p>入力したメールアドレスに確認メールを送信します。</p>
             </v-col>
         </v-row>
         <v-row class="mx-1">
             <v-col cols="12">
                 <Label text="メールアドレス" class="mb-3"></Label>
-                <input type="text" class="input-form ps-2">
+                <input type="text" class="input-form ps-2 py-1" v-model="email">
+            </v-col>
+            <v-col cols="12" class="mt-3">
+                <Label text="パスワード" class="mb-3"></Label>
+                <input type="text" class="input-form ps-2 py-1" v-model="password">
             </v-col>
             <v-col cols="12" class="mb-3">
-                <SubmitButton @submitButton="submitButton" text="確認コードを送信する"
+                <SubmitButton @submitButton="submitButton" text="アカウントを作成する"
                 color="red"></SubmitButton>
             </v-col>
         </v-row>
