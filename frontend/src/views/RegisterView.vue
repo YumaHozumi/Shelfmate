@@ -25,7 +25,7 @@ const back = (): void => {
 
 <template>
     <Header @navigate="onNavigate"></Header>
-    <v-sheet width="500" class="mx-auto form px-10 py-3">
+    <v-sheet width="500" class="mx-auto form px-10 py-3 mt-5">
         <ProgressBar :currentStep="currentCompIndex"></ProgressBar>
         <RegisterStep1 v-if="currentCompIndex == 0" @submitButton="switchComp"></RegisterStep1>
         <RegisterStep2 v-if="currentCompIndex == 1" @back="back" @submitButton="switchComp"></RegisterStep2>

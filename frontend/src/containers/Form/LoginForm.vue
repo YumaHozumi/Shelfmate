@@ -15,7 +15,7 @@ const clickGoogleLoginButton = (): void => {
 <template>
     <v-container>
         <v-row>
-            <v-sheet width="450" class="mx-auto px-6 py-6 form">
+            <v-sheet width="450" class="mx-auto px-6 py-6 form mt-3">
                 <v-form>
                      <v-row>
                         <v-col cols="12" class="pb-0">
