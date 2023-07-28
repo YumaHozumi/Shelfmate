@@ -4,17 +4,24 @@ import GoogleLogin from "@/basic/Login/GoogleLoginButton.vue";
 import Link from "@/basic/Login/Link.vue";
 import { signInWithEmailAndPassword, getAuth } from "firebase/auth";
 import { ref } from "vue";
+import { FirebaseError } from "firebase/app";
+import ErrorMessage from "@/basic/ErrorMessage.vue";
+import { firebaseErrorMessage } from "@/function";
 
 const auth = getAuth();
 const email = ref("");
 const password = ref("");
+const errorMessage = ref("");
 
 const submitButton = async () => {
-    await signInWithEmailAndPassword(auth, email.value, password.value)
-    .then(() => console.log("success"))
-    .catch((e) => {
-        console.log(e);
-    });
+    try {
+        const cred = await signInWithEmailAndPassword(auth, email.value, password.value)
+        if(!cred.user.emailVerified) errorMessage.value = "メール認証が終了していません"
+    } catch(e) {
+        if(e instanceof FirebaseError){
+            errorMessage.value = firebaseErrorMessage(e);
+        }
+    }
 };
 
 const clickGoogleLoginButton = (): void => {
@@ -28,6 +35,9 @@ const clickGoogleLoginButton = (): void => {
             <v-sheet width="450" class="mx-auto px-6 py-6 form mt-3">
                 <v-form>
                      <v-row>
+                        <v-col cols="12">
+                            <ErrorMessage :errorMessage="errorMessage"></ErrorMessage>
+                        </v-col>
                         <v-col cols="12" class="pb-0">
                             <p>ログインIDとパスワードを入力してください</p>
                         </v-col>

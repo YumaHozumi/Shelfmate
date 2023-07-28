@@ -3,6 +3,9 @@ import SubmitButton from "@/basic//Login/SubmitButton.vue";
 import Label from "@/basic/Label.vue";
 import { ref } from "vue";
 import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, fetchSignInMethodsForEmail, EmailAuthProvider} from "firebase/auth";
+import { FirebaseError } from "firebase/app";
+import ErrorMessage from "@/basic/ErrorMessage.vue";
+import { firebaseErrorMessage } from "@/function";
 
 interface Emits {
     (event: "submitButton"): void;
@@ -14,23 +17,17 @@ const auth = getAuth();
 
 const email = ref("");
 const password = ref("");
+const errorMessage = ref("");
 
 const submitButton = async () => {
-    const providers = await fetchSignInMethodsForEmail(auth, email.value)
-    if(providers.findIndex(p => p === EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD) !== -1) {
-        console.log("すでに登録されています")
-        return;
-    }
-
-    let cred;
     try {
-        cred = await createUserWithEmailAndPassword(auth, email.value, password.value);
-    } catch(e) {
-        console.log(e);
-        return; // exit function if error occurs
-    }
-
-    try {
+        const providers = await fetchSignInMethodsForEmail(auth, email.value)
+        
+        if(providers.findIndex(p => p === EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD) !== -1) {
+            errorMessage.value = "すでに登録されています"
+            return;
+        }
+        const cred = await createUserWithEmailAndPassword(auth, email.value, password.value);
         const actionCodeSettings = {
             url: 'http://localhost:5173/login', // replace this with the URL of your top page
             handleCodeInApp: true,
@@ -38,7 +35,9 @@ const submitButton = async () => {
         await sendEmailVerification(cred.user, actionCodeSettings);
         emit("submitButton");
     } catch(e) {
-        console.log(e);
+        if(e instanceof FirebaseError){
+            errorMessage.value = firebaseErrorMessage(e);
+        }
     }
 };
 
@@ -47,6 +46,9 @@ const submitButton = async () => {
 <template>
     <v-form>
         <v-row class="mx-1">
+            <v-col cols="12">
+                <ErrorMessage :errorMessage="errorMessage"></ErrorMessage>
+            </v-col>
             <v-col cols="12" class="pb-2">
                 <p>ユーザIDとして登録するメールアドレスを入力してください。</p>
             </v-col>
