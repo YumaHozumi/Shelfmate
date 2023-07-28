@@ -8,17 +8,16 @@ interface Props {
 }
 defineProps<Props>();
 
-const steps = ref(["STEP1", "STEP2", "STEP3"])
-const texts = ref(["メールアドレス入力", "確認コードの入力", "情報の入力"])
-
+const steps = ref(["STEP1", "STEP2"])
+const texts = ref(["メールアドレス入力", "確認コードの入力"])
 </script>
 
 <template>
     <v-container>
         <StepItem v-for="(step, index) in steps" :key="index" :label="step"
-        :class="{current: index === currentStep}"></StepItem>
+        :class="{current: index === currentStep}" :itemCount="steps.length"></StepItem>
         <StepLabel v-for="(text, index) in texts" :key="index" :label="text"
-        :class="{current: index === currentStep}"></StepLabel>
+        :class="{current: index === currentStep}" :itemCount="steps.length"></StepLabel>
     </v-container>
 </template>
 
