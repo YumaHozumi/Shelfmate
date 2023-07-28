@@ -1,22 +1,25 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import SubmitButton from '@/basic/Login/SubmitButton.vue';
+import { getAuth } from 'firebase/auth';
+
+const auth = getAuth();
 
 interface Emits {
     (event: "back"): void;
-    (event: "submitButton"): void;
+    (event: "navigate", name: string): void;
 }
 
 const emit = defineEmits<Emits>();
 
-const address = ref("test@test");
+const address = ref(auth.currentUser?.email);
 
 const back = (): void => {
     emit("back");
 }
 
 const submitButton = (): void => {
-    emit("submitButton");
+    emit("navigate", "Login");
 };
 </script>
 
@@ -24,19 +27,16 @@ const submitButton = (): void => {
     <v-form>
         <v-row class="mx-4">
             <v-col cols="12" class="pa-0 mt-3">
-                <p>確認コードを下記メールアドレスに送信しました。</p>
+                <p>確認メールを下記メールアドレスに送信しました。</p>
             </v-col>
             <v-col cols="12" class="confirm-code mt-3">
                 <p>{{ address }}</p>
             </v-col>
             <v-col cols="12" class="pa-0 mt-3">
-                <p>確認コードを入力し、「次へ」を押してください。</p>
-            </v-col>
-            <v-col cols="12" class="pa-0 mt-3">
-                <input type="text" class="input-form ps-2 pa-1">
+                <p>確認メールを開いた後に、ログインしてください。</p>
             </v-col>
             <v-col cols="12" class="pa-0 mt-4">
-                <SubmitButton @submitButton="submitButton" text="次へ" color="red"></SubmitButton>
+                <SubmitButton @submitButton="submitButton" text="ログイン画面を開く" color="red"></SubmitButton>
             </v-col>
             <v-col cols="12" class="pa-0 mt-4 mb-6">
                 <v-btn color="blue" @click="back">

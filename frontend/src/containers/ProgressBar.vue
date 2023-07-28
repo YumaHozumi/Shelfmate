@@ -9,7 +9,7 @@ interface Props {
 defineProps<Props>();
 
 const steps = ref(["STEP1", "STEP2"])
-const texts = ref(["メールアドレス入力", "確認コードの入力"])
+const texts = ref(["メールアドレス入力", "確認メールの確認"])
 </script>
 
 <template>

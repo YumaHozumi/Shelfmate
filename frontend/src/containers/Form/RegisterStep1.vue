@@ -2,7 +2,7 @@
 import SubmitButton from "@/basic//Login/SubmitButton.vue";
 import Label from "@/basic/Label.vue";
 import { ref } from "vue";
-import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, fetchSignInMethodsForEmail, EmailAuthProvider} from "firebase/auth";
 
 interface Emits {
     (event: "submitButton"): void;
@@ -11,14 +11,37 @@ interface Emits {
 const emit = defineEmits<Emits>();
 
 const auth = getAuth();
+
 const email = ref("");
 const password = ref("");
 
 const submitButton = async () => {
-    const cred = await createUserWithEmailAndPassword(auth, email.value, password.value);
-    await sendEmailVerification(cred.user);
-    emit("submitButton");
+    const providers = await fetchSignInMethodsForEmail(auth, email.value)
+    if(providers.findIndex(p => p === EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD) !== -1) {
+        console.log("すでに登録されています")
+        return;
+    }
+
+    let cred;
+    try {
+        cred = await createUserWithEmailAndPassword(auth, email.value, password.value);
+    } catch(e) {
+        console.log(e);
+        return; // exit function if error occurs
+    }
+
+    try {
+        const actionCodeSettings = {
+            url: 'http://localhost:5173/login', // replace this with the URL of your top page
+            handleCodeInApp: true,
+        };
+        await sendEmailVerification(cred.user, actionCodeSettings);
+        emit("submitButton");
+    } catch(e) {
+        console.log(e);
+    }
 };
+
 </script>
 
 <template>
@@ -38,7 +61,7 @@ const submitButton = async () => {
             </v-col>
             <v-col cols="12" class="mt-3">
                 <Label text="パスワード" class="mb-3"></Label>
-                <input type="text" class="input-form ps-2 py-1" v-model="password">
+                <input type="password" class="input-form ps-2 py-1" v-model="password">
             </v-col>
             <v-col cols="12" class="mb-3">
                 <SubmitButton @submitButton="submitButton" text="アカウントを作成する"

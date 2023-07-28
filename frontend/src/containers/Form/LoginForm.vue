@@ -2,9 +2,19 @@
 import SubmitButton from "@/basic//Login/SubmitButton.vue";
 import GoogleLogin from "@/basic/Login/GoogleLoginButton.vue";
 import Link from "@/basic/Login/Link.vue";
+import { signInWithEmailAndPassword, getAuth } from "firebase/auth";
+import { ref } from "vue";
 
-const submitButton = (): void => {
-    console.log("submit");
+const auth = getAuth();
+const email = ref("");
+const password = ref("");
+
+const submitButton = async () => {
+    await signInWithEmailAndPassword(auth, email.value, password.value)
+    .then(() => console.log("success"))
+    .catch((e) => {
+        console.log(e);
+    });
 };
 
 const clickGoogleLoginButton = (): void => {
@@ -22,10 +32,10 @@ const clickGoogleLoginButton = (): void => {
                             <p>ログインIDとパスワードを入力してください</p>
                         </v-col>
                         <v-col cols="12">
-                            <input type="text" class="input-form ps-2">
+                            <input type="text" class="input-form ps-2" v-model="email">
                         </v-col>
                         <v-col cols="12">
-                            <input type="password" class="input-form ps-2">
+                            <input type="password" class="input-form ps-2" v-model="password">
                         </v-col>
                         <v-col cols="12">
                             <SubmitButton @submitButton="submitButton" text="ログイン"
