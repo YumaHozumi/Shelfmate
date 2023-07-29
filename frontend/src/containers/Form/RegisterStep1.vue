@@ -2,7 +2,7 @@
 import SubmitButton from "@/basic//Login/SubmitButton.vue";
 import Label from "@/basic/Label.vue";
 import { ref } from "vue";
-import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, fetchSignInMethodsForEmail, EmailAuthProvider} from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, fetchSignInMethodsForEmail, EmailAuthProvider } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import ErrorMessage from "@/basic/ErrorMessage.vue";
 import { firebaseErrorMessage } from "@/function";
@@ -44,6 +44,7 @@ const submitButton = async () => {
 </script>
 
 <template>
+    
     <v-form>
         <v-row class="mx-1">
             <v-col cols="12">
@@ -70,6 +71,7 @@ const submitButton = async () => {
                 color="red"></SubmitButton>
             </v-col>
         </v-row>
+
     </v-form>
 </template>
 

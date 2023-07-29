@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import SubmitButton from "@/basic//Login/SubmitButton.vue";
-import GoogleLogin from "@/basic/Login/GoogleLoginButton.vue";
+import GoogleButton from "@/basic/Login/GoogleButton.vue";
 import Link from "@/basic/Login/Link.vue";
-import { signInWithEmailAndPassword, getAuth } from "firebase/auth";
-import { ref } from "vue";
+import { signInWithEmailAndPassword, getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult } from "firebase/auth";
+import { ref, onMounted } from "vue";
 import { FirebaseError } from "firebase/app";
 import ErrorMessage from "@/basic/ErrorMessage.vue";
 import { firebaseErrorMessage } from "@/function";
@@ -24,9 +24,32 @@ const submitButton = async () => {
     }
 };
 
-const clickGoogleLoginButton = (): void => {
+const clickGoogleButton = async () => {
     console.log("google");
+    const provider = new GoogleAuthProvider();
+
+    try {
+        await signInWithRedirect(auth, provider);
+    } catch (e) {
+        if(e instanceof FirebaseError){
+            errorMessage.value = firebaseErrorMessage(e);
+        }
+    }
 };
+
+onMounted(async () => {
+    try {
+      const result = await getRedirectResult(auth);
+      if (result?.user) {
+        // ユーザーは正常に認証されました
+        const user = result.user;
+        // userを使用して何かしらの処理を行います
+        console.log(user);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+})
 </script>
 
 <template>
@@ -63,7 +86,7 @@ const clickGoogleLoginButton = (): void => {
                         <p>他サービスでログイン</p>
                     </v-col>
                     <v-col cols="12">
-                        <GoogleLogin @clickGoogleLoginButton="clickGoogleLoginButton"></GoogleLogin>
+                        <GoogleButton @clickGoogleButton="clickGoogleButton" text="Googleでログイン"></GoogleButton>
                     </v-col>
                 </v-row>
             </v-sheet>

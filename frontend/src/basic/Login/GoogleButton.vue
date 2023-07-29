@@ -1,22 +1,28 @@
 <script setup lang="ts">
 interface Emits {
-    (event: "clickGoogleLoginButton"): void;
+    (event: "clickGoogleButton"): void;
 }
 
 const emit = defineEmits<Emits>();
 
-const clickGoogleLoginButton = (): void => {
-    emit("clickGoogleLoginButton");
+interface Props {
+    text: string;
+}
+
+defineProps<Props>()
+
+const clickGoogleButton = (): void => {
+    emit("clickGoogleButton");
 }
 </script>
 
 <template>
-    <v-btn class="justify-start" @click="clickGoogleLoginButton" width="100%">
+    <v-btn class="justify-start" @click="clickGoogleButton" width="100%">
         <v-avatar size="24">
             <img src="@/assets/google.png" class="button">
         </v-avatar>
         <p class="ms-2">
-            Googleでログイン
+            {{ text }}
         </p>
     </v-btn>
 </template>
