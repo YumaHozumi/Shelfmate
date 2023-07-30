@@ -1,5 +1,9 @@
 <template>
-  <v-toolbar-title class="title no-copy">BookShelf</v-toolbar-title>
+  <v-toolbar-title class="title no-copy">
+    <span class="clickable">
+      BookShelf    
+    </span>
+  </v-toolbar-title>
 </template>
 
 <style scoped lang="scss">
@@ -9,13 +13,16 @@
   font-size: 24px;
   font-family: 'Lato', sans-serif;
   font-family: 'Tektur', cursive;
-  cursor: pointer;
 
   &.no-copy {
     user-select: none; /* standard syntax */
     -webkit-user-select: none; /* Chrome and Safari */
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* Internet Explorer/Edge */
+  }
+
+  .clickable {
+    cursor: pointer;
   }
 }
 </style>
