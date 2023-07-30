@@ -35,9 +35,8 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const auth = getAuth();
   const requireAuth = to.matched.some(record => record.meta.requireAuth);
-  if(requireAuth && auth.currentUser) {
+  if(requireAuth) {
     onAuthStateChanged(getAuth(), (user) => {
       if(user) {
         next()

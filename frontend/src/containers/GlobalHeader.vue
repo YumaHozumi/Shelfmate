@@ -23,6 +23,10 @@ const onClickSiteLogo = (): void => {
   emit("navigate", "AppTop");
 }
 
+const onClickRegisterButton = (): void => {
+  emit("navigate", "Register");
+}
+
 const isShow = ref(true);
 
 onAuthStateChanged(getAuth(), (user) => {
@@ -37,24 +41,31 @@ onAuthStateChanged(getAuth(), (user) => {
 </script>
 
 <template>
-  <v-app-bar color="green" flat>
-    <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-
-      <SiteTitle @click="onClickSiteLogo"></SiteTitle>
-
+  <v-app-bar color="white" flat>
+    <SiteTitle @click="onClickSiteLogo" class="green"></SiteTitle>
     <LoginButton @clickLoginButton="onClickLoginButton" v-show="isShow"></LoginButton>
+    <v-btn class="register ml-3" @click="onClickRegisterButton" v-show="isShow">
+      <v-icon>mdi-account-plus-outline</v-icon>
+      新規登録
+    </v-btn>
   </v-app-bar>
-
-  <v-navigation-drawer v-model="drawer" color="green" temporary>
-    <v-list nav density="compact" class="list">
-      <NavItem title="本棚" icon="mdi-bookshelf"></NavItem>
-    </v-list>
-  </v-navigation-drawer>
 </template>
 
 <style scoped lang="scss">
+
+.green {
+  color: #4CAF50
+}
 .list {
   margin-left: -8px;
   margin-top: 25px;
+}
+
+.register {
+    font-weight: bold;
+    font-size: 14px;
+    border: 2px solid #4CAF50;
+    background-color: #4CAF50;
+    color: white;
 }
 </style>

@@ -10,5 +10,5 @@ const onNavigate = (name: string): void => {
 
 <template>
   <Header @navigate="onNavigate"></Header>
-  <LoginForm></LoginForm>
+  <LoginForm @navigate="onNavigate"></LoginForm>
 </template>

@@ -8,15 +8,26 @@ import { FirebaseError } from "firebase/app";
 import ErrorMessage from "@/basic/ErrorMessage.vue";
 import { firebaseErrorMessage } from "@/function";
 
+interface Emits {
+    (event: "navigate", name: string): void;
+}
+
+const emit = defineEmits<Emits>();
+
 const auth = getAuth();
 const email = ref("");
 const password = ref("");
 const errorMessage = ref("");
 
+const onClickLogin = () => {
+    emit("navigate", "AppTop");
+}
+
 const submitButton = async () => {
     try {
         const cred = await signInWithEmailAndPassword(auth, email.value, password.value)
         if(!cred.user.emailVerified) errorMessage.value = "メール認証が終了していません"
+        else onClickLogin();
     } catch(e) {
         if(e instanceof FirebaseError){
             errorMessage.value = firebaseErrorMessage(e);

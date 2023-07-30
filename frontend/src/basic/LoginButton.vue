@@ -18,10 +18,12 @@ const clickLoginButton = (): void => {
 </template>
 
 <style scoped lang="scss">
+
 .btn {
     background-color: #fff;
-    color: green;
     font-weight: bold;
-    font-size: 16px;
+    font-size: 13px;
+    border: 2px solid #4CAF50;
+    color: #4CAF50
 }
 </style>
