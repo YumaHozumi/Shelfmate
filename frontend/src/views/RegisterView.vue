@@ -21,25 +21,27 @@ const errorMessage = ref("");
 const currentCompIndex = ref(0);
 
 const switchComp = (): void => {
+  errorMessage.value = "";
   currentCompIndex.value++;
 }
 
 const back = (): void => {
+  errorMessage.value = "";
   currentCompIndex.value--;
 }
 
 const clickGoogleButton = async () => {
-  console.log("hoge");
   const auth = getAuth();
   const provider = new GoogleAuthProvider();
+  errorMessage.value = "";
 
-    try {
-        await signInWithRedirect(auth, provider);
-    } catch (e) {
-        if(e instanceof FirebaseError){
-            errorMessage.value = firebaseErrorMessage(e);
-        }
-    }
+  try {
+      await signInWithRedirect(auth, provider);
+  } catch (e) {
+      if(e instanceof FirebaseError){
+          errorMessage.value = firebaseErrorMessage(e);
+      }
+  }
 }
 
 onMounted(async () => {

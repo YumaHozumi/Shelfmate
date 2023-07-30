@@ -3,6 +3,7 @@ import SiteTitle from '@/basic/SiteTitle.vue'
 import NavItem from '@/components/Sidebar/NavItem.vue'
 import LoginButton from '@/basic/LoginButton.vue'
 import { ref } from 'vue'
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 interface Emits {
   (event: 'navigate', name: string): void
@@ -21,6 +22,18 @@ const onClickLoginButton = (): void => {
 const onClickSiteLogo = (): void => {
   emit("navigate", "AppTop");
 }
+
+const isShow = ref(true);
+
+onAuthStateChanged(getAuth(), (user) => {
+  if(user && user.emailVerified) {
+    console.log("ログイン済み");
+    isShow.value = false;
+  }else {
+    console.log("ログインしてない")
+    isShow.value = true;
+  }
+})
 </script>
 
 <template>
@@ -29,7 +42,7 @@ const onClickSiteLogo = (): void => {
 
       <SiteTitle @click="onClickSiteLogo"></SiteTitle>
 
-    <LoginButton @clickLoginButton="onClickLoginButton"></LoginButton>
+    <LoginButton @clickLoginButton="onClickLoginButton" v-show="isShow"></LoginButton>
   </v-app-bar>
 
   <v-navigation-drawer v-model="drawer" color="green" temporary>
