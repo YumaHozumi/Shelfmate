@@ -1,12 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import AppTop from '@/views/AppTopView.vue'
+import { onAuthStateChanged, getAuth } from 'firebase/auth'
 
 const routeSettings: RouteRecordRaw[] = [
   {
     path: '/',
     name: 'AppTop',
-    component: AppTop
+    component: AppTop,
+    meta: { requireAuth: true }
   },
   {
     path: '/login',
@@ -22,13 +24,29 @@ const routeSettings: RouteRecordRaw[] = [
     path: "/series/:id",
     name: "Series",
     props: true,
-    component: () => import("@/views/SeriesView.vue")
+    component: () => import("@/views/SeriesView.vue"),
+    meta: { requiresAuth: true }
   }
 ]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: routeSettings
+})
+
+router.beforeEach((to, from, next) => {
+  const auth = getAuth();
+  const requireAuth = to.matched.some(record => record.meta.requireAuth);
+  if(requireAuth) {
+    onAuthStateChanged(auth, (user) => {
+      if(user && user.emailVerified) {
+        next()
+      }
+      else next({name: "Login"});
+    })
+  } else {
+    next();
+  }
 })
 
 export default router
