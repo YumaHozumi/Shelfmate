@@ -4,6 +4,7 @@ import NavItem from '@/components/Sidebar/NavItem.vue'
 import LoginButton from '@/basic/LoginButton.vue'
 import { ref } from 'vue'
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import axios from "axios"
 
 interface Emits {
   (event: 'navigate', name: string): void
@@ -29,6 +30,12 @@ const onClickRegisterButton = (): void => {
 
 const isShow = ref(true);
 
+const onClickAddButton = (): void => {
+  axios
+  .get("/api/test")
+  .then(res => console.log(res))
+}
+
 onAuthStateChanged(getAuth(), (user) => {
   if(user && user.emailVerified) {
     console.log("ログイン済み");
@@ -48,7 +55,7 @@ onAuthStateChanged(getAuth(), (user) => {
       <v-icon>mdi-account-plus-outline</v-icon>
       新規登録
     </v-btn>
-    <v-btn v-show="!isShow" class="button register">
+    <v-btn v-show="!isShow" class="button register" @click="onClickAddButton">
       <v-icon>mdi-book-plus-outline</v-icon>
       本を追加
     </v-btn>
