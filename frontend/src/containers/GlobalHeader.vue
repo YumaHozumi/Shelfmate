@@ -44,9 +44,13 @@ onAuthStateChanged(getAuth(), (user) => {
   <v-app-bar color="white" flat>
     <SiteTitle @click="onClickSiteLogo" class="green"></SiteTitle>
     <LoginButton @clickLoginButton="onClickLoginButton" v-show="isShow"></LoginButton>
-    <v-btn class="register ml-3" @click="onClickRegisterButton" v-show="isShow">
+    <v-btn class="button register ml-3" @click="onClickRegisterButton" v-show="isShow">
       <v-icon>mdi-account-plus-outline</v-icon>
       新規登録
+    </v-btn>
+    <v-btn v-show="!isShow" class="button register">
+      <v-icon>mdi-book-plus-outline</v-icon>
+      本を追加
     </v-btn>
   </v-app-bar>
 </template>
@@ -61,11 +65,14 @@ onAuthStateChanged(getAuth(), (user) => {
   margin-top: 25px;
 }
 
-.register {
-    font-weight: bold;
-    font-size: 14px;
-    border: 2px solid #4CAF50;
-    background-color: #4CAF50;
-    color: white;
+.button {
+  font-weight: bold;
+  font-size: 14px;
+  &.register {
+      border: 2px solid #4CAF50;
+      background-color: #4CAF50;
+      color: white;
+  }
+
 }
 </style>
