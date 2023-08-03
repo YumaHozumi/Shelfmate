@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onUpdated } from 'vue';
+import { ref, onUpdated, watch } from 'vue';
 import axios from "axios"
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
@@ -24,7 +24,7 @@ onUpdated(() => {
   if (dialog.value) {
     setTimeout(() => {
       focusInput();
-    }, 0);
+    }, 100);
   }
 })
 
