@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, onUpdated, watch } from 'vue';
+import { ref, onUpdated } from 'vue';
 import axios from "axios"
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import Camera from '@/components/Camera.vue';
 
 const dialog = ref(false);
 
@@ -40,7 +41,7 @@ onAuthStateChanged(getAuth(), (user) => {
 </script>
 
 <template>
-    <v-dialog v-model="dialog" width="400px">
+    <v-dialog v-model="dialog" width="600px">
         <template v-slot:activator="{ props }">
             <v-btn v-show="isShow" class="button register" @click="onClickAddButton" v-bind="props" ref="input">
                 <v-icon>mdi-book-plus-outline</v-icon>
@@ -62,6 +63,9 @@ onAuthStateChanged(getAuth(), (user) => {
                                     <v-icon>mdi-camera</v-icon>
                                 </button>
                             </div>
+                        </v-col>
+                        <v-col cols="12">
+                          <Camera></Camera>
                         </v-col>
                     </v-row>
                 </v-container>
