@@ -3,6 +3,7 @@ import { ref, onBeforeUnmount} from 'vue';
 import axios from 'axios';
 import { onMounted } from 'vue';
 
+
 const videoRef = ref<HTMLVideoElement | null>(null);
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 const constraints: MediaStreamConstraints = {
@@ -31,7 +32,6 @@ const stopVideo = () => {
 };
 
 const captureImage = async () => {
-    console.log(canvasRef.value)
     if(videoRef.value && canvasRef.value){
         const canvas = canvasRef.value;
         const video = videoRef.value;
@@ -40,25 +40,43 @@ const captureImage = async () => {
         canvas.height = video.videoHeight;
         canvas.getContext('2d')?.drawImage(video, 0, 0);
 
-        const imgDataUrl = canvas.toDataURL('image/png');
-        
-        const blobBin = atob(imgDataUrl.split(',')[1]);
-        console.log(blobBin)
-        const array = [];
+       // それからcanvasを画像として取得します
+        const dataUrl = canvas.toDataURL();
+        const blob = dataURLtoBlob(dataUrl);
 
-        for(let i = 0; i < blobBin.length; i++) {
-            array.push(blobBin.charCodeAt(i));
-        }
-
-        const file = new Blob([new Uint8Array(array)], {type: 'image/png'});
-        const formData = new FormData();
-        formData.append('image', file);
-       
-
-        await axios.post('/api/upload', formData)
-        .then(res => console.log(res))
-        .catch(e => console.log(e));
+        await uploadFile(blob);
     }
+}
+
+const uploadFile = async (file: Blob) => {
+    const formData = new FormData();
+    formData.append('file', new File([file], 'canvasImage.png'));
+    try {
+        const response = await axios.post('/api/upload', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        console.log(response.data);
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+const dataURLtoBlob = (dataurl: string) => {
+    const arr = dataurl.split(','); 
+    const mimeMatch = arr[0].match(/:(.*?);/);
+    if (!mimeMatch) {
+        throw new Error('Invalid data URL');
+    }
+    const mime = mimeMatch[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length; // 'const' を 'let' に変更
+    const u8arr = new Uint8Array(n);
+    while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], {type:mime});
 }
 
 // startVideo(); // Initially start the video

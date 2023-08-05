@@ -4,6 +4,7 @@ import LocalHeader from '@/containers/LocalHeader.vue';
 import BookshelfContainer from '@/containers/BookshelfContainer.vue';
 import OptionContainer from '@/containers/OptionContainer.vue';
 import router from '@/router'
+import Camera from '@/components/Camera.vue';
 
 const onNavigate = (name: string): void => {
   router.push({name: name});

@@ -28,3 +28,6 @@ coverage
 *.sw?
 
 config
+
+**/__pycache/__
+*.pyc

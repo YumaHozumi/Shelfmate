@@ -16,6 +16,6 @@ import Menu from '@/components/Menu.vue';
 }
 
 .transparency {
-    background-color: transparent;
+    background-color: white;
 }
 </style>
