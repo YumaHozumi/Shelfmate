@@ -11,5 +11,5 @@ defineProps<Props>();
 </script>
 
 <template>
-    <SearchResult v-for="item in items" :key="item.isbn" :title="item.title" :image="item.image_url"></SearchResult>
+    <SearchResult v-for="item in items" :key="item.isbn" :book="item"></SearchResult>
 </template>

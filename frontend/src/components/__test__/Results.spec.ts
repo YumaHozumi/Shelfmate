@@ -36,8 +36,8 @@ describe("Results.vue", () => {
         // 各アイテムが正しくレンダリングされていることを確認します
         items.forEach((item, index) => {
             const result = wrapper.findAllComponents(SearchResult)[index]
-            expect(result.props().title).toBe(item.title)
-            expect(result.props().image).toBe(item.image_url)
+            expect(result.props().book.title).toBe(item.title)
+            expect(result.props().book.image_url).toBe(item.image_url)
         })
     })
 })

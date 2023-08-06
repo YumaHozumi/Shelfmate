@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import imageURL from "@/assets/no-image.png";
 import { computed } from 'vue';
+import type { BookItem} from "@/interface.ts";
 
 interface Props {
-    title: string;
-    image: string | undefined;
+    book: BookItem;
 }
 //デフォルト値設定
 const props = defineProps<Props>();
 const localImage = computed((): string => {
-    let localImage = props.image;
+    let localImage = props.book.image_url;
     if(localImage === undefined) {
         localImage = imageURL;
     }
@@ -21,9 +21,9 @@ const localImage = computed((): string => {
     <div class="book-item">
       <img class="book-cover" :src="localImage" alt="Book Cover">
       <div class="book-info">
-        <h2 class="book-title">{{ title }}</h2>
-        <p class="book-author">By Author Name</p>
-        <p class="book-price">$19.99</p>
+        <h2 class="book-title">{{ book.title }}</h2>
+        <p class="book-author">{{ book.author }}</p>
+        <p class="book-detail">{{ book.detail }}</p>
       </div>
       <div class="book-actions">
         <v-btn color="green">Add to Cart</v-btn>
@@ -41,6 +41,12 @@ const localImage = computed((): string => {
   border: 1px solid #ccc;
   padding: 10px;
 
+  .book-cover {
+    width: 128px;
+    height: 201px;
+    object-fit: cover; // 全体が見えるようにフィットさせる
+  }
+
   .book-info {
     padding-left: 10px;
     flex: 1;
@@ -54,7 +60,7 @@ const localImage = computed((): string => {
       font-size: 14px;
     }
 
-    .book-price {
+    .book-detail {
       font-size: 12px;
       color: #999;
     }

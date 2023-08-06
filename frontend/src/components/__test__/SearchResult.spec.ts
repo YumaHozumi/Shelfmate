@@ -6,29 +6,52 @@ import { describe, test, expect } from 'vitest'
 describe('SearchResult.vue', () => {
   test('renders with default image when image prop is not provided', () => {
     const propsData = {
-        title: "きめつ",
-        image: undefined
+        book: {
+            isbn: 1111111111,
+            title: "2.5次元の誘惑",
+            image_url: undefined,
+            author: "あああ",
+            detail: "hoge",
+            public_date: new Date()
+        }
     }
 
     const wrapper = mount(SearchResult, {
       props: propsData
     })
-    console.log(wrapper.find('.book-title').text())
 
-    expect(wrapper.find('.book-title').text()).toBe(propsData.title)
-    expect(wrapper.find('.book-cover').attributes('src')).toBe(imageURL)
+    const book = propsData.book
+    // Check if the title, author and detail are rendered correctly
+    expect(wrapper.get('.book-title').text()).toBe(book.title)
+    expect(wrapper.get('.book-author').text()).toBe(book.author)
+    expect(wrapper.get('.book-detail').text()).toBe(book.detail)
+
+    // Check if the image is rendered with correct src
+    expect(wrapper.get('.book-cover').attributes('src')).toBe(imageURL)
   })
 
   test('renders with provided image when image prop is provided', () => {
+
     const propsData = {
-        title: "きめつ",
-        image: "https://www.iwanami.co.jp/files/kojien/kojien6img5.jpg"
+        book: {
+            isbn: 1111111111,
+            title: "2.5次元の誘惑",
+            image_url: "https://www.iwanami.co.jp/files/kojien/kojien6img5.jpg",
+            author: "あああ",
+            detail: "hoge",
+            public_date: new Date()
+        }
     }
     const wrapper = mount(SearchResult, {
       props: propsData
     })
 
-    expect(wrapper.find('.book-title').text()).toBe(propsData.title)
-    expect(wrapper.find('.book-cover').attributes('src')).toBe(propsData.image)
+    const book = propsData.book;
+
+    // Check if the title, author and detail are rendered correctly
+    expect(wrapper.get('.book-title').text()).toBe(book.title)
+    expect(wrapper.get('.book-author').text()).toBe(book.author)
+    expect(wrapper.get('.book-detail').text()).toBe(book.detail)
+    expect(wrapper.find('.book-cover').attributes('src')).toBe(book.image_url)
   })
 })
