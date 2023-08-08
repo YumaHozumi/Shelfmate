@@ -18,6 +18,7 @@ const buttonsInit = [
     {text: "hogggggggggggggggg"},
     {text: "hogggggggggggggggg"},
     {text: "hogggggggggggggggg"},
+    {text: "hogggggggggggggggg"},
 ]
 
 const buttonWidth = 80;

@@ -4,7 +4,7 @@ import NavItem from '@/components/Sidebar/NavItem.vue'
 import LoginButton from '@/basic/LoginButton.vue'
 import { ref } from 'vue'
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-
+import MyDialog from '@/components/MyDialog.vue';
 
 interface Emits {
   (event: 'navigate', name: string): void
@@ -43,6 +43,8 @@ onAuthStateChanged(getAuth(), (user) => {
 const onClickAddButton = (): void => {
 
 }
+
+
 </script>
 
 <template>
@@ -53,7 +55,8 @@ const onClickAddButton = (): void => {
       <v-icon>mdi-account-plus-outline</v-icon>
       新規登録
     </v-btn>
-    <v-btn v-show="!isShow" class="button register" @click="onClickAddButton" ref="input">
+    <MyDialog color="green" btnText="本棚を作成"/>
+    <v-btn v-show="!isShow" class="button register ml-3" @click="onClickAddButton" ref="input">
           <v-icon>mdi-book-plus-outline</v-icon>
           本を追加
       </v-btn>
