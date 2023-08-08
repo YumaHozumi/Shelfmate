@@ -2,10 +2,11 @@
 import SubmitButton from "@/basic//Login/SubmitButton.vue";
 import Label from "@/basic/Label.vue";
 import { ref } from "vue";
-import { getAuth, createUserWithEmailAndPassword, sendEmailVerification, fetchSignInMethodsForEmail, EmailAuthProvider } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification, fetchSignInMethodsForEmail, EmailAuthProvider } from "firebase/auth";
 import { FirebaseError } from "firebase/app";
 import ErrorMessage from "@/basic/ErrorMessage.vue";
 import { firebaseErrorMessage } from "@/function";
+import { firebaseAuth } from "@/config/firebase";
 
 interface Emits {
     (event: "submitButton"): void;
@@ -13,23 +14,21 @@ interface Emits {
 
 const emit = defineEmits<Emits>();
 
-const auth = getAuth();
-
 const email = ref("");
 const password = ref("");
 const errorMessage = ref("");
 
 const submitButton = async () => {
     try {
-        const providers = await fetchSignInMethodsForEmail(auth, email.value)
+        const providers = await fetchSignInMethodsForEmail(firebaseAuth, email.value)
         
         if(providers.findIndex(p => p === EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD) !== -1) {
             errorMessage.value = "すでに登録されています"
             return;
         }
-        const cred = await createUserWithEmailAndPassword(auth, email.value, password.value);
+        const cred = await createUserWithEmailAndPassword(firebaseAuth, email.value, password.value);
         const actionCodeSettings = {
-            url: 'http://localhost:5173/login', // replace this with the URL of your top page
+            url: 'http://localhost:8000/login', // replace this with the URL of your top page
             handleCodeInApp: true,
         };
         await sendEmailVerification(cred.user, actionCodeSettings);

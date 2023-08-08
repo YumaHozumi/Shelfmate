@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import AppTop from '@/views/AppTopView.vue'
-import { onAuthStateChanged, getAuth } from 'firebase/auth'
+import { onAuthStateChanged } from 'firebase/auth'
+import { firebaseAuth } from '@/config/firebase'
 
 const routeSettings: RouteRecordRaw[] = [
   {
@@ -42,7 +43,7 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const requireAuth = to.matched.some(record => record.meta.requireAuth);
   if(requireAuth) {
-    onAuthStateChanged(getAuth(), (user) => {
+    onAuthStateChanged(firebaseAuth, (user) => {
       if(user) {
         next()
       }

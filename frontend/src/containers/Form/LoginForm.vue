@@ -2,11 +2,12 @@
 import SubmitButton from "@/basic//Login/SubmitButton.vue";
 import GoogleButton from "@/basic/Login/GoogleButton.vue";
 import Link from "@/basic/Login/Link.vue";
-import { signInWithEmailAndPassword, getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult } from "firebase/auth";
-import { ref, onMounted } from "vue";
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect, getRedirectResult } from "firebase/auth";
+import { ref } from "vue";
 import { FirebaseError } from "firebase/app";
 import ErrorMessage from "@/basic/ErrorMessage.vue";
 import { firebaseErrorMessage } from "@/function";
+import { firebaseAuth } from "@/config/firebase";
 
 interface Emits {
     (event: "navigate", name: string): void;
@@ -14,7 +15,6 @@ interface Emits {
 
 const emit = defineEmits<Emits>();
 
-const auth = getAuth();
 const email = ref("");
 const password = ref("");
 const errorMessage = ref("");
@@ -25,7 +25,7 @@ const onClickLogin = () => {
 
 const submitButton = async () => {
     try {
-        const cred = await signInWithEmailAndPassword(auth, email.value, password.value)
+        const cred = await signInWithEmailAndPassword(firebaseAuth, email.value, password.value)
         if(!cred.user.emailVerified) errorMessage.value = "メール認証が終了していません"
         else onClickLogin();
     } catch(e) {
@@ -38,9 +38,8 @@ const submitButton = async () => {
 const clickGoogleButton = async () => {
     console.log("google");
     const provider = new GoogleAuthProvider();
-
     try {
-        await signInWithRedirect(auth, provider);
+        await signInWithRedirect(firebaseAuth, provider);
     } catch (e) {
         if(e instanceof FirebaseError){
             errorMessage.value = firebaseErrorMessage(e);
@@ -48,19 +47,7 @@ const clickGoogleButton = async () => {
     }
 };
 
-onMounted(async () => {
-    try {
-      const result = await getRedirectResult(auth);
-      if (result?.user) {
-        // ユーザーは正常に認証されました
-        const user = result.user;
-        // userを使用して何かしらの処理を行います
-        console.log(user);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-})
+
 </script>
 
 <template>

@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import SiteTitle from '@/basic/SiteTitle.vue'
-import NavItem from '@/components/Sidebar/NavItem.vue'
 import LoginButton from '@/basic/LoginButton.vue'
 import { ref } from 'vue'
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import MyDialog from '@/components/MyDialog.vue';
+import {getCurrentUser, firebaseAuth} from "@/config/firebase"
+import { collection, addDoc, getFirestore } from "firebase/firestore";
 
 interface Emits {
   (event: 'navigate', name: string): void
 }
 
 const emit = defineEmits<Emits>()
-
-const drawer = ref(false)
 
 //ログインボタンが押された
 const onClickLoginButton = (): void => {
@@ -30,7 +29,7 @@ const onClickRegisterButton = (): void => {
 
 const isShow = ref(true);
 
-onAuthStateChanged(getAuth(), (user) => {
+onAuthStateChanged(firebaseAuth, (user) => {
   if(user && user.emailVerified) {
     console.log("ログイン済み");
     isShow.value = false;
@@ -40,11 +39,20 @@ onAuthStateChanged(getAuth(), (user) => {
   }
 })
 
+
+
 const onClickAddButton = (): void => {
 
 }
 
+const onCreateButton = async () => {
+  console.log("tes");
 
+  // const user = await 
+  // const bookShelfCollection = collection(db, "users", )
+  // await addDoc(collection(db, "users", ))
+  
+}
 </script>
 
 <template>
@@ -55,7 +63,7 @@ const onClickAddButton = (): void => {
       <v-icon>mdi-account-plus-outline</v-icon>
       新規登録
     </v-btn>
-    <MyDialog color="green" btnText="本棚を作成"/>
+    <MyDialog color="green" btnText="本棚を作成" @onCreateButton="onCreateButton" :isShow="!isShow"/>
     <v-btn v-show="!isShow" class="button register ml-3" @click="onClickAddButton" ref="input">
           <v-icon>mdi-book-plus-outline</v-icon>
           本を追加
