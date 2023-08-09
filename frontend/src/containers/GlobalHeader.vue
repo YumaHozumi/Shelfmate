@@ -4,8 +4,9 @@ import LoginButton from '@/basic/LoginButton.vue'
 import { ref } from 'vue'
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import MyDialog from '@/components/MyDialog.vue';
-import {getCurrentUser, firebaseAuth} from "@/config/firebase"
-import { collection, addDoc, getFirestore } from "firebase/firestore";
+import {getCurrentUser, firebaseAuth, firestore} from "@/config/firebase"
+import { collection, addDoc } from "firebase/firestore";
+
 
 interface Emits {
   (event: 'navigate', name: string): void
@@ -45,12 +46,10 @@ const onClickAddButton = (): void => {
 
 }
 
-const onCreateButton = async () => {
-  console.log("tes");
-
-  // const user = await 
-  // const bookShelfCollection = collection(db, "users", )
-  // await addDoc(collection(db, "users", ))
+const onCreateButton = async (shelf_name: string) => {
+  const user = await getCurrentUser();
+  const bookShelfCollection = collection(firestore, "users", user.uid, "bookshelves")
+  await addDoc(bookShelfCollection, { shelf_name: shelf_name})
   
 }
 </script>

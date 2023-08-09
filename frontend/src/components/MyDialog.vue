@@ -11,7 +11,7 @@ interface Props {
 defineProps<Props>();
 
 interface Emits {
-    (event: "onCreateButton"): void
+    (event: "onCreateButton", shelfName: string): void
 }
 
 const emit = defineEmits<Emits>();
@@ -19,7 +19,8 @@ const emit = defineEmits<Emits>();
 const inputText = ref("");
 
 const onCreateButton = (): void => {
-    emit("onCreateButton");
+    emit("onCreateButton", inputText.value);
+    dialog.value = false;
 }
 </script>
 
