@@ -7,4 +7,8 @@ interface BookItem {
     public_date: Date
 }
 
-export type { BookItem }
+interface BookShelf {
+    shelf_name: string
+}
+
+export type { BookItem, BookShelf }

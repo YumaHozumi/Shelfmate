@@ -2,23 +2,16 @@
 import LocalHeaderButton from '@/components/LocalHeaderButton.vue';
 import { ref, onMounted, onUnmounted, watchEffect } from 'vue';
 import MoreMenu from '@/components/MoreMenu.vue';
+import type { BookShelf } from '@/interface';
+import { collection, connectFirestoreEmulator, onSnapshot } from 'firebase/firestore';
+import { getCurrentUser, firestore, firebaseAuth } from '@/config/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { runInThisContext } from 'vm';
 
-const buttonsInit = [
-    {text: "hoge"},
-    {text: "hogggggggggggggggg"},
-    {text: "hogggggggggggggggg"},
-    {text: "hogggggggggggggggg"},
-    {text: "hogggggggggggggggg"},
-    {text: "hogggggggggggggggg"},
-    {text: "hogggggggggggggggg"},
-    {text: "hogggggggggggggggg"},
-    {text: "hogggggggggggggggg"},
-    {text: "hogggggggggggggggg"},
-    {text: "hogggggggggggggggg"},
-    {text: "hogggggggggggggggg"},
-    {text: "hogggggggggggggggg"},
-    {text: "hogggggggggggggggg"},
-    {text: "hogggggggggggggggg"},
+const buttonsInit: BookShelf[] = [
+    {shelf_name: "hoge"},
+    {shelf_name: "hoge"},
+    {shelf_name: "hoge"},
 ]
 
 const buttonWidth = 80;
@@ -49,12 +42,27 @@ onMounted(() => {
 onUnmounted(() => {
     window.removeEventListener('resize', updateWidth)
 })
+
+onAuthStateChanged(firebaseAuth, (user) => {
+
+    if(user) {
+        //const user = await getCurrentUser();
+        const unsubscribe = onSnapshot(collection(firestore, "users", user.uid, "bookshelves"), (snapshot) => {
+        
+            snapshot.docChanges().forEach((change) => {
+                if(change.type === "added") console.log(change.doc.data())
+            })
+        })
+    }
+
+})
+
 </script>
 
 <template>
     <v-app-bar color="white" elevation="0" height="33" class="header-border">
         <div class="button-container">
-            <LocalHeaderButton v-for="(button, index) in visibleButtons" :key="index" :text="button.text" class="me-2"></LocalHeaderButton>
+            <LocalHeaderButton v-for="(button, index) in visibleButtons" :key="index" :text="button.shelf_name" class="me-2"></LocalHeaderButton>
             <div v-show="hiddenButtons.length > 0">
                 <v-spacer></v-spacer>
                 <MoreMenu :items="hiddenButtons"></MoreMenu>
@@ -72,7 +80,6 @@ onUnmounted(() => {
 
 .button-container {
     display: flex;
-    justify-content: space-between;
     width: 100%;
 }
 </style>

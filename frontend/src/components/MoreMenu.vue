@@ -8,15 +8,17 @@
   
       <v-list>
         <v-list-item v-for="(item, index) in items" :key="index">
-          <v-list-item-title>{{ item.text }}</v-list-item-title>
+          <v-list-item-title>{{ item.shelf_name }}</v-list-item-title>
         </v-list-item>
       </v-list>
     </v-menu>
 </template>
   
 <script setup lang="ts">
+import type { BookShelf } from '@/interface';
+
 interface Props {
-    items: { text: string }[];
+    items: BookShelf[];
 }
 
 defineProps<Props>();
