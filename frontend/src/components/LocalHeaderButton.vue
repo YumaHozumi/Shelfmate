@@ -1,13 +1,14 @@
 <script setup lang="ts">
 interface Props {
-    text: string;
+    doc_id?: string
+    shelf_name: string;
 }
 
 defineProps<Props>();
 </script>
 
 <template>
-    <button class="local-header-button">{{ text }}</button>
+    <button class="local-header-button">{{ shelf_name }}</button>
 </template>
 
 <style scoped lang="scss">

@@ -6,7 +6,7 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import MyDialog from '@/components/MyDialog.vue';
 import {getCurrentUser, firebaseAuth, firestore} from "@/config/firebase"
 import { collection, addDoc } from "firebase/firestore";
-
+import type { BookShelf } from '@/interface';
 
 interface Emits {
   (event: 'navigate', name: string): void
