@@ -5,7 +5,7 @@ import MoreMenu from '@/components/MoreMenu.vue';
 import type { BookShelf } from '@/interface';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { getCurrentUser, firestore, firebaseAuth } from '@/config/firebase';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, type Unsubscribe } from 'firebase/auth';
 import Books from '@/components/Bookshelf/Books.vue';
 import { implementBookShelf } from "@/interface";
 
@@ -42,10 +42,12 @@ onUnmounted(() => {
     window.removeEventListener('resize', updateWidth)
 })
 
+let unsubscribe: Unsubscribe;
+
 onAuthStateChanged(firebaseAuth, (user) => {
 
     if(user) {
-        const unsubscribe = onSnapshot(collection(firestore, "users", user.uid, "bookshelves"), (snapshot) => {
+        unsubscribe = onSnapshot(collection(firestore, "users", user.uid, "bookshelves"), (snapshot) => {
             snapshot.docChanges().forEach((change) => {
                 const data = change.doc.data();
                 if (implementBookShelf(data)) {
@@ -57,13 +59,13 @@ onAuthStateChanged(firebaseAuth, (user) => {
             })
         })
 
-        onUnmounted(() => {
-            unsubscribe();
-        })
     }
-
+    
 })
 
+onUnmounted(() => {
+    unsubscribe();
+})
 </script>
 
 <template>

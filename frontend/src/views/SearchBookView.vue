@@ -3,8 +3,10 @@ import GlobalHeader from "@/containers/GlobalHeader.vue";
 import Results from "@/components/SearchBook/Results.vue";
 import type { BookItem } from "@/interface.ts"
 import { ref } from "vue";
+import SearchBar from "@/basic/SearchBar.vue";
+import axios from "axios";
 
-const items: BookItem[] = [
+const itemsInit: BookItem[] = [
             {
                 isbn: 1111111111,
                 title: "2.5次元の誘惑",
@@ -22,12 +24,32 @@ const items: BookItem[] = [
                 public_date: new Date()
             },
         ]
-const its = ref(items)
+const items = ref(itemsInit)
+
+const searchClick = async (searchText: string) => {
+    //const baseURL = "https://iss.ndl.go.jp/api/opensearch"
+    const baseURL = "/api/search"
+    // const query = new URLSearchParams({
+    //     cnt: "1",
+    //     title: searchText,
+    // }).toString();
+    const query = new URLSearchParams({q: "きめつ"})
+
+    const completedURL = `${baseURL}?${query}`
+
+    await axios
+        .get(baseURL)
+        .then((res) => {
+            console.log(res)
+        })
+}
+
 </script>
 
 <template>
     <GlobalHeader></GlobalHeader>
     <v-container>
-        <Results :items="its"></Results>
+        <SearchBar @search="searchClick"></SearchBar>
+        <Results :items="items"></Results>
     </v-container>
 </template>

@@ -43,7 +43,7 @@ onAuthStateChanged(firebaseAuth, (user) => {
 
 
 const onClickAddButton = (): void => {
-
+  emit("navigate", "Search");
 }
 
 const onCreateButton = async (shelf_name: string) => {

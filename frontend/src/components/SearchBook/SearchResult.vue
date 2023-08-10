@@ -26,7 +26,7 @@ const localImage = computed((): string => {
         <p class="book-detail">{{ book.detail }}</p>
       </div>
       <div class="book-actions">
-        <v-btn color="green">Add to Cart</v-btn>
+        <v-btn color="green">本を追加</v-btn>
       </div>
     </div>
 </template>

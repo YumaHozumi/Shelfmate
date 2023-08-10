@@ -17,7 +17,7 @@ export default defineConfig({
     port: 8000,
     host: true,
     proxy: {
-      "^/api": "http://localhost:10500",
+      "^/api": "http://localhost:8080",
     }
   }
 })
