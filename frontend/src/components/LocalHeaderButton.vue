@@ -14,8 +14,8 @@ defineProps<Props>();
 <style scoped lang="scss">
 .local-header-button {
     /* 既存のスタイル */
-    width: 80px;
-    min-width: 80px;
+    width: 100px;
+    min-width: 100px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

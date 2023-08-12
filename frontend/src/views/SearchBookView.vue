@@ -30,14 +30,14 @@ const searchClick = async (searchText: string) => {
             const apiItems = res.data.items;
             const books: BookItem[] = apiItems.map((item: any) => ({
                 bookId: item.id,
-                isbn: item.volumeInfo.industryIdentifiers[1]?.identifier,
-                title: item.volumeInfo.title,
-                image_url: item.volumeInfo.imageLinks?.thumbnail,
-                author: item.volumeInfo.authors[0],
+                isbn: item.volumeInfo?.industryIdentifiers?.[1]?.identifier,
+                title: item.volumeInfo?.title,
+                image_url: item.volumeInfo?.imageLinks?.thumbnail,
+                author: item.volumeInfo?.authors?.[0],
                 detail: item.searchInfo?.textSnippet,
-                public_date: new Date(item.volumeInfo.publishedDate),
-                seriesId: item.volumeInfo?.seriesInfo?.volumeSeries[0]?.seriesId,
-                orderNumber: item.volumeInfo?.seriesInfo?.volumeSeries[0]?.orderNumber,
+                public_date: new Date(item.volumeInfo?.publishedDate),
+                seriesId: item.volumeInfo?.seriesInfo?.volumeSeries?.[0]?.seriesId,
+                orderNumber: item.volumeInfo?.seriesInfo?.volumeSeries?.[0]?.orderNumber,
             }))
 
             books.forEach((book) => {
@@ -59,7 +59,7 @@ const searchClick = async (searchText: string) => {
 <template>
     <GlobalHeader></GlobalHeader>
     <SearchBar @search="searchClick" class="my-8"></SearchBar>
-    <Results :items="items" v-show="!isLoading"></Results>
+    <Results :items="items" v-if="!isLoading"></Results>
     <LoadingContainer :isLoading="isLoading"></LoadingContainer>
 </template>
 

@@ -13,9 +13,10 @@ const buttonsInit: BookShelf[] = []
 
 const buttons = ref(buttonsInit);
 
-const buttonWidth = 80;
+const buttonWidth = 100;
 const buttonMarginEnd = 8;
-const sum = buttonWidth + buttonMarginEnd;
+const buttonMarginStart = 8
+const sum = buttonWidth + buttonMarginEnd + buttonMarginStart;
 const windowWidth = ref(window.innerWidth)
 //表示するボタンの最大数
 let maxButtons = Math.floor(windowWidth.value / sum) - 1
@@ -71,7 +72,7 @@ onUnmounted(() => {
 <template>
     <v-app-bar color="white" elevation="0" height="33" class="header-border">
         <div class="button-container">
-            <LocalHeaderButton v-for="(button, index) in visibleButtons" :key="index" :shelf_name="button.shelf_name" :doc_id="button.doc_id" class="me-2"></LocalHeaderButton>
+            <LocalHeaderButton v-for="(button, index) in visibleButtons" :key="index" :shelf_name="button.shelf_name" :doc_id="button.doc_id" class="mx-2"></LocalHeaderButton>
             <div v-show="hiddenButtons.length > 0">
                 <v-spacer></v-spacer>
                 <MoreMenu :items="hiddenButtons"></MoreMenu>

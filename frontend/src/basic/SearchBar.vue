@@ -18,7 +18,7 @@ const searchClick = (): void => {
 
 <template>
     <v-toolbar class="pa-2 search-bar">
-        <v-text-field hide-details v-model="inputText"></v-text-field>
+        <v-text-field hide-details v-model="inputText" @keyup.enter="searchClick"></v-text-field>
         <v-btn icon @click="searchClick">
             <v-icon>mdi-magnify</v-icon>
         </v-btn>
