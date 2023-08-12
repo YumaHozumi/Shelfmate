@@ -1,10 +1,13 @@
 interface BookItem {
+    bookId: number
     isbn?: number
     title: string
     image_url: string | undefined
     author: string
     detail: string
     public_date: Date
+    seriesId?: string
+    orderNumber?: number
 }
 
 interface BookShelf {

@@ -6,22 +6,7 @@ import { ref } from "vue";
 import SearchBar from "@/basic/SearchBar.vue";
 import axios from "axios";
 
-const itemsInit: BookItem[] = [
-            {
-                title: "2.5次元の誘惑",
-                image_url: undefined,
-                author: "あああ",
-                detail: "hoge",
-                public_date: new Date()
-            },
-            {
-                title: "3.5次元の誘惑",
-                image_url: "https://www.iwanami.co.jp/files/kojien/kojien6img5.jpg",
-                author: "あiiああ",
-                detail: "hogeaaa",
-                public_date: new Date()
-            },
-        ]
+const itemsInit: BookItem[] = []
 const items = ref(itemsInit)
 
 const searchClick = async (searchText: string) => {
@@ -29,7 +14,8 @@ const searchClick = async (searchText: string) => {
     const baseURL = "https://www.googleapis.com/books/v1/volumes"
     const query = new URLSearchParams({q: searchText, 
         printType: "books",
-        filter: "ebooks"
+        filter: "ebooks",
+        maxResults: "5"
     })
 
     const completedURL = `${baseURL}?${query}`
@@ -40,12 +26,15 @@ const searchClick = async (searchText: string) => {
             console.log(res)
             const apiItems = res.data.items;
             const books: BookItem[] = apiItems.map((item: any) => ({
+                bookId: item.id,
                 isbn: item.volumeInfo.industryIdentifiers[1]?.identifier,
                 title: item.volumeInfo.title,
                 image_url: item.volumeInfo.imageLinks?.thumbnail,
                 author: item.volumeInfo.authors[0],
                 detail: item.searchInfo?.textSnippet,
                 public_date: new Date(item.volumeInfo.publishedDate),
+                seriesId: item.volumeInfo?.seriesInfo?.volumeSeries[0]?.seriesId,
+                orderNumber: item.volumeInfo?.seriesInfo?.volumeSeries[0]?.orderNumber,
             }))
 
             books.forEach((book) => {
