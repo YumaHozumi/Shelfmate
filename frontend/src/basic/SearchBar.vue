@@ -27,7 +27,7 @@ const searchClick = (): void => {
 
 <style scoped lang="scss">
 .search-bar {
-    max-width: 55%;
+    max-width: 80%;
     margin: auto;
 }
 </style>

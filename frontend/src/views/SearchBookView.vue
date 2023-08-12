@@ -5,11 +5,14 @@ import type { BookItem } from "@/interface.ts"
 import { ref } from "vue";
 import SearchBar from "@/basic/SearchBar.vue";
 import axios from "axios";
+import LoadingContainer from "@/containers/LoadingContainer.vue";
 
 const itemsInit: BookItem[] = []
 const items = ref(itemsInit)
+const isLoading = ref(false)
 
 const searchClick = async (searchText: string) => {
+    isLoading.value = true;
     //const baseURL = "https://iss.ndl.go.jp/api/opensearch"
     const baseURL = "https://www.googleapis.com/books/v1/volumes"
     const query = new URLSearchParams({q: searchText, 
@@ -48,13 +51,21 @@ const searchClick = async (searchText: string) => {
         .catch((e) => {
             console.log(e);
         })
+
+    isLoading.value = false;
 }
 </script>
 
 <template>
     <GlobalHeader></GlobalHeader>
-    <v-container>
-        <SearchBar @search="searchClick"></SearchBar>
-        <Results :items="items"></Results>
-    </v-container>
+    <SearchBar @search="searchClick" class="my-8"></SearchBar>
+    <Results :items="items" v-show="!isLoading"></Results>
+    <LoadingContainer :isLoading="isLoading"></LoadingContainer>
 </template>
+
+<style scoped>
+.modify-width {
+    width: 100%;
+    height: 100%;
+}
+</style>
