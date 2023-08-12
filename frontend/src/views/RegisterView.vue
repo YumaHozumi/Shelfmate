@@ -10,7 +10,9 @@ import { getRedirectResult, GoogleAuthProvider, signInWithRedirect } from "fireb
 import { FirebaseError } from "firebase/app";
 import ErrorMessage from "@/basic/ErrorMessage.vue";
 import { firebaseErrorMessage } from "@/function";
-import { firebaseAuth } from '@/config/firebase';
+import { firebaseAuth, getCurrentUser, firestore } from '@/config/firebase';
+import LoadingContainer from "@/containers/LoadingContainer.vue";
+import { collection, addDoc } from "firebase/firestore";
 
 const onNavigate = (name: string): void => {
   router.push({name: name});
@@ -45,35 +47,37 @@ const clickGoogleButton = async () => {
 }
 
 // レンダリングフラグを追加
-const isRendered = ref(false);
+const isLoading = ref(true);
+
+const onInitBookshelf = async () => {
+  const user = await getCurrentUser();
+  const bookShelfCollection = collection(firestore, "users", user.uid, "bookshelves")
+  await addDoc(bookShelfCollection, { shelf_name: "始まりの本棚"})
+}
 
 onMounted(async () => {
     try {
+      isLoading.value = true;
       const result = await getRedirectResult(firebaseAuth);
       if (result?.user) {
         // ユーザーは正常に認証されました
         //const user = result.user;
         // userを使用して何かしらの処理を行います
+        await onInitBookshelf()
         onNavigate("AppTop");
       }
     } catch (error) {
       console.error(error);
     }
     // リダイレクト処理が終わったらレンダリングを許可
-    isRendered.value = true;
+    isLoading.value = false;
 })
 
 </script>
 
 <template>
-  <div class="loading" v-if="!isRendered">
-    <v-progress-circular
-        indeterminate
-        :size="100"
-        color="green"
-    ></v-progress-circular>
-  </div>
-    <div v-if="isRendered">
+    <LoadingContainer :isLoading="isLoading"></LoadingContainer>
+    <div v-if="!isLoading">
       <Header @navigate="onNavigate"></Header>
       <v-sheet width="500" class="mx-auto form px-10 py-3 mt-5 no-radius-bottom">
           <ProgressBar :currentStep="currentCompIndex"></ProgressBar>

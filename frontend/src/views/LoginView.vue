@@ -5,16 +5,18 @@ import router from '@/router'
 import { onMounted, ref } from "vue";
 import  {getRedirectResult } from "firebase/auth";
 import { firebaseAuth } from "@/config/firebase";
+import LoadingContainer from "@/containers/LoadingContainer.vue";
 
 const onNavigate = (name: string): void => {
   router.push({name: name});
 }
 
 // レンダリングフラグを追加
-const isRendered = ref(false);
+const isLoading = ref(true);
 
 onMounted(async () => {
     try {
+      isLoading.value = true;
       const result = await getRedirectResult(firebaseAuth);
       if (result?.user) {
         // ユーザーは正常に認証されました
@@ -26,19 +28,13 @@ onMounted(async () => {
       console.error(error);
     }
     // リダイレクト処理が終わったらレンダリングを許可
-    isRendered.value = true;
+    isLoading.value = false;
 })
 </script>
 
 <template>
-  <div class="loading" v-if="!isRendered">
-    <v-progress-circular
-        indeterminate
-        :size="100"
-        color="green"
-    ></v-progress-circular>
-  </div>
-  <div v-if="isRendered">
+  <LoadingContainer :isLoading="isLoading"></LoadingContainer>
+  <div v-if="!isLoading">
     <Header @navigate="onNavigate"></Header>
     <LoginForm @navigate="onNavigate"></LoginForm>
   </div>
