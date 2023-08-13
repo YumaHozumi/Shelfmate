@@ -8,8 +8,18 @@ interface Props {
 }
 
 defineProps<Props>();
+
+interface Emits {
+  (event: "registerBook", book: BookItem): void;
+}
+
+const emit = defineEmits<Emits>();
+
+const registerBook = (book: BookItem): void => {
+    emit("registerBook", book);
+}
 </script>
 
 <template>
-    <SearchResult v-for="item in items" :key="item.isbn" :book="item"></SearchResult>
+    <SearchResult v-for="item in items" :key="item.bookId" :book="item" @registerBook="registerBook"></SearchResult>
 </template>

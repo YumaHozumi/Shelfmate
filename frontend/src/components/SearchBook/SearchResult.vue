@@ -8,25 +8,28 @@ interface Props {
 }
 //デフォルト値設定
 const props = defineProps<Props>();
-const localImage = computed((): string => {
-    let localImage = props.book.image_url;
-    if(localImage === undefined) {
-        localImage = imageURL;
-    }
-    return localImage;
-})
+
+interface Emits {
+  (event: "registerBook", book: BookItem): void;
+}
+
+const emit = defineEmits<Emits>();
+
+const registerBook = (): void => {
+  emit("registerBook", props.book);
+}
 </script>
 
 <template>
     <div class="book-item">
-      <img class="book-cover" :src="localImage" alt="Book Cover">
+      <img class="book-cover" :src="book.image_url" alt="Book Cover">
       <div class="book-info">
         <h2 class="book-title">{{ book.title }}</h2>
         <p class="book-author">{{ book.author }}</p>
         <p class="book-detail">{{ book.detail }}</p>
       </div>
       <div class="book-actions">
-        <v-btn color="green">本を追加</v-btn>
+        <v-btn color="green" @click="registerBook">本を追加</v-btn>
       </div>
     </div>
 </template>

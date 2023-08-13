@@ -4,8 +4,9 @@ import Header from "@/containers/GlobalHeader.vue";
 import router from '@/router'
 import { onMounted, ref } from "vue";
 import  {getRedirectResult } from "firebase/auth";
-import { firebaseAuth } from "@/config/firebase";
+import { firebaseAuth, getCurrentUser, firestore } from "@/config/firebase";
 import LoadingContainer from "@/containers/LoadingContainer.vue";
+import { collection, addDoc } from "firebase/firestore";
 
 const onNavigate = (name: string): void => {
   router.push({name: name});
@@ -13,6 +14,12 @@ const onNavigate = (name: string): void => {
 
 // レンダリングフラグを追加
 const isLoading = ref(true);
+
+const onInitBookshelf = async () => {
+  const user = await getCurrentUser();
+  const bookShelfCollection = collection(firestore, "users", user.uid, "bookshelves")
+  await addDoc(bookShelfCollection, { shelf_name: "始まりの本棚"})
+}
 
 onMounted(async () => {
     try {
@@ -22,6 +29,7 @@ onMounted(async () => {
         // ユーザーは正常に認証されました
         //const user = result.user;
         // userを使用して何かしらの処理を行います
+        await onInitBookshelf()
         onNavigate("AppTop");
       }
     } catch (error) {
