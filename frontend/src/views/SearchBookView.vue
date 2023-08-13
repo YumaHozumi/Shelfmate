@@ -1,15 +1,19 @@
 <script setup lang="ts">
 import GlobalHeader from "@/containers/GlobalHeader.vue";
 import Results from "@/components/SearchBook/Results.vue";
-import type { BookItem } from "@/interface.ts"
+import { type BookShelf, type BookItem } from "@/interface.ts"
 import { ref } from "vue";
 import SearchBar from "@/basic/SearchBar.vue";
 import axios from "axios";
 import LoadingContainer from "@/containers/LoadingContainer.vue";
 import Menu from "@/components/Menu.vue";
-import { firestore, getCurrentUser } from "@/config/firebase";
-import { addDoc, collection } from "firebase/firestore";
+import { firebaseAuth, firestore, getCurrentUser } from "@/config/firebase";
+import { addDoc, collection, onSnapshot } from "firebase/firestore";
 import imageURL from "@/assets/no-image.png";
+import { onAuthStateChanged, type Unsubscribe } from "firebase/auth";
+import { implementBookShelf } from "@/interface";
+import { onUnmounted, computed, watch } from "vue";
+import { onMounted } from "vue";
 
 const itemsInit: BookItem[] = []
 const items = ref(itemsInit)
@@ -64,23 +68,84 @@ const menu = ["作品名順", "発売日順"]
 const registerBook = async(book: BookItem) => {
     try {
         const user = await getCurrentUser();
-        const bookCollection = collection(firestore, "users", user.uid, "bookshelves", "QdqAGHac6dH9FQWg0E6v", "books")
+        const bookCollection = collection(firestore, "users", user.uid, "bookshelves", selectedBookshelf.value?.doc_id || "", "books")
         await addDoc(bookCollection, book);
     }catch(error) {
         console.log(error);
     }
 }
+
+const buttons = ref<BookShelf[]>([]);
+
+let unsubscribe: Unsubscribe;
+
+onAuthStateChanged(firebaseAuth, (user) => {
+
+if(user) {
+    unsubscribe = onSnapshot(collection(firestore, "users", user.uid, "bookshelves"), (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+            const data = change.doc.data();
+            if (implementBookShelf(data)) {
+                if (change.type === "added") {
+                    const bookShelfData: BookShelf = { doc_id: change.doc.id, ...data }; // doc_idを設定し直します
+                    buttons.value.push(bookShelfData);
+                }
+
+                if(selectedBookshelf.value === undefined) {
+                    selectedBookshelf.value = buttons.value?.[0];
+                }
+            }
+        })
+    })
+
+}
+
+})
+
+onUnmounted(() => {
+    unsubscribe();
+})
+
+const bookshelfOptions = computed(() => {
+  return buttons.value.map(button => ({
+    title: button.shelf_name,
+    value: button // ここで識別子として使用するプロパティを設定します
+  }));
+});
+
+const selectedBookshelf = ref<BookShelf | undefined>(undefined); // 選択されたbookshelfのIDを保持するためのref
 </script>
 
 <template>
     <GlobalHeader></GlobalHeader>
-    <SearchBar @search="searchClick" class="mt-8 mb-4"></SearchBar>
-    <Menu :items="menu" icon="mdi-sort" class="transparency"></Menu>
+
+        <div class="search-add-container mt-8 mb-4 mx-12">
+            <SearchBar @search="searchClick" class="me-6"></SearchBar>
+            <v-select label="追加先" :items="bookshelfOptions" item-title="title" item-value="value" v-model="selectedBookshelf">
+                
+            </v-select>
+
+        </div>
+
+    <v-row justify="end">
+        <v-col cols="1" class="me-12">
+            <Menu :items="menu" icon="mdi-sort" class="transparency"></Menu>
+
+        </v-col>
+        
+    </v-row>
     <Results :items="items" v-if="!isLoading" @registerBook="registerBook"></Results>
     <LoadingContainer :isLoading="isLoading"></LoadingContainer>
 </template>
 
 <style scoped>
+.search-add-container {
+    display: flex;
+}
+.menu {
+    margin: 0 10px 0 0;
+    display: flex;
+}
 .modify-width {
     width: 100%;
     height: 100%;

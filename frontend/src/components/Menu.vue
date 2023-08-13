@@ -20,6 +20,7 @@ const selectItem = (item: string) => {
         <template v-slot:activator="{ props }">
             <v-btn v-bind="props">
                 <v-icon>{{icon}}</v-icon>
+                <slot></slot>
                 {{ currentSelect }}
             </v-btn>
         </template>
