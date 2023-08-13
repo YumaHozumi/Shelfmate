@@ -72,7 +72,7 @@ onUnmounted(() => {
 <template>
     <v-app-bar color="white" elevation="0" height="33" class="header-border">
         <div class="button-container">
-            <LocalHeaderButton v-for="(button, index) in visibleButtons" :key="index" :shelf_name="button.shelf_name" :doc_id="button.doc_id" class="mx-2"></LocalHeaderButton>
+            <LocalHeaderButton v-for="(button, index) in visibleButtons" :key="index" :bookshelf="button" class="mx-2"></LocalHeaderButton>
             <div v-show="hiddenButtons.length > 0">
                 <v-spacer></v-spacer>
                 <MoreMenu :items="hiddenButtons"></MoreMenu>

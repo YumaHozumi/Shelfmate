@@ -1,14 +1,15 @@
 <script setup lang="ts">
+import type { BookShelf } from '@/interface';
+
 interface Props {
-    doc_id?: string
-    shelf_name: string;
+    bookshelf: BookShelf
 }
 
 defineProps<Props>();
 </script>
 
 <template>
-    <button class="local-header-button">{{ shelf_name }}</button>
+    <button class="local-header-button">{{ bookshelf.shelf_name }}</button>
 </template>
 
 <style scoped lang="scss">
