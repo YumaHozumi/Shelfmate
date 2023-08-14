@@ -46,6 +46,10 @@ const onClickAddButton = (): void => {
   emit("navigate", "Search");
 }
 
+const clickSiteTitle = (): void => {
+  emit("navigate", "AppTop");
+}
+
 const onCreateButton = async (shelf_name: string) => {
   const user = await getCurrentUser();
   const bookShelfCollection = collection(firestore, "users", user.uid, "bookshelves")
@@ -56,7 +60,7 @@ const onCreateButton = async (shelf_name: string) => {
 
 <template>
   <v-app-bar color="white" flat class="header-border">
-    <SiteTitle @click="onClickSiteLogo" class="green"></SiteTitle>
+    <SiteTitle @click="onClickSiteLogo" class="green" @clickSiteTitle="clickSiteTitle"></SiteTitle>
     <LoginButton @clickLoginButton="onClickLoginButton" v-show="isShow"></LoginButton>
     <v-btn class="button register ml-3" @click="onClickRegisterButton" v-show="isShow">
       <v-icon>mdi-account-plus-outline</v-icon>

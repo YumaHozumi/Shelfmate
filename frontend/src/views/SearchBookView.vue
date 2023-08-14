@@ -13,6 +13,11 @@ import imageURL from "@/assets/no-image.png";
 import { onAuthStateChanged, type Unsubscribe } from "firebase/auth";
 import { implementBookShelf } from "@/interface";
 import { onUnmounted, computed} from "vue";
+import router from '@/router'
+
+const onNavigate = (name: string): void => {
+  router.push({name: name});
+}
 
 const itemsInit: BookItem[] = []
 const items = ref(itemsInit)
@@ -136,7 +141,7 @@ const sort = (books: BookItem[], order: string): BookItem[] => {
 </script>
 
 <template>
-    <GlobalHeader></GlobalHeader>
+    <GlobalHeader @navigate="onNavigate"></GlobalHeader>
 
         <div class="search-add-container mt-8 mb-4 mx-12">
             <SearchBar @search="searchClick" class="me-6"></SearchBar>
