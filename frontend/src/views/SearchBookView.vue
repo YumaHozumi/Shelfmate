@@ -12,12 +12,12 @@ import { addDoc, collection, onSnapshot } from "firebase/firestore";
 import imageURL from "@/assets/no-image.png";
 import { onAuthStateChanged, type Unsubscribe } from "firebase/auth";
 import { implementBookShelf } from "@/interface";
-import { onUnmounted, computed, watch } from "vue";
-import { onMounted } from "vue";
+import { onUnmounted, computed} from "vue";
 
 const itemsInit: BookItem[] = []
 const items = ref(itemsInit)
 const isLoading = ref(false)
+let nowIndex = 0;
 
 const searchClick = async (searchText: string) => {
     isLoading.value = true;
@@ -43,7 +43,7 @@ const searchClick = async (searchText: string) => {
                 image_url: item.volumeInfo?.imageLinks?.thumbnail ?? imageURL,
                 author: item.volumeInfo?.authors?.[0] ?? "",
                 detail: item.searchInfo?.textSnippet ?? "",
-                public_date: new Date(item.volumeInfo?.publishedDate),
+                public_date: new Date(item.volumeInfo?.publishedDate || 0),
                 seriesId: item.volumeInfo?.seriesInfo?.volumeSeries?.[0]?.seriesId ?? "",
                 orderNumber: item.volumeInfo?.seriesInfo?.volumeSeries?.[0]?.orderNumber ?? 0,
             }))
@@ -53,8 +53,8 @@ const searchClick = async (searchText: string) => {
                     book.image_url = "https://iss.ndl.go.jp/thumbnail/" + book.isbn;
                 }
             })
-
-            items.value = books;
+            //予めソートしたものを入れる
+            items.value = sort(books, menu[nowIndex]);
         })
         .catch((e) => {
             console.log(e);
@@ -63,7 +63,7 @@ const searchClick = async (searchText: string) => {
     isLoading.value = false;
 }
 
-const menu = ["作品名順", "発売日順"]
+const menu = ["発売日が新しい順", "発売日が古い順", "作品名順", "作者名順"]
 
 const registerBook = async(book: BookItem) => {
     try {
@@ -114,6 +114,25 @@ const bookshelfOptions = computed(() => {
 });
 
 const selectedBookshelf = ref<BookShelf | undefined>(undefined); // 選択されたbookshelfのIDを保持するためのref
+
+const selectMenu = (index: number): void => {
+    items.value = sort(items.value, menu[index]);
+    nowIndex = index;
+}
+
+const sort = (books: BookItem[], order: string): BookItem[] => {
+    if(order === "発売日が新しい順") {
+        return books.slice().sort((a, b) => b.public_date.getTime() - a.public_date.getTime())
+    } else if (order === "発売日が古い順") {
+        return books.slice().sort((a, b) => a.public_date.getTime() - b.public_date.getTime())
+    } else if(order === "作品名順") {
+        return books.slice().sort((a, b) => a.title.localeCompare(b.title, 'ja-u-co-natural'));
+    } else if(order === "作者名順"){
+        return books.slice().sort((a, b) => a.title.localeCompare(b.author, 'ja-u-co-natural'));
+    } else {
+        return books;
+    }
+}
 </script>
 
 <template>
@@ -129,7 +148,7 @@ const selectedBookshelf = ref<BookShelf | undefined>(undefined); // 選択され
 
     <v-row justify="end">
         <v-col cols="2">
-            <Menu :items="menu" icon="mdi-sort" class="transparency"></Menu>
+            <Menu :items="menu" icon="mdi-sort" class="transparency" @selectItem="selectMenu"></Menu>
 
         </v-col>
         

@@ -8,10 +8,16 @@ interface Props {
 
 const props = defineProps<Props>()
 
+interface Emits {
+    (event: "selectItem", currentSelect: number): void;
+}
+const emit = defineEmits<Emits>();
+
 const currentSelect = ref(props.items[0]);
 
-const selectItem = (item: string) => {
+const selectItem = (item: string, index: number) => {
     currentSelect.value = item;
+    emit("selectItem", index);
 }
 </script>
 
@@ -27,7 +33,7 @@ const selectItem = (item: string) => {
 
         <v-list>
             <v-list-item link v-for="(key, index) in items" :key="index"
-                @click="() => selectItem(key)">
+                @click="() => selectItem(key, index)">
                 <v-list-item-title>
                     {{ key }}
                 </v-list-item-title>
