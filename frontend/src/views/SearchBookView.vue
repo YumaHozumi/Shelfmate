@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import GlobalHeader from "@/containers/GlobalHeader.vue";
 import Results from "@/components/SearchBook/Results.vue";
-import { type BookShelf, type BookItem } from "@/interface.ts"
+import { type BookShelf, type BookItem } from "@/interface"
 import { ref } from "vue";
 import SearchBar from "@/basic/SearchBar.vue";
 import axios from "axios";
@@ -68,7 +68,7 @@ const menu = ["作品名順", "発売日順"]
 const registerBook = async(book: BookItem) => {
     try {
         const user = await getCurrentUser();
-        const bookCollection = collection(firestore, "users", user.uid, "bookshelves", selectedBookshelf.value?.doc_id || "", "books")
+        const bookCollection = collection(firestore, "users", user.uid, "bookshelves", selectedBookshelf.value?.doc_id || "", "series", book?.seriesId || "","books")
         await addDoc(bookCollection, book);
     }catch(error) {
         console.log(error);
@@ -128,7 +128,7 @@ const selectedBookshelf = ref<BookShelf | undefined>(undefined); // 選択され
         </div>
 
     <v-row justify="end">
-        <v-col cols="1" class="me-12">
+        <v-col cols="2">
             <Menu :items="menu" icon="mdi-sort" class="transparency"></Menu>
 
         </v-col>
