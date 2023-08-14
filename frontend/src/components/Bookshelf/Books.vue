@@ -1,21 +1,26 @@
 <script setup lang="ts">
+import type { BookItem } from '@/interface';
+
+//同じ作品はまとめる
 interface Props {
-    img: string;
+    books: BookItem[];
 }
 
 defineProps<Props>()
+
+
 </script>
 
 <template>
     <div class="book-container book-stack">
-        <img class="book-image" :src="img">
+        <img class="book-image" :src="books?.[0].image_url">
         <v-badge
             color="blue"
             overlap
             class="book-badge"
         >
             <template v-slot:badge>
-                <span>5冊</span>
+                <span>{{ books.length }}冊</span>
             </template>
         </v-badge>
     </div>
@@ -24,12 +29,13 @@ defineProps<Props>()
 
 <style scoped lang="scss">
 .book-container {
+    margin: 0 auto;
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
     height: 100%;
-    width: 100%; // widthをパーセンテージに変更
+    width: 60%; // widthをパーセンテージに変更
     background: #f3f3f3;
     cursor: pointer;
     overflow: hidden; //拡大時に画像がコンテナからはみ出さないようにする
