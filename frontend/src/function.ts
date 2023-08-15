@@ -33,7 +33,6 @@ const incrementCounter = async (docRef: DocumentReference) => {
     if (docSnap.exists()) {
       const data = docSnap.data();
       const currentCounter = data?.counter ?? 0; // 既存のカウンター値を取得、または0を設定
-      console.log(data?.counter)
       await updateDoc(docRef, { counter: currentCounter + 1 });
     }
   } catch (error) {

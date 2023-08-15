@@ -90,6 +90,7 @@ const registerBook = async(book: BookItem) => {
         } else {
         // ドキュメントが存在しない場合、画像とカウンターを設定
             await setDoc(seriesRef, {
+                seriesId: seriesId,
                 pic: book.image_url,
                 counter: 0
         });

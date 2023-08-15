@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { BookItem } from '@/interface';
+import type { Series } from '@/interface';
 
 //同じ作品はまとめる
 interface Props {
-    books: BookItem[];
+    series: Series;
 }
 
 defineProps<Props>()
@@ -13,14 +13,14 @@ defineProps<Props>()
 
 <template>
     <div class="book-container book-stack">
-        <img class="book-image" :src="books?.[0].image_url">
+        <img class="book-image" :src="series.pic">
         <v-badge
             color="blue"
             overlap
             class="book-badge"
         >
             <template v-slot:badge>
-                <span>{{ books.length }}冊</span>
+                <span>{{ series.counter }}冊</span>
             </template>
         </v-badge>
     </div>

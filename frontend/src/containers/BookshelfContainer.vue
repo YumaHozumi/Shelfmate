@@ -5,70 +5,33 @@ import Books from "@/components/Bookshelf/Books.vue";
 import { onMounted } from 'vue';
 import { collection, getDocs, query } from 'firebase/firestore';
 import { firestore, getCurrentUser } from '@/config/firebase';
-import type { constants } from 'buffer';
+import { type Series} from "@/interface";
 
-const books = ref<BookItem[]>([{
-  bookId: 0,
-  title: "hoge",
-  image_url: "http://books.google.com/books/content?id=Xc3YDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  author: "aaa",
-  detail: "gege",
-  public_date: new Date(),
-},
-{
-  bookId: 0,
-  title: "hoge",
-  image_url: "http://books.google.com/books/content?id=Xc3YDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  author: "aaa",
-  detail: "gege",
-  public_date: new Date(),
-},
-{
-  bookId: 0,
-  title: "hoge",
-  image_url: "http://books.google.com/books/content?id=Xc3YDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api",
-  author: "aaa",
-  detail: "gege",
-  public_date: new Date(),
-}])
+const series = ref<Series[]>([]);
 
 onMounted(async() => {
     await getSeries();
 })
 
 const getSeries = async () => {
-    // const test = "OAuPO3RJ1pnHfb8bTGya"
-    // const user = await getCurrentUser();
-    // console.log(user.uid)
-    // // 本棚のシリーズコレクションへの参照を取得
-    // // 本棚のシリーズコレクションへの参照を取得
-    // const seriesCollectionRef = collection(firestore, "users", user.uid, "bookshelves", test, "series");
+    const test = "912QcbhsSDDSORTQrXRb"
+    const user = await getCurrentUser();
+    // 本棚のシリーズコレクションへの参照を取得
+    // 本棚のシリーズコレクションへの参照を取得
+    const seriesCollectionRef = collection(firestore, "users", user.uid, "bookshelves", test, "series");
 
-    // // シリーズコレクション内のすべてのドキュメントID（シリーズID）を取得
-    // const seriesSnapshot = await getDocs(seriesCollectionRef);
-    // const seriesList = [];
-    // for (const seriesDoc of seriesSnapshot.docs) {
-    //   // 各シリーズIDの下にある本のコレクションを取得
-    //   console.log("tes")
-    //   console.log("")
-    //   const booksRef = collection(seriesCollectionRef, seriesDoc.id, "books");
-    //   const booksSnapshot = await getDocs(booksRef);
-    //   const books: BookItem[] = [];
-    //   booksSnapshot.forEach((bookDoc) => {
-    //     // 各本のデータを取得してリストに追加
-    //     books.push(bookDoc.data() as BookItem);
-    //   });
-    //   // シリーズリストに追加
-    //   seriesList.push({ seriesId: seriesDoc.id, books: books });
-    // }
-    // console.log(seriesList)
+    getDocs(seriesCollectionRef).then((snapshot) => {
+      snapshot.forEach((e) => {
+        series.value.push(e.data() as Series)
+      })
+    })
   }
 </script>
 
 <template>
     <v-container>
         <div class="bookshelf">
-            <Books :books="books"></Books>
+            <Books v-for="(element, index) in series" :key="index" :series="element"></Books>
         </div>
     </v-container>
 </template>

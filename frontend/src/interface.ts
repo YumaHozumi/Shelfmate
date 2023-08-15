@@ -17,7 +17,8 @@ interface BookShelf {
 
 interface Series {
     seriesId?: string;
-    mainPic: string;
+    pic: string;
+    counter: number;
 }
 
 //ユーザ定義タイプガード
@@ -25,5 +26,5 @@ const implementBookShelf = (arg: any): arg is BookShelf => {
     return arg !== null && typeof arg === "object" &&  typeof arg.shelf_name === "string" 
 }
 
-export type { BookItem, BookShelf }
+export type { BookItem, BookShelf, Series }
 export { implementBookShelf }
