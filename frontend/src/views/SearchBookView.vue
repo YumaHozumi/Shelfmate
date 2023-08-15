@@ -8,12 +8,15 @@ import axios from "axios";
 import LoadingContainer from "@/containers/LoadingContainer.vue";
 import Menu from "@/components/Menu.vue";
 import { firebaseAuth, firestore, getCurrentUser } from "@/config/firebase";
-import { addDoc, collection, onSnapshot } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
 import imageURL from "@/assets/no-image.png";
 import { onAuthStateChanged, type Unsubscribe } from "firebase/auth";
 import { implementBookShelf } from "@/interface";
 import { onUnmounted, computed} from "vue";
 import router from '@/router'
+import LocalHeader from "@/containers/LocalHeader.vue";
+import { incrementCounter } from "@/function";
+
 
 const onNavigate = (name: string): void => {
   router.push({name: name});
@@ -73,8 +76,45 @@ const menu = ["発売日が新しい順", "発売日が古い順", "作品名順
 const registerBook = async(book: BookItem) => {
     try {
         const user = await getCurrentUser();
-        const bookCollection = collection(firestore, "users", user.uid, "bookshelves", selectedBookshelf.value?.doc_id || "", "series", book?.seriesId || "","books")
-        await addDoc(bookCollection, book);
+        const bookshelvesRef = collection(firestore, "users", user.uid, "bookshelves");
+        const selectedBookshelfId = selectedBookshelf.value?.doc_id || "";
+        const seriesId = book?.seriesId || "";
+        console.log(`${selectedBookshelfId}, ${seriesId}`)
+        const seriesRef = doc(bookshelvesRef, selectedBookshelfId, "series", seriesId);
+        const seriesSnap = await getDoc(seriesRef);
+        if (seriesSnap.exists()) {
+        // ドキュメントが存在する場合、画像のみ更新
+            await updateDoc(seriesRef, {
+                pic: book.image_url
+        });
+        } else {
+        // ドキュメントが存在しない場合、画像とカウンターを設定
+            await setDoc(seriesRef, {
+                pic: book.image_url,
+                counter: 0
+        });
+        }
+
+
+        const booksCollection = collection(firestore, "users", user.uid, "bookshelves",selectedBookshelfId, "series", seriesId, "books")
+        await addDoc(booksCollection, book);
+        await incrementCounter(seriesRef)
+
+        // if (seriesSnapshot.exists()) {
+        //     const seriesData = seriesSnapshot.data();
+        //     const books = seriesData?.books || [];
+        //     books.push(book);
+
+        //     await updateDoc(seriesRef, {
+        //         books: books
+        //     });
+        // } else {
+        // // シリーズが存在しない場合の処理
+        //     await setDoc(seriesRef, {
+        //         // ここでシリーズの他のプロパティを設定できます
+        //         books: [book]
+        //     });
+        // }
     }catch(error) {
         console.log(error);
     }
@@ -142,7 +182,6 @@ const sort = (books: BookItem[], order: string): BookItem[] => {
 
 <template>
     <GlobalHeader @navigate="onNavigate"></GlobalHeader>
-
         <div class="search-add-container mt-8 mb-4 mx-12">
             <SearchBar @search="searchClick" class="me-6"></SearchBar>
             <v-select label="追加先" :items="bookshelfOptions" item-title="title" item-value="value" v-model="selectedBookshelf">

@@ -1,4 +1,5 @@
 import { FirebaseError } from "firebase/app";
+import { DocumentReference, getDoc, increment, updateDoc } from "firebase/firestore";
 
 const firebaseErrorMessage = (e: FirebaseError): string => {
     switch (e.code) {
@@ -25,4 +26,28 @@ const firebaseErrorMessage = (e: FirebaseError): string => {
     }
 };
 
-export { firebaseErrorMessage };
+// インクリメント
+const incrementCounter = async (docRef: DocumentReference) => {
+  try {
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      const currentCounter = data?.counter ?? 0; // 既存のカウンター値を取得、または0を設定
+      console.log(data?.counter)
+      await updateDoc(docRef, { counter: currentCounter + 1 });
+    }
+  } catch (error) {
+    console.error("Error incrementing counter:", error); // エラーハンドリング
+  }
+};
+
+
+// デクリメント
+const decrementCounter = async (docRef: DocumentReference) => {
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    await updateDoc(docRef, { counter: increment(-1) });
+  }
+};
+
+export { firebaseErrorMessage, incrementCounter, decrementCounter };

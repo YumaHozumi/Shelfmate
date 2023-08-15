@@ -15,6 +15,11 @@ interface BookShelf {
     shelf_name: string
 }
 
+interface Series {
+    seriesId?: string;
+    mainPic: string;
+}
+
 //ユーザ定義タイプガード
 const implementBookShelf = (arg: any): arg is BookShelf => {
     return arg !== null && typeof arg === "object" &&  typeof arg.shelf_name === "string" 

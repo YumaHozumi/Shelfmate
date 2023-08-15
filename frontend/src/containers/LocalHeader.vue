@@ -53,6 +53,7 @@ onAuthStateChanged(firebaseAuth, (user) => {
                 const data = change.doc.data();
                 if (implementBookShelf(data)) {
                     if (change.type === "added") {
+                        console.log("wa")
                         const bookShelfData: BookShelf = { doc_id: change.doc.id, ...data }; // doc_idを設定し直します
                         buttons.value.push(bookShelfData);
                     }
