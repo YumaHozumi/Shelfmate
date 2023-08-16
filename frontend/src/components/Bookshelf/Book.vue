@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import type { BookItem } from '@/interface';
+
 interface Props {
-    img: string;
+    book: BookItem;
 }
 
 defineProps<Props>()
@@ -8,7 +10,7 @@ defineProps<Props>()
 
 <template>
     <div class="book-container">
-        <img class="book-image" :src="img">
+        <img class="book-image" :src="book.image_url">
     </div>
 </template>
 

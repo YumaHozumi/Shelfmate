@@ -11,7 +11,7 @@ import { firebaseAuth, firestore, getCurrentUser } from "@/config/firebase";
 import { addDoc, collection, doc, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
 import imageURL from "@/assets/no-image.png";
 import { onAuthStateChanged, type Unsubscribe } from "firebase/auth";
-import { implementBookShelf } from "@/interface";
+import { implementBookShelf, type BookItemNoSeries } from "@/interface";
 import { onUnmounted, computed} from "vue";
 import router from '@/router'
 import LocalHeader from "@/containers/LocalHeader.vue";
@@ -78,44 +78,35 @@ const registerBook = async(book: BookItem) => {
         const user = await getCurrentUser();
         const bookshelvesRef = collection(firestore, "users", user.uid, "bookshelves");
         const selectedBookshelfId = selectedBookshelf.value?.doc_id || "";
-        const seriesId = book?.seriesId || "";
-        console.log(`${selectedBookshelfId}, ${seriesId}`)
-        const seriesRef = doc(bookshelvesRef, selectedBookshelfId, "series", seriesId);
-        const seriesSnap = await getDoc(seriesRef);
-        if (seriesSnap.exists()) {
-        // ドキュメントが存在する場合、画像のみ更新
-            await updateDoc(seriesRef, {
-                pic: book.image_url
-        });
+        const seriesId = book?.seriesId ?? "";
+
+        if(seriesId === ""){
+            const noSeriesBookCollection = collection(firestore, "users", user.uid, "bookshelves", selectedBookshelfId, "books")
+            const noSeriesBook: BookItemNoSeries = convertToBookItemWithoutSeries(book);
+            await addDoc(noSeriesBookCollection, noSeriesBook);
         } else {
-        // ドキュメントが存在しない場合、画像とカウンターを設定
-            await setDoc(seriesRef, {
-                seriesId: seriesId,
-                pic: book.image_url,
-                counter: 0
-        });
+            const seriesRef = doc(bookshelvesRef, selectedBookshelfId, "series", seriesId);
+            const seriesSnap = await getDoc(seriesRef);
+            if (seriesSnap.exists()) {
+            // ドキュメントが存在する場合、画像のみ更新
+                await updateDoc(seriesRef, {
+                    pic: book.image_url
+            });
+            } else {
+            // ドキュメントが存在しない場合、画像とカウンターを設定
+                await setDoc(seriesRef, {
+                    seriesId: seriesId,
+                    pic: book.image_url,
+                    counter: 0
+            });
+            }
+    
+    
+            const booksCollection = collection(firestore, "users", user.uid, "bookshelves",selectedBookshelfId, "series", seriesId, "books")
+            await addDoc(booksCollection, book);
+            await incrementCounter(seriesRef)
         }
-
-
-        const booksCollection = collection(firestore, "users", user.uid, "bookshelves",selectedBookshelfId, "series", seriesId, "books")
-        await addDoc(booksCollection, book);
-        await incrementCounter(seriesRef)
-
-        // if (seriesSnapshot.exists()) {
-        //     const seriesData = seriesSnapshot.data();
-        //     const books = seriesData?.books || [];
-        //     books.push(book);
-
-        //     await updateDoc(seriesRef, {
-        //         books: books
-        //     });
-        // } else {
-        // // シリーズが存在しない場合の処理
-        //     await setDoc(seriesRef, {
-        //         // ここでシリーズの他のプロパティを設定できます
-        //         books: [book]
-        //     });
-        // }
+        
     }catch(error) {
         console.log(error);
     }
@@ -179,6 +170,14 @@ const sort = (books: BookItem[], order: string): BookItem[] => {
         return books;
     }
 }
+
+const convertToBookItemWithoutSeries = (bookItem: BookItem): BookItemNoSeries => {
+  const copy = { ...bookItem };
+  delete copy.seriesId;
+  delete copy.orderNumber;
+  return copy;
+};
+
 </script>
 
 <template>

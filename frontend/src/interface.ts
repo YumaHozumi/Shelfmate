@@ -21,10 +21,12 @@ interface Series {
     counter: number;
 }
 
+type BookItemNoSeries = Omit<BookItem, "seriesId" | "orderNumber">;
+
 //ユーザ定義タイプガード
 const implementBookShelf = (arg: any): arg is BookShelf => {
     return arg !== null && typeof arg === "object" &&  typeof arg.shelf_name === "string" 
 }
 
-export type { BookItem, BookShelf, Series }
+export type { BookItem, BookShelf, Series, BookItemNoSeries }
 export { implementBookShelf }

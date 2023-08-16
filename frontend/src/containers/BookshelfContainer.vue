@@ -3,11 +3,12 @@ import type { BookItem, BookShelf } from '@/interface';
 import { ref } from "vue";
 import Books from "@/components/Bookshelf/Books.vue";
 import { onMounted } from 'vue';
-import { collection, getDocs, query } from 'firebase/firestore';
+import { collection, getDoc, getDocs, query } from 'firebase/firestore';
 import { firestore, getCurrentUser } from '@/config/firebase';
 import { type Series} from "@/interface";
+import BookComp from '@/components/Bookshelf/BookComp.vue';
 
-const series = ref<Series[]>([]);
+const items = ref<(Series | BookItem)[]>([]);
 
 onMounted(async() => {
     await getSeries();
@@ -17,12 +18,17 @@ const getSeries = async () => {
     const test = "912QcbhsSDDSORTQrXRb"
     const user = await getCurrentUser();
     // 本棚のシリーズコレクションへの参照を取得
-    // 本棚のシリーズコレクションへの参照を取得
     const seriesCollectionRef = collection(firestore, "users", user.uid, "bookshelves", test, "series");
-
+    const noSeriesBookCollection = collection(firestore, "users", user.uid, "bookshelves", test, "books");
     getDocs(seriesCollectionRef).then((snapshot) => {
       snapshot.forEach((e) => {
-        series.value.push(e.data() as Series)
+        items.value.push(e.data() as Series)
+      })
+    })
+
+    getDocs(noSeriesBookCollection).then((snapshot) => {
+      snapshot.forEach((e) => {
+        items.value.push(e.data() as BookItem);
       })
     })
   }
@@ -31,7 +37,7 @@ const getSeries = async () => {
 <template>
     <v-container>
         <div class="bookshelf">
-            <Books v-for="(element, index) in series" :key="index" :series="element"></Books>
+            <BookComp v-for="(element, index) in items" :key="index" :item="element"></BookComp>
         </div>
     </v-container>
 </template>
