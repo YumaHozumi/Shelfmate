@@ -9,6 +9,10 @@ import { onAuthStateChanged, type Unsubscribe } from 'firebase/auth';
 import Books from '@/components/Bookshelf/Books.vue';
 import { implementBookShelf } from "@/interface";
 
+interface Emits {
+    (event: "clickLocalHeaderBtn", bookshelf: BookShelf): void
+}
+
 const buttonsInit: BookShelf[] = []
 
 const buttons = ref(buttonsInit);
@@ -67,12 +71,18 @@ onAuthStateChanged(firebaseAuth, (user) => {
 onUnmounted(() => {
     unsubscribe();
 })
+
+const emit = defineEmits<Emits>();
+//ヘッダーのボタン押されたらさらに上位層へ
+const clickLocalHeaderBtn = (bookshelf: BookShelf): void => {
+    emit("clickLocalHeaderBtn", bookshelf);
+}
 </script>
 
 <template>
     <v-app-bar color="white" elevation="0" height="33" class="header-border">
         <div class="button-container">
-            <LocalHeaderButton v-for="(button, index) in visibleButtons" :key="index" :bookshelf="button" class="mx-2"></LocalHeaderButton>
+            <LocalHeaderButton v-for="(button, index) in visibleButtons" :key="index" :bookshelf="button" class="mx-2" @clickLocalHeaderBtn="clickLocalHeaderBtn"></LocalHeaderButton>
             <div v-show="hiddenButtons.length > 0">
                 <v-spacer></v-spacer>
                 <MoreMenu :items="hiddenButtons"></MoreMenu>

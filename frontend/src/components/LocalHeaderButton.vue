@@ -5,11 +5,21 @@ interface Props {
     bookshelf: BookShelf
 }
 
-defineProps<Props>();
+const prop = defineProps<Props>();
+
+interface Emits {
+    (event: "clickLocalHeaderBtn", bookshelf: BookShelf): void;
+}
+
+const emit = defineEmits<Emits>();
+
+const clickLocalHeaderBtn = (): void => {
+    emit("clickLocalHeaderBtn", prop.bookshelf);
+}
 </script>
 
 <template>
-    <button class="local-header-button">{{ bookshelf.shelf_name }}</button>
+    <button class="local-header-button" @click="clickLocalHeaderBtn">{{ bookshelf.shelf_name }}</button>
 </template>
 
 <style scoped lang="scss">
