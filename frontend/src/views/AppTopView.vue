@@ -16,31 +16,38 @@ const onNavigate = (name: string): void => {
   router.push({name: name});
 }
 
-const selectedBookshelf = ref<BookShelf>();
+const clickLocalHeaderBtn = (bookshelf: BookShelf): void => {
+  selectedBookshelf.value = bookshelf;
+}
 
-onBeforeMount(async () => {
+// ...
+const selectedBookshelf = ref<BookShelf | undefined>();
+
+
+const initializeSelectedBookshelf = async () => {
   try {
     const user = await getCurrentUser();
     const bookshelvesRef = collection(firestore, "users", user.uid, "bookshelves");
-    getDocs(bookshelvesRef).then((snapshot) => {
-      const firstDoc = snapshot.docs[0];
-      if(firstDoc) {
-        const data = firstDoc.data();
-        if(implementBookShelf(data)) {
-          const bookShelfData: BookShelf = { doc_id: firstDoc.id, ...data };
-          console.log(bookShelfData)
-        }
+    const snapshot = await getDocs(bookshelvesRef);
+    const firstDoc = snapshot.docs[0];
+    if (firstDoc) {
+      const data = firstDoc.data();
+      if (implementBookShelf(data)) {
+        const bookShelfData: BookShelf = { doc_id: firstDoc.id, ...data };
+        selectedBookshelf.value = bookShelfData;
       }
-    })
-  }catch(e){
-    console.log(e)
+    }
+  } catch (e) {
+    console.log(e);
   }
-})
+};
+
+initializeSelectedBookshelf(); // 関数を呼び出し、selectedBookshelfを初期化
 </script>
 
 <template>
   <Header @navigate="onNavigate"></Header>
-  <LocalHeader></LocalHeader>
+  <LocalHeader @clickLocalHeaderBtn="clickLocalHeaderBtn"></LocalHeader>
   <OptionContainer></OptionContainer>
-  <BookshelfContainer></BookshelfContainer>
+  <BookshelfContainer :selectedBookshelf="selectedBookshelf" v-if="selectedBookshelf"></BookshelfContainer>
 </template>

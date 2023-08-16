@@ -1,12 +1,18 @@
 <script setup lang="ts">
 import type { BookItem, BookShelf } from '@/interface';
-import { ref } from "vue";
+import { ref, watch, toRef} from "vue";
 import Books from "@/components/Bookshelf/Books.vue";
 import { onMounted } from 'vue';
 import { collection, getDoc, getDocs, query } from 'firebase/firestore';
 import { firestore, getCurrentUser } from '@/config/firebase';
 import { type Series} from "@/interface";
 import BookComp from '@/components/Bookshelf/BookComp.vue';
+
+interface Props {
+  selectedBookshelf: BookShelf | undefined
+}
+
+const prop = defineProps<Props>()
 
 const items = ref<(Series | BookItem)[]>([]);
 
@@ -15,23 +21,33 @@ onMounted(async() => {
 })
 
 const getSeries = async () => {
-    const test = "912QcbhsSDDSORTQrXRb"
     const user = await getCurrentUser();
     // 本棚のシリーズコレクションへの参照を取得
-    const seriesCollectionRef = collection(firestore, "users", user.uid, "bookshelves", test, "series");
-    const noSeriesBookCollection = collection(firestore, "users", user.uid, "bookshelves", test, "books");
-    getDocs(seriesCollectionRef).then((snapshot) => {
-      snapshot.forEach((e) => {
-        items.value.push(e.data() as Series)
+    const doc_id = prop.selectedBookshelf?.doc_id;
+    if(doc_id) {
+      const seriesCollectionRef = collection(firestore, "users", user.uid, "bookshelves", doc_id, "series");
+      const noSeriesBookCollection = collection(firestore, "users", user.uid, "bookshelves", doc_id, "books");
+      getDocs(seriesCollectionRef).then((snapshot) => {
+        snapshot.forEach((e) => {
+          items.value.push(e.data() as Series)
+        })
       })
-    })
+  
+      getDocs(noSeriesBookCollection).then((snapshot) => {
+        snapshot.forEach((e) => {
+          items.value.push(e.data() as BookItem);
+        })
+      })
 
-    getDocs(noSeriesBookCollection).then((snapshot) => {
-      snapshot.forEach((e) => {
-        items.value.push(e.data() as BookItem);
-      })
-    })
+    }
   }
+
+const selectedBookshelf = toRef(prop, "selectedBookshelf");
+
+watch(selectedBookshelf, async () => {
+  items.value.length = 0;
+  await getSeries();
+})
 </script>
 
 <template>
