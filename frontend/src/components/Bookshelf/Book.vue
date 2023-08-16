@@ -20,7 +20,7 @@ defineProps<Props>()
     align-items: center;
     justify-content: center;
     height: 100%;
-    width: 100%; // widthをパーセンテージに変更
+    width: 60%; // widthをパーセンテージに変更
     background: #e5e5e5;
     cursor: pointer;
     overflow: hidden; //拡大時に画像がコンテナからはみ出さないようにする

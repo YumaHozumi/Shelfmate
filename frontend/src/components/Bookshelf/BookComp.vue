@@ -1,32 +1,28 @@
 <script setup lang="ts">
 import type { Series, BookItem } from '@/interface';
+import Books from './Books.vue';
+import Book from './Book.vue';
+import FullDialog from '../FullDialog.vue';
 
 interface Props {
     item: Series | BookItem;
+    selectBookshelfId: string;
 }
 
 defineProps<Props>();
 
-// プロパティの型に基づいて特定の処理を実行するための関数
 const isSeries = (input: Series | BookItem): input is Series => {
     return (input as Series).counter !== undefined;
 }
 </script>
 
 <template>
-    <div class="book-container" :class="{'book-stack': isSeries(item)}">
-        <img class="book-image" :src="isSeries(item) ? item.pic : item.image_url">
-        <v-badge v-if="isSeries(item)"
-            color="blue"
-            overlap
-            class="book-badge"
-        >
-            <template v-slot:badge>
-                <span>{{ item.counter }}冊</span>
-            </template>
-        </v-badge>
-    </div>
+    <FullDialog v-if="isSeries(item)" :series="item" :selectBookshelfId="selectBookshelfId">
+        <Books :series="item"></Books>
+    </FullDialog>
+    <Book v-else :book="item"></Book>
 </template>
+
 
 <style scoped lang="scss">
 .book-container {

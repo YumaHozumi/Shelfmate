@@ -53,7 +53,7 @@ watch(selectedBookshelf, async () => {
 <template>
     <v-container>
         <div class="bookshelf">
-            <BookComp v-for="(element, index) in items" :key="index" :item="element"></BookComp>
+            <BookComp v-for="(element, index) in items" :key="index" :item="element" :selectBookshelfId="selectedBookshelf?.doc_id || ''"></BookComp>
         </div>
     </v-container>
 </template>
