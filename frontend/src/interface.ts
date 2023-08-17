@@ -28,5 +28,6 @@ const implementBookShelf = (arg: any): arg is BookShelf => {
     return arg !== null && typeof arg === "object" &&  typeof arg.shelf_name === "string" 
 }
 
+
 export type { BookItem, BookShelf, Series, BookItemNoSeries }
 export { implementBookShelf }

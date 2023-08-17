@@ -1,20 +1,33 @@
 <script setup lang="ts">
-import { getCurrentUser } from '@/config/firebase';
-import type { Series } from '@/interface';
+import { firestore, getCurrentUser } from '@/config/firebase';
+import { type BookItem, type Series } from '@/interface';
+import { collection, getDocs } from 'firebase/firestore';
 import { ref } from 'vue';
+import BookListItem from "@/components/BookListItem.vue";
 
 interface Props {
     series: Series
     selectBookshelfId: string;
 }
 
-const props = defineProps<Props>();
+const prop = defineProps<Props>();
 
 const dialog = ref(false);
+const bookList = ref<BookItem[]>([]);
 
 const onClickBook = async() => {
     const user = await getCurrentUser();
-    console.log(props.selectBookshelfId)
+
+    if (prop.series.seriesId){
+        const booksCollection = collection(firestore, "users", user.uid, "bookshelves", prop.selectBookshelfId, "series", prop.series.seriesId, "books");
+        await getDocs(booksCollection)
+            .then((snapshot) => {
+                snapshot.forEach((book) => {
+                    bookList.value.push(book.data() as BookItem);
+                })
+            })
+    }
+    
 }
 </script>
 
@@ -34,7 +47,9 @@ const onClickBook = async() => {
                 </v-btn>
             </v-toolbar>
             <v-list>
-                <v-list-item></v-list-item>
+                <v-list-item v-for="(book, index) in bookList" :key="index">
+                    <BookListItem :book="book"></BookListItem>
+                </v-list-item>
             </v-list>
         </v-card>
     </v-dialog>
