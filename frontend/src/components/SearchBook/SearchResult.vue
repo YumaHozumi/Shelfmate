@@ -1,35 +1,35 @@
 <script setup lang="ts">
-import type { BookItem} from "@/interface.ts";
+import type { BookItem } from '@/interface.ts'
 
 interface Props {
-    book: BookItem;
+  book: BookItem
 }
 //デフォルト値設定
-const props = defineProps<Props>();
+const props = defineProps<Props>()
 
 interface Emits {
-  (event: "registerBook", book: BookItem): void;
+  (event: 'registerBook', book: BookItem): void
 }
 
-const emit = defineEmits<Emits>();
+const emit = defineEmits<Emits>()
 
 const registerBook = (): void => {
-  emit("registerBook", props.book);
+  emit('registerBook', props.book)
 }
 </script>
 
 <template>
-    <div class="book-item">
-      <img class="book-cover" :src="book.image_url" alt="Book Cover">
-      <div class="book-info">
-        <h2 class="book-title">{{ book.title }}</h2>
-        <p class="book-author">{{ book.author }}</p>
-        <p class="book-detail">{{ book.detail }}</p>
-      </div>
-      <div class="book-actions">
-        <v-btn color="green" @click="registerBook">本を追加</v-btn>
-      </div>
+  <div class="book-item">
+    <img class="book-cover" :src="book.image_url" alt="Book Cover" />
+    <div class="book-info">
+      <h2 class="book-title">{{ book.title }}</h2>
+      <p class="book-author">{{ book.author }}</p>
+      <p class="book-detail">{{ book.detail }}</p>
     </div>
+    <div class="book-actions">
+      <v-btn color="green" @click="registerBook">本を追加</v-btn>
+    </div>
+  </div>
 </template>
 
 <style scoped lang="scss">
@@ -64,7 +64,7 @@ const registerBook = (): void => {
     .book-detail {
       font-size: 12px;
       color: #999;
-      max-height:45%;
+      max-height: 45%;
       overflow: hidden;
     }
   }
@@ -79,5 +79,3 @@ const registerBook = (): void => {
   }
 }
 </style>
-
-  

@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import type { BookItem} from "@/interface.ts";
+import type { BookItem } from '@/interface.ts'
 
 interface Props {
-    book: BookItem;
+  book: BookItem
 }
 //デフォルト値設定
-defineProps<Props>();
+defineProps<Props>()
 </script>
 
 <template>
-    <div class="book-item">
-      <img class="book-cover" :src="book.image_url" alt="Book Cover">
-      <div class="book-info">
-        <h2 class="book-title">{{ book.title }}</h2>
-        <p class="book-author">{{ book.author }}</p>
-        <p class="book-detail">{{ book.detail }}</p>
-      </div>
+  <div class="book-item">
+    <img class="book-cover" :src="book.image_url" alt="Book Cover" />
+    <div class="book-info">
+      <h2 class="book-title">{{ book.title }}</h2>
+      <p class="book-author">{{ book.author }}</p>
+      <p class="book-detail">{{ book.detail }}</p>
     </div>
+  </div>
 </template>
 
 <style scoped lang="scss">
@@ -53,5 +53,3 @@ defineProps<Props>();
   }
 }
 </style>
-
-  

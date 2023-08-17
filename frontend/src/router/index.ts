@@ -17,22 +17,22 @@ const routeSettings: RouteRecordRaw[] = [
     component: () => import('@/views/LoginView.vue')
   },
   {
-    path: "/register",
-    name: "Register",
-    component: () => import("@/views/RegisterView.vue")
+    path: '/register',
+    name: 'Register',
+    component: () => import('@/views/RegisterView.vue')
   },
   {
-    path: "/series/:id",
-    name: "Series",
+    path: '/series/:id',
+    name: 'Series',
     props: true,
-    component: () => import("@/views/SeriesView.vue"),
+    component: () => import('@/views/SeriesView.vue'),
     meta: { requiresAuth: true }
   },
   {
-    path: "/search",
-    name: "Search",
-    component: () => import("@/views/SearchBookView.vue"),
-    meta: { requiresAuth: true}
+    path: '/search',
+    name: 'Search',
+    component: () => import('@/views/SearchBookView.vue'),
+    meta: { requiresAuth: true }
   }
 ]
 
@@ -42,17 +42,16 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  console.log("route")
-  const requireAuth = to.matched.some(record => record.meta.requireAuth);
-  if(requireAuth) {
+  console.log('route')
+  const requireAuth = to.matched.some((record) => record.meta.requireAuth)
+  if (requireAuth) {
     onAuthStateChanged(firebaseAuth, (user) => {
-      if(user) {
+      if (user) {
         next()
-      }
-      else next({name: "Login"});
+      } else next({ name: 'Login' })
     })
   } else {
-    next();
+    next()
   }
 })
 

@@ -1,20 +1,16 @@
 <script setup lang="ts">
 interface Props {
-    isLoading: boolean
+  isLoading: boolean
 }
 
-defineProps<Props>();
+defineProps<Props>()
 // ローディングフラグ
 </script>
 
 <template>
-    <div class="loading" v-if="isLoading">
-        <v-progress-circular
-        indeterminate
-        :size="100"
-        color="green"
-        ></v-progress-circular>
-    </div>
+  <div class="loading" v-if="isLoading">
+    <v-progress-circular indeterminate :size="100" color="green"></v-progress-circular>
+  </div>
 </template>
 
 <style scoped lang="scss">

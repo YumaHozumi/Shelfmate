@@ -1,208 +1,226 @@
 <script setup lang="ts">
-import GlobalHeader from "@/containers/GlobalHeader.vue";
-import Results from "@/components/SearchBook/Results.vue";
-import { type BookShelf, type BookItem } from "@/interface"
-import { ref } from "vue";
-import SearchBar from "@/basic/SearchBar.vue";
-import axios from "axios";
-import LoadingContainer from "@/containers/LoadingContainer.vue";
-import Menu from "@/components/Menu.vue";
-import { firebaseAuth, firestore, getCurrentUser } from "@/config/firebase";
-import { addDoc, collection, doc, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
-import imageURL from "@/assets/no-image.png";
-import { onAuthStateChanged, type Unsubscribe } from "firebase/auth";
-import { implementBookShelf, type BookItemNoSeries } from "@/interface";
-import { onUnmounted, computed} from "vue";
+import GlobalHeader from '@/containers/GlobalHeader.vue'
+import Results from '@/components/SearchBook/Results.vue'
+import { type BookShelf, type BookItem } from '@/interface'
+import { ref } from 'vue'
+import SearchBar from '@/basic/SearchBar.vue'
+import axios from 'axios'
+import LoadingContainer from '@/containers/LoadingContainer.vue'
+import Menu from '@/components/Menu.vue'
+import { firebaseAuth, firestore, getCurrentUser } from '@/config/firebase'
+import { addDoc, collection, doc, getDoc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore'
+import imageURL from '@/assets/no-image.png'
+import { onAuthStateChanged, type Unsubscribe } from 'firebase/auth'
+import { implementBookShelf, type BookItemNoSeries } from '@/interface'
+import { onUnmounted, computed } from 'vue'
 import router from '@/router'
-import { incrementCounter, sort } from "@/function";
-
+import { incrementCounter, sort } from '@/function'
 
 const onNavigate = (name: string): void => {
-  router.push({name: name});
+  router.push({ name: name })
 }
 
 const itemsInit: BookItem[] = []
 const items = ref(itemsInit)
 const isLoading = ref(false)
-let nowIndex = 0;
+let nowIndex = 0
 
 const searchClick = async (searchText: string) => {
-    isLoading.value = true;
-    //const baseURL = "https://iss.ndl.go.jp/api/opensearch"
-    const baseURL = "https://www.googleapis.com/books/v1/volumes"
-    const query = new URLSearchParams({q: searchText, 
-        printType: "books",
-        filter: "ebooks",
-        maxResults: "5"
+  isLoading.value = true
+  //const baseURL = "https://iss.ndl.go.jp/api/opensearch"
+  const baseURL = 'https://www.googleapis.com/books/v1/volumes'
+  const query = new URLSearchParams({
+    q: searchText,
+    printType: 'books',
+    filter: 'ebooks',
+    maxResults: '5'
+  })
+
+  const completedURL = `${baseURL}?${query}`
+
+  await axios
+    .get(completedURL)
+    .then((res) => {
+      const apiItems = res.data.items
+      const books: BookItem[] = apiItems.map((item: any) => ({
+        bookId: item.id,
+        isbn: item.volumeInfo?.industryIdentifiers?.[1]?.identifier ?? 0,
+        title: item.volumeInfo?.title ?? '',
+        image_url: item.volumeInfo?.imageLinks?.thumbnail ?? imageURL,
+        author: item.volumeInfo?.authors?.[0] ?? '',
+        detail: item.searchInfo?.textSnippet ?? '',
+        public_date: new Date(item.volumeInfo?.publishedDate || 0),
+        seriesId: item.volumeInfo?.seriesInfo?.volumeSeries?.[0]?.seriesId ?? '',
+        orderNumber: item.volumeInfo?.seriesInfo?.volumeSeries?.[0]?.orderNumber ?? 0
+      }))
+
+      books.forEach((book) => {
+        if (book.isbn !== undefined && book.image_url === undefined) {
+          book.image_url = 'https://iss.ndl.go.jp/thumbnail/' + book.isbn
+        }
+      })
+      //予めソートしたものを入れる
+      items.value = sort(books, menu[nowIndex])
+    })
+    .catch((e) => {
+      console.log(e)
     })
 
-    const completedURL = `${baseURL}?${query}`
-
-    await axios
-        .get(completedURL)
-        .then((res) => {
-            const apiItems = res.data.items;
-            const books: BookItem[] = apiItems.map((item: any) => ({
-                bookId: item.id,
-                isbn: item.volumeInfo?.industryIdentifiers?.[1]?.identifier ?? 0,
-                title: item.volumeInfo?.title ?? "",
-                image_url: item.volumeInfo?.imageLinks?.thumbnail ?? imageURL,
-                author: item.volumeInfo?.authors?.[0] ?? "",
-                detail: item.searchInfo?.textSnippet ?? "",
-                public_date: new Date(item.volumeInfo?.publishedDate || 0),
-                seriesId: item.volumeInfo?.seriesInfo?.volumeSeries?.[0]?.seriesId ?? "",
-                orderNumber: item.volumeInfo?.seriesInfo?.volumeSeries?.[0]?.orderNumber ?? 0,
-            }))
-
-            books.forEach((book) => {
-                if(book.isbn !== undefined && book.image_url === undefined){
-                    book.image_url = "https://iss.ndl.go.jp/thumbnail/" + book.isbn;
-                }
-            })
-            //予めソートしたものを入れる
-            items.value = sort(books, menu[nowIndex]);
-        })
-        .catch((e) => {
-            console.log(e);
-        })
-
-    isLoading.value = false;
+  isLoading.value = false
 }
 
-const menu = ["発売日が新しい順", "発売日が古い順", "作品名順", "作者名順"]
+const menu = ['発売日が新しい順', '発売日が古い順', '作品名順', '作者名順']
 
-const registerBook = async(book: BookItem) => {
-    try {
-        const user = await getCurrentUser();
-        const bookshelvesRef = collection(firestore, "users", user.uid, "bookshelves");
-        const selectedBookshelfId = selectedBookshelf.value?.doc_id || "";
-        const seriesId = book?.seriesId ?? "";
+const registerBook = async (book: BookItem) => {
+  try {
+    const user = await getCurrentUser()
+    const bookshelvesRef = collection(firestore, 'users', user.uid, 'bookshelves')
+    const selectedBookshelfId = selectedBookshelf.value?.doc_id || ''
+    const seriesId = book?.seriesId ?? ''
 
-        if(seriesId === ""){
-            const noSeriesBookCollection = collection(firestore, "users", user.uid, "bookshelves", selectedBookshelfId, "books")
-            const noSeriesBook: BookItemNoSeries = convertToBookItemWithoutSeries(book);
-            await addDoc(noSeriesBookCollection, noSeriesBook);
-        } else {
-            const seriesRef = doc(bookshelvesRef, selectedBookshelfId, "series", seriesId);
-            const seriesSnap = await getDoc(seriesRef);
-            if (seriesSnap.exists()) {
-            // ドキュメントが存在する場合、画像のみ更新
-                await updateDoc(seriesRef, {
-                    pic: book.image_url
-            });
-            } else {
-            // ドキュメントが存在しない場合、画像とカウンターを設定
-                await setDoc(seriesRef, {
-                    seriesId: seriesId,
-                    pic: book.image_url,
-                    counter: 0
-            });
-            }
-    
-    
-            const booksCollection = collection(firestore, "users", user.uid, "bookshelves",selectedBookshelfId, "series", seriesId, "books")
-            await addDoc(booksCollection, book);
-            await incrementCounter(seriesRef)
-        }
-        
-    }catch(error) {
-        console.log(error);
+    if (seriesId === '') {
+      const noSeriesBookCollection = collection(
+        firestore,
+        'users',
+        user.uid,
+        'bookshelves',
+        selectedBookshelfId,
+        'books'
+      )
+      const noSeriesBook: BookItemNoSeries = convertToBookItemWithoutSeries(book)
+      await addDoc(noSeriesBookCollection, noSeriesBook)
+    } else {
+      const seriesRef = doc(bookshelvesRef, selectedBookshelfId, 'series', seriesId)
+      const seriesSnap = await getDoc(seriesRef)
+      if (seriesSnap.exists()) {
+        // ドキュメントが存在する場合、画像のみ更新
+        await updateDoc(seriesRef, {
+          pic: book.image_url
+        })
+      } else {
+        // ドキュメントが存在しない場合、画像とカウンターを設定
+        await setDoc(seriesRef, {
+          seriesId: seriesId,
+          pic: book.image_url,
+          counter: 0
+        })
+      }
+
+      const booksCollection = collection(
+        firestore,
+        'users',
+        user.uid,
+        'bookshelves',
+        selectedBookshelfId,
+        'series',
+        seriesId,
+        'books'
+      )
+      await addDoc(booksCollection, book)
+      await incrementCounter(seriesRef)
     }
+  } catch (error) {
+    console.log(error)
+  }
 }
 
-const buttons = ref<BookShelf[]>([]);
+const buttons = ref<BookShelf[]>([])
 
-let unsubscribe: Unsubscribe;
+let unsubscribe: Unsubscribe
 
 onAuthStateChanged(firebaseAuth, (user) => {
-
-if(user) {
-    unsubscribe = onSnapshot(collection(firestore, "users", user.uid, "bookshelves"), (snapshot) => {
+  if (user) {
+    unsubscribe = onSnapshot(
+      collection(firestore, 'users', user.uid, 'bookshelves'),
+      (snapshot) => {
         snapshot.docChanges().forEach((change) => {
-            const data = change.doc.data();
-            if (implementBookShelf(data)) {
-                if (change.type === "added") {
-                    const bookShelfData: BookShelf = { doc_id: change.doc.id, ...data }; // doc_idを設定し直します
-                    buttons.value.push(bookShelfData);
-                }
-
-                if(selectedBookshelf.value === undefined) {
-                    selectedBookshelf.value = buttons.value?.[0];
-                }
+          const data = change.doc.data()
+          if (implementBookShelf(data)) {
+            if (change.type === 'added') {
+              const bookShelfData: BookShelf = { doc_id: change.doc.id, ...data } // doc_idを設定し直します
+              buttons.value.push(bookShelfData)
             }
+
+            if (selectedBookshelf.value === undefined) {
+              selectedBookshelf.value = buttons.value?.[0]
+            }
+          }
         })
-    })
-
-}
-
+      }
+    )
+  }
 })
 
 onUnmounted(() => {
-    unsubscribe();
+  unsubscribe()
 })
 
 const bookshelfOptions = computed(() => {
-  return buttons.value.map(button => ({
+  return buttons.value.map((button) => ({
     title: button.shelf_name,
     value: button // ここで識別子として使用するプロパティを設定します
-  }));
-});
+  }))
+})
 
-const selectedBookshelf = ref<BookShelf | undefined>(undefined); // 選択されたbookshelfのIDを保持するためのref
+const selectedBookshelf = ref<BookShelf | undefined>(undefined) // 選択されたbookshelfのIDを保持するためのref
 
 const selectMenu = (index: number): void => {
-    items.value = sort(items.value, menu[index]);
-    nowIndex = index;
+  items.value = sort(items.value, menu[index])
+  nowIndex = index
 }
 
 const convertToBookItemWithoutSeries = (bookItem: BookItem): BookItemNoSeries => {
-  const copy = { ...bookItem };
-  delete copy.seriesId;
-  delete copy.orderNumber;
-  return copy;
-};
-
+  const copy = { ...bookItem }
+  delete copy.seriesId
+  delete copy.orderNumber
+  return copy
+}
 </script>
 
 <template>
-    <GlobalHeader @navigate="onNavigate"></GlobalHeader>
-    <v-select label="追加先" :items="bookshelfOptions" item-title="title" item-value="value" v-model="selectedBookshelf" class="select">
-    </v-select>
-    <SearchBar @search="searchClick" class="mt-4 mb-4"></SearchBar>
-    
-    <div class="menu-container">
-        <Menu :items="menu" icon="mdi-sort" class="menu" @selectItem="selectMenu"></Menu>
-    </div>
+  <GlobalHeader @navigate="onNavigate"></GlobalHeader>
+  <v-select
+    label="追加先"
+    :items="bookshelfOptions"
+    item-title="title"
+    item-value="value"
+    v-model="selectedBookshelf"
+    class="select"
+  >
+  </v-select>
+  <SearchBar @search="searchClick" class="mt-4 mb-4"></SearchBar>
 
-    <Results :items="items" v-if="!isLoading" @registerBook="registerBook"></Results>
-    <LoadingContainer :isLoading="isLoading"></LoadingContainer>
+  <div class="menu-container">
+    <Menu :items="menu" icon="mdi-sort" class="menu" @selectItem="selectMenu"></Menu>
+  </div>
+
+  <Results :items="items" v-if="!isLoading" @registerBook="registerBook"></Results>
+  <LoadingContainer :isLoading="isLoading"></LoadingContainer>
 </template>
 
 <style scoped lang="scss">
 .menu {
-    margin: 0 10px 0 0;
-    display: flex;
+  margin: 0 10px 0 0;
+  display: flex;
 }
 .modify-width {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 .select {
-    margin-top: 30px;
-    margin-left: 10%;
-    margin-right: 10%;
+  margin-top: 30px;
+  margin-left: 10%;
+  margin-right: 10%;
 }
 
 .menu-container {
-    display: flex;
-    justify-content: flex-end;
-    margin-right: 9%;
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 9%;
 
-    .menu {
-        background-color: white;
-    }
+  .menu {
+    background-color: white;
+  }
 }
-
-
 </style>

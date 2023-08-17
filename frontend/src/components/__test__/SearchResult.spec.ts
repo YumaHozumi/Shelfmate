@@ -6,14 +6,14 @@ import { describe, test, expect } from 'vitest'
 describe('SearchResult.vue', () => {
   test('renders with default image when image prop is not provided', () => {
     const propsData = {
-        book: {
-            isbn: 1111111111,
-            title: "2.5次元の誘惑",
-            image_url: undefined,
-            author: "あああ",
-            detail: "hoge",
-            public_date: new Date()
-        }
+      book: {
+        isbn: 1111111111,
+        title: '2.5次元の誘惑',
+        image_url: undefined,
+        author: 'あああ',
+        detail: 'hoge',
+        public_date: new Date()
+      }
     }
 
     const wrapper = mount(SearchResult, {
@@ -31,22 +31,21 @@ describe('SearchResult.vue', () => {
   })
 
   test('renders with provided image when image prop is provided', () => {
-
     const propsData = {
-        book: {
-            isbn: 1111111111,
-            title: "2.5次元の誘惑",
-            image_url: "https://www.iwanami.co.jp/files/kojien/kojien6img5.jpg",
-            author: "あああ",
-            detail: "hoge",
-            public_date: new Date()
-        }
+      book: {
+        isbn: 1111111111,
+        title: '2.5次元の誘惑',
+        image_url: 'https://www.iwanami.co.jp/files/kojien/kojien6img5.jpg',
+        author: 'あああ',
+        detail: 'hoge',
+        public_date: new Date()
+      }
     }
     const wrapper = mount(SearchResult, {
       props: propsData
     })
 
-    const book = propsData.book;
+    const book = propsData.book
 
     // Check if the title, author and detail are rendered correctly
     expect(wrapper.get('.book-title').text()).toBe(book.title)

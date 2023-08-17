@@ -1,31 +1,31 @@
 <script setup lang="ts">
 interface Emits {
-    (event: "submitButton"): void;
+  (event: 'submitButton'): void
 }
 
-const emit = defineEmits<Emits>();
+const emit = defineEmits<Emits>()
 
 const submitButton = (): void => {
-    emit("submitButton");
+  emit('submitButton')
 }
 
 interface Props {
-    text: string;
-    color: string;
+  text: string
+  color: string
 }
 
-defineProps<Props>();
+defineProps<Props>()
 </script>
 
 <template>
-    <v-btn :color="color" class="submitButton" width="100%" @click="submitButton">
-        {{ text }}
-    </v-btn>
+  <v-btn :color="color" class="submitButton" width="100%" @click="submitButton">
+    {{ text }}
+  </v-btn>
 </template>
 
 <style scoped>
 .submitButton {
-    font-weight: bolder;
-    font-size: 17px;
+  font-weight: bolder;
+  font-size: 17px;
 }
 </style>

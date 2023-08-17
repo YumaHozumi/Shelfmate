@@ -1,12 +1,12 @@
 <script setup lang="ts">
 interface Props {
-    text: string;
-    name: string;
+  text: string
+  name: string
 }
 
-defineProps<Props>();
+defineProps<Props>()
 </script>
 
 <template>
-    <RouterLink :to="{name: name}">{{ text }}</RouterLink>
+  <RouterLink :to="{ name: name }">{{ text }}</RouterLink>
 </template>

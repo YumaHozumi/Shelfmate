@@ -1,21 +1,21 @@
 <script setup lang="ts">
 interface Props {
-    errorMessage: string;
+  errorMessage: string
 }
 
-defineProps<Props>();
+defineProps<Props>()
 </script>
 
 <template>
-    <div v-if="errorMessage" class="error">
-        {{ errorMessage }}
-    </div>
+  <div v-if="errorMessage" class="error">
+    {{ errorMessage }}
+  </div>
 </template>
 
 <style scoped>
 .error {
-    color: red;
-    font-weight: bold;
-    margin-top: 10px;
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
 }
 </style>

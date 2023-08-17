@@ -6,7 +6,7 @@ import type { RouterView } from 'vue-router'
   <div id="app">
     <v-app>
       <v-main>
-          <RouterView></RouterView>
+        <RouterView></RouterView>
       </v-main>
     </v-app>
   </div>

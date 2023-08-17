@@ -1,50 +1,49 @@
 <script setup lang="ts">
-import LoginForm from "@/containers/Form/LoginForm.vue";
-import Header from "@/containers/GlobalHeader.vue";
+import LoginForm from '@/containers/Form/LoginForm.vue'
+import Header from '@/containers/GlobalHeader.vue'
 import router from '@/router'
-import { onMounted, ref } from "vue";
-import  {getRedirectResult } from "firebase/auth";
-import { firebaseAuth, getCurrentUser, firestore } from "@/config/firebase";
-import LoadingContainer from "@/containers/LoadingContainer.vue";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { onMounted, ref } from 'vue'
+import { getRedirectResult } from 'firebase/auth'
+import { firebaseAuth, getCurrentUser, firestore } from '@/config/firebase'
+import LoadingContainer from '@/containers/LoadingContainer.vue'
+import { collection, addDoc, getDocs } from 'firebase/firestore'
 
 const onNavigate = (name: string): void => {
-  router.push({name: name});
+  router.push({ name: name })
 }
 
 // レンダリングフラグを追加
-const isLoading = ref(true);
+const isLoading = ref(true)
 
 const onInitBookshelf = async () => {
-  const user = await getCurrentUser();
-  const bookShelfCollection = collection(firestore, "users", user.uid, "bookshelves");
+  const user = await getCurrentUser()
+  const bookShelfCollection = collection(firestore, 'users', user.uid, 'bookshelves')
 
   // コレクションからドキュメントをクエリ
-  const querySnapshot = await getDocs(bookShelfCollection);
+  const querySnapshot = await getDocs(bookShelfCollection)
 
   // クエリが空の場合、ドキュメントを追加
   if (querySnapshot.empty) {
-    await addDoc(bookShelfCollection, { shelf_name: "始まりの本棚" });
+    await addDoc(bookShelfCollection, { shelf_name: '始まりの本棚' })
   }
 }
 
-
 onMounted(async () => {
-    try {
-      isLoading.value = true;
-      const result = await getRedirectResult(firebaseAuth);
-      if (result?.user) {
-        // ユーザーは正常に認証されました
-        //const user = result.user;
-        // userを使用して何かしらの処理を行います
-        await onInitBookshelf()
-        onNavigate("AppTop");
-      }
-    } catch (error) {
-      console.error(error);
+  try {
+    isLoading.value = true
+    const result = await getRedirectResult(firebaseAuth)
+    if (result?.user) {
+      // ユーザーは正常に認証されました
+      //const user = result.user;
+      // userを使用して何かしらの処理を行います
+      await onInitBookshelf()
+      onNavigate('AppTop')
     }
-    // リダイレクト処理が終わったらレンダリングを許可
-    isLoading.value = false;
+  } catch (error) {
+    console.error(error)
+  }
+  // リダイレクト処理が終わったらレンダリングを許可
+  isLoading.value = false
 })
 </script>
 
