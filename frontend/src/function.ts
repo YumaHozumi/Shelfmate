@@ -1,5 +1,6 @@
 import { FirebaseError } from "firebase/app";
 import { DocumentReference, getDoc, increment, updateDoc } from "firebase/firestore";
+import type { BookItem } from "./interface";
 
 const firebaseErrorMessage = (e: FirebaseError): string => {
     switch (e.code) {
@@ -49,4 +50,18 @@ const decrementCounter = async (docRef: DocumentReference) => {
   }
 };
 
-export { firebaseErrorMessage, incrementCounter, decrementCounter };
+const sort = (books: BookItem[], order: string): BookItem[] => {
+  if(order === "発売日が新しい順") {
+      return books.slice().sort((a, b) => b.public_date.getTime() - a.public_date.getTime())
+  } else if (order === "発売日が古い順") {
+      return books.slice().sort((a, b) => a.public_date.getTime() - b.public_date.getTime())
+  } else if(order === "作品名順") {
+      return books.slice().sort((a, b) => a.title.localeCompare(b.title, 'ja-u-co-natural'));
+  } else if(order === "作者名順"){
+      return books.slice().sort((a, b) => a.title.localeCompare(b.author, 'ja-u-co-natural'));
+  } else {
+      return books;
+  }
+}
+
+export { firebaseErrorMessage, incrementCounter, decrementCounter, sort };

@@ -14,8 +14,7 @@ import { onAuthStateChanged, type Unsubscribe } from "firebase/auth";
 import { implementBookShelf, type BookItemNoSeries } from "@/interface";
 import { onUnmounted, computed} from "vue";
 import router from '@/router'
-import LocalHeader from "@/containers/LocalHeader.vue";
-import { incrementCounter } from "@/function";
+import { incrementCounter, sort } from "@/function";
 
 
 const onNavigate = (name: string): void => {
@@ -42,7 +41,6 @@ const searchClick = async (searchText: string) => {
     await axios
         .get(completedURL)
         .then((res) => {
-            console.log(res)
             const apiItems = res.data.items;
             const books: BookItem[] = apiItems.map((item: any) => ({
                 bookId: item.id,
@@ -157,20 +155,6 @@ const selectMenu = (index: number): void => {
     nowIndex = index;
 }
 
-const sort = (books: BookItem[], order: string): BookItem[] => {
-    if(order === "発売日が新しい順") {
-        return books.slice().sort((a, b) => b.public_date.getTime() - a.public_date.getTime())
-    } else if (order === "発売日が古い順") {
-        return books.slice().sort((a, b) => a.public_date.getTime() - b.public_date.getTime())
-    } else if(order === "作品名順") {
-        return books.slice().sort((a, b) => a.title.localeCompare(b.title, 'ja-u-co-natural'));
-    } else if(order === "作者名順"){
-        return books.slice().sort((a, b) => a.title.localeCompare(b.author, 'ja-u-co-natural'));
-    } else {
-        return books;
-    }
-}
-
 const convertToBookItemWithoutSeries = (bookItem: BookItem): BookItemNoSeries => {
   const copy = { ...bookItem };
   delete copy.seriesId;
@@ -182,29 +166,19 @@ const convertToBookItemWithoutSeries = (bookItem: BookItem): BookItemNoSeries =>
 
 <template>
     <GlobalHeader @navigate="onNavigate"></GlobalHeader>
-        <div class="search-add-container mt-8 mb-4 mx-12">
-            <SearchBar @search="searchClick" class="me-6"></SearchBar>
-            <v-select label="追加先" :items="bookshelfOptions" item-title="title" item-value="value" v-model="selectedBookshelf">
-                
-            </v-select>
+    <v-select label="追加先" :items="bookshelfOptions" item-title="title" item-value="value" v-model="selectedBookshelf" class="select">
+    </v-select>
+    <SearchBar @search="searchClick" class="mt-4 mb-4"></SearchBar>
+    
+    <div class="menu-container">
+        <Menu :items="menu" icon="mdi-sort" class="menu" @selectItem="selectMenu"></Menu>
+    </div>
 
-        </div>
-
-    <v-row justify="end">
-        <v-col cols="2">
-            <Menu :items="menu" icon="mdi-sort" class="transparency" @selectItem="selectMenu"></Menu>
-
-        </v-col>
-        
-    </v-row>
     <Results :items="items" v-if="!isLoading" @registerBook="registerBook"></Results>
     <LoadingContainer :isLoading="isLoading"></LoadingContainer>
 </template>
 
-<style scoped>
-.search-add-container {
-    display: flex;
-}
+<style scoped lang="scss">
 .menu {
     margin: 0 10px 0 0;
     display: flex;
@@ -214,7 +188,21 @@ const convertToBookItemWithoutSeries = (bookItem: BookItem): BookItemNoSeries =>
     height: 100%;
 }
 
-.transparency {
-    background-color: white;
+.select {
+    margin-top: 30px;
+    margin-left: 10%;
+    margin-right: 10%;
 }
+
+.menu-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-right: 9%;
+
+    .menu {
+        background-color: white;
+    }
+}
+
+
 </style>

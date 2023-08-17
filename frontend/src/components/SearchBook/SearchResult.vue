@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import imageURL from "@/assets/no-image.png";
-import { computed } from 'vue';
 import type { BookItem} from "@/interface.ts";
 
 interface Props {
@@ -39,8 +37,8 @@ const registerBook = (): void => {
   position: relative; // Added
   display: flex;
   flex-direction: row;
-  max-width: 55%;
-  margin: 10px auto;
+  max-width: 95%;
+  margin: 10px 10%;
   border: 1px solid #ccc;
   padding: 10px;
 
@@ -66,6 +64,8 @@ const registerBook = (): void => {
     .book-detail {
       font-size: 12px;
       color: #999;
+      max-height:45%;
+      overflow: hidden;
     }
   }
 

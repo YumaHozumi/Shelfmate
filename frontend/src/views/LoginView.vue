@@ -6,7 +6,7 @@ import { onMounted, ref } from "vue";
 import  {getRedirectResult } from "firebase/auth";
 import { firebaseAuth, getCurrentUser, firestore } from "@/config/firebase";
 import LoadingContainer from "@/containers/LoadingContainer.vue";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs } from "firebase/firestore";
 
 const onNavigate = (name: string): void => {
   router.push({name: name});
@@ -17,9 +17,17 @@ const isLoading = ref(true);
 
 const onInitBookshelf = async () => {
   const user = await getCurrentUser();
-  const bookShelfCollection = collection(firestore, "users", user.uid, "bookshelves")
-  await addDoc(bookShelfCollection, { shelf_name: "始まりの本棚"})
+  const bookShelfCollection = collection(firestore, "users", user.uid, "bookshelves");
+
+  // コレクションからドキュメントをクエリ
+  const querySnapshot = await getDocs(bookShelfCollection);
+
+  // クエリが空の場合、ドキュメントを追加
+  if (querySnapshot.empty) {
+    await addDoc(bookShelfCollection, { shelf_name: "始まりの本棚" });
+  }
 }
+
 
 onMounted(async () => {
     try {
