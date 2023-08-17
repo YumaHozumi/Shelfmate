@@ -45,6 +45,9 @@ const onClickBook = async() => {
                 <v-btn icon @click="dialog = false">
                     <v-icon>mdi-close</v-icon>
                 </v-btn>
+                <v-toolbar-title>
+                    作品一覧
+                </v-toolbar-title>
             </v-toolbar>
             <v-list>
                 <v-list-item v-for="(book, index) in bookList" :key="index">
@@ -54,3 +57,10 @@ const onClickBook = async() => {
         </v-card>
     </v-dialog>
 </template>
+
+<style scoped lang="scss">
+.book-item {
+    margin: 10px auto;
+    width: 95%
+}
+</style>

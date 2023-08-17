@@ -24,8 +24,6 @@ defineProps<Props>();
   position: relative; // Added
   display: flex;
   flex-direction: row;
-  max-width: 95%;
-  margin: 10px auto;
   border: 1px solid #ccc;
   padding: 10px;
 

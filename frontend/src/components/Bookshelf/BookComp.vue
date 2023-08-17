@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import type { Series, BookItem } from '@/interface';
-import Books from './Books.vue';
-import Book from './Book.vue';
-import FullDialog from '../FullDialog.vue';
+import Books from '@/components/Bookshelf/Books.vue';
+import Book from '@/components/Bookshelf/Book.vue';
+import FullDialog from '@/components/FullDialog.vue';
+import BookDialog from '@/components/Bookshelf/BookDialog.vue';
 
 interface Props {
     item: Series | BookItem;
@@ -20,7 +21,12 @@ const isSeries = (input: Series | BookItem): input is Series => {
     <FullDialog v-if="isSeries(item)" :series="item" :selectBookshelfId="selectBookshelfId">
         <Books :series="item"></Books>
     </FullDialog>
-    <Book v-else :book="item"></Book>
+    
+    <BookDialog v-else :book="item">
+
+        <Book :book="item"></Book>
+
+    </BookDialog>
 </template>
 
 
