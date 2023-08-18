@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { firestore, getCurrentUser } from '@/config/firebase'
 import { type BookItem, type Series } from '@/interface'
-import { collection, doc, getDoc, getDocs } from 'firebase/firestore'
+import { collection, getDocs } from 'firebase/firestore'
 import { ref } from 'vue'
 import BookListItem from '@/components/BookListItem.vue'
 
@@ -14,8 +14,6 @@ const prop = defineProps<Props>()
 
 const dialog = ref(false)
 const bookList = ref<BookItem[]>([])
-
-const count = ref(0);
 
 const onClickBook = async () => {
   const user = await getCurrentUser()

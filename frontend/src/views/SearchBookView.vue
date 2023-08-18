@@ -138,6 +138,7 @@ onAuthStateChanged(firebaseAuth, (user) => {
           if (implementBookShelf(data)) {
             if (change.type === 'added') {
               const bookShelfData: BookShelf = { doc_id: change.doc.id, ...data } // doc_idを設定し直します
+              console.log(bookShelfData)
               buttons.value.push(bookShelfData)
             }
 
@@ -146,6 +147,8 @@ onAuthStateChanged(firebaseAuth, (user) => {
             }
           }
         })
+
+        isBookshelvesLoaded.value = true;
       }
     )
   }
@@ -175,11 +178,14 @@ const convertToBookItemWithoutSeries = (bookItem: BookItem): BookItemNoSeries =>
   delete copy.orderNumber
   return copy
 }
+
+const isBookshelvesLoaded = ref(false) // 読み込み状態を追跡
 </script>
 
 <template>
   <GlobalHeader @navigate="onNavigate"></GlobalHeader>
   <v-select
+    v-if="isBookshelvesLoaded"
     label="追加先"
     :items="bookshelfOptions"
     item-title="title"
