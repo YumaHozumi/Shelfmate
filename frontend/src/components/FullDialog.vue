@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { firestore, getCurrentUser } from '@/config/firebase'
 import { type BookItem, type Series } from '@/interface'
-import { collection, getDocs } from 'firebase/firestore'
+import { collection, doc, getDoc, getDocs } from 'firebase/firestore'
 import { ref } from 'vue'
 import BookListItem from '@/components/BookListItem.vue'
 
@@ -14,6 +14,8 @@ const prop = defineProps<Props>()
 
 const dialog = ref(false)
 const bookList = ref<BookItem[]>([])
+
+const count = ref(0);
 
 const onClickBook = async () => {
   const user = await getCurrentUser()
@@ -53,6 +55,8 @@ const onClickBook = async () => {
         </v-btn>
         <v-toolbar-title> 作品一覧 </v-toolbar-title>
       </v-toolbar>
+
+      <p class="text-count">件数: {{ series.counter }}件</p>
       <v-list>
         <v-list-item v-for="(book, index) in bookList" :key="index">
           <BookListItem :book="book"></BookListItem>
@@ -66,5 +70,10 @@ const onClickBook = async () => {
 .book-item {
   margin: 10px auto;
   width: 95%;
+}
+
+.text-count {
+  margin-left: 1%;
+  margin-top: 0.4%;
 }
 </style>

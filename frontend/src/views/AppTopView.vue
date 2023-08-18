@@ -17,7 +17,12 @@ const clickLocalHeaderBtn = (bookshelf: BookShelf): void => {
   selectedBookshelf.value = bookshelf
 }
 
-// ...
+const num = ref(0);
+
+const getCount = (count: number): void => {
+  num.value = count;
+}
+
 const selectedBookshelf = ref<BookShelf | undefined>()
 
 const initializeSelectedBookshelf = async () => {
@@ -44,9 +49,10 @@ initializeSelectedBookshelf() // 関数を呼び出し、selectedBookshelfを初
 <template>
   <Header @navigate="onNavigate"></Header>
   <LocalHeader @clickLocalHeaderBtn="clickLocalHeaderBtn"></LocalHeader>
-  <OptionContainer></OptionContainer>
+  <OptionContainer :count="num"></OptionContainer>
   <BookshelfContainer
     :selectedBookshelf="selectedBookshelf"
     v-if="selectedBookshelf"
+    @count="getCount"
   ></BookshelfContainer>
 </template>

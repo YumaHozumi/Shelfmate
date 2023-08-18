@@ -13,6 +13,12 @@ interface Props {
 
 const prop = defineProps<Props>()
 
+interface Emits {
+  (event: "count", count: number): void
+}
+
+const emit = defineEmits<Emits>();
+
 const items = ref<(Series | BookItem)[]>([])
 
 onMounted(async () => {
@@ -40,17 +46,19 @@ const getSeries = async () => {
       doc_id,
       'books'
     )
-    getDocs(seriesCollectionRef).then((snapshot) => {
+    await getDocs(seriesCollectionRef).then((snapshot) => {
       snapshot.forEach((e) => {
         items.value.push(e.data() as Series)
       })
     })
 
-    getDocs(noSeriesBookCollection).then((snapshot) => {
+    await getDocs(noSeriesBookCollection).then((snapshot) => {
       snapshot.forEach((e) => {
         items.value.push(e.data() as BookItem)
       })
     })
+
+    emit("count", items.value.length);
   }
 }
 
