@@ -47,7 +47,6 @@ onUnmounted(() => {
 })
 
 let unsubscribe: Unsubscribe
-const isBookshelvesLoaded = ref(false)
 
 onAuthStateChanged(firebaseAuth, (user) => {
   if (user) {
@@ -64,7 +63,6 @@ onAuthStateChanged(firebaseAuth, (user) => {
             }
           }
         })
-        isBookshelvesLoaded.value = true;
       }
     )
   }
@@ -82,7 +80,7 @@ const clickLocalHeaderBtn = (bookshelf: BookShelf): void => {
 </script>
 
 <template>
-  <v-app-bar color="white" elevation="0" height="33" class="header-border">
+  <v-app-bar color="white" elevation="0" height="33" class="header-border" v-if="buttons.length > 0">
     <div class="button-container">
       <LocalHeaderButton
         v-for="(button, index) in visibleButtons"

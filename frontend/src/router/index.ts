@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import AppTop from '@/views/AppTopView.vue'
 import { onAuthStateChanged } from 'firebase/auth'
-import { firebaseAuth } from '@/config/firebase'
+import { firebaseAuth, getCurrentUser } from '@/config/firebase'
 
 const routeSettings: RouteRecordRaw[] = [
   {
@@ -26,13 +26,13 @@ const routeSettings: RouteRecordRaw[] = [
     name: 'Series',
     props: true,
     component: () => import('@/views/SeriesView.vue'),
-    meta: { requiresAuth: true }
+    meta: { requireAuth: true }
   },
   {
     path: '/search',
     name: 'Search',
     component: () => import('@/views/SearchBookView.vue'),
-    meta: { requiresAuth: true }
+    meta: { requireAuth: true }
   }
 ]
 
@@ -43,16 +43,20 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   console.log('route')
+  console.log(to)
   const requireAuth = to.matched.some((record) => record.meta.requireAuth)
   if (requireAuth) {
-    onAuthStateChanged(firebaseAuth, (user) => {
+      const user = firebaseAuth.currentUser
+      console.log(firebaseAuth)
       if (user) {
+        console.log("next now")
         next()
       } else next({ name: 'Login' })
-    })
   } else {
+    console.log("next here")
     next()
   }
+  console.log("routing finish")
 })
 
 export default router

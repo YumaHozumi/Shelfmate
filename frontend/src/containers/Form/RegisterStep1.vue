@@ -33,7 +33,7 @@ const submitButton = async () => {
     }
     const cred = await createUserWithEmailAndPassword(firebaseAuth, email.value, password.value)
     const actionCodeSettings = {
-      url: 'http://localhost:8000/login', // replace this with the URL of your top page
+      url: 'http://localhost:10400/login', // replace this with the URL of your top page
       handleCodeInApp: true
     }
     await sendEmailVerification(cred.user, actionCodeSettings)
