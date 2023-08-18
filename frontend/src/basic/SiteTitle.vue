@@ -1,18 +1,6 @@
-<script setup lang="ts">
-interface Emits {
-  (event: 'clickSiteTitle'): void
-}
-
-const emit = defineEmits<Emits>()
-
-const clickSiteTitle = (): void => {
-  emit('clickSiteTitle')
-}
-</script>
-
 <template>
   <v-toolbar-title class="title no-copy">
-    <span class="clickable" @click="clickSiteTitle"> BookShelf </span>
+    <span class="clickable"> BookShelf </span>
   </v-toolbar-title>
 </template>
 

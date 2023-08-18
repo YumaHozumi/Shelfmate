@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import SiteTitle from '@/basic/SiteTitle.vue'
 import LoginButton from '@/basic/LoginButton.vue'
-import { ref } from 'vue'
+import { ref, watchEffect } from 'vue'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import MyDialog from '@/components/MyDialog.vue'
 import { getCurrentUser, firebaseAuth, firestore } from '@/config/firebase'
@@ -28,24 +28,26 @@ const onClickRegisterButton = (): void => {
   emit('navigate', 'Register')
 }
 
-const isShow = ref(true)
+const isShow = ref(true);
 
-onAuthStateChanged(firebaseAuth, (user) => {
-  if (user && user.emailVerified) {
-    console.log('ログイン済み')
-    isShow.value = false
-  } else {
-    console.log('ログインしてない')
-    isShow.value = true
-  }
-})
+watchEffect(() => {
+  // watchEffect内で非同期処理を監視
+  const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
+    if (user && user?.emailVerified) {
+      console.log('ログイン済み');
+      isShow.value = false;
+    } else {
+      console.log('ログインしてない');
+      isShow.value = true;
+    }
+  });
+
+  // コンポーネントのアンマウント時にリスナーを解除
+  return () => unsubscribe();
+});
 
 const onClickAddButton = (): void => {
   emit('navigate', 'Search')
-}
-
-const clickSiteTitle = (): void => {
-  emit('navigate', 'AppTop')
 }
 
 const onCreateButton = async (shelf_name: string) => {
@@ -57,7 +59,7 @@ const onCreateButton = async (shelf_name: string) => {
 
 <template>
   <v-app-bar color="white" flat class="header-border">
-    <SiteTitle @click="onClickSiteLogo" class="green" @clickSiteTitle="clickSiteTitle"></SiteTitle>
+    <SiteTitle @click="onClickSiteLogo" class="green"></SiteTitle>
     <LoginButton @clickLoginButton="onClickLoginButton" v-show="isShow"></LoginButton>
     <v-btn class="button register ml-3" @click="onClickRegisterButton" v-show="isShow">
       <v-icon>mdi-account-plus-outline</v-icon>
@@ -69,7 +71,7 @@ const onCreateButton = async (shelf_name: string) => {
       @onCreateButton="onCreateButton"
       :isShow="!isShow"
     />
-    <v-btn v-show="!isShow" class="button register ml-3" @click="onClickAddButton" ref="input">
+    <v-btn v-if="!isShow" class="button register ml-3" @click="onClickAddButton" ref="input">
       <v-icon>mdi-book-plus-outline</v-icon>
       本を追加
     </v-btn>

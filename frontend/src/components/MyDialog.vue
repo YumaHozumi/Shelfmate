@@ -27,7 +27,7 @@ const onCreateButton = (): void => {
 <template>
   <v-dialog v-model="dialog" max-width="400px" transition="dialog-bottom-transition">
     <template v-slot:activator="{ props }">
-      <v-btn v-bind="props" class="button register" v-show="isShow">
+      <v-btn v-bind="props" class="button register" v-if="isShow">
         <v-icon>mdi-bookshelf</v-icon>
         {{ btnText }}
       </v-btn>
