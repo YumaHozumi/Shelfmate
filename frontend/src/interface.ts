@@ -1,5 +1,5 @@
 interface BookItem {
-  bookId: number
+  bookId: string
   isbn?: number
   title: string
   image_url: string | undefined

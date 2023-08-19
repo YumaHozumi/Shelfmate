@@ -42,14 +42,11 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  console.log('to:', to, 'from:', from);
-
   const requireAuth = to.matched.some((record) => record.meta.requireAuth);
   if (requireAuth) {
     // Promiseを使って認証状態の確認を非同期に行う
     new Promise((resolve) => {
       onAuthStateChanged(firebaseAuth, (user) => {
-        console.log("test")
         resolve(user); // ユーザー情報またはnullを解決
       });
     }).then((user) => {

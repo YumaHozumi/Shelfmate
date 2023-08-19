@@ -30,6 +30,7 @@ const onClickBook = async () => {
       'books'
     )
     await getDocs(booksCollection).then((snapshot) => {
+      bookList.value.length = 0;
       snapshot.forEach((book) => {
         bookList.value.push(book.data() as BookItem)
       })

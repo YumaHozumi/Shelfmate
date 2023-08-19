@@ -71,13 +71,38 @@ const searchClick = async (searchText: string) => {
 
 const menu = ['発売日が新しい順', '発売日が古い順', '作品名順', '作者名順']
 
+const registerBookId = async (bookShelfId: string, book: BookItem): Promise<boolean> => {
+  try {
+    const user = await getCurrentUser();
+    const bookshelvesRef = collection(firestore, "users", user.uid, "bookshelves");
+    const bookshelvesDoc = doc(bookshelvesRef, bookShelfId, "allBooks", book.bookId)
+    const snapshot = await getDoc(bookshelvesDoc)
+  
+    if(snapshot.exists()) {
+      console.log("登録済み")
+      return false;
+    }else {
+      await setDoc(bookshelvesDoc, book);
+      return true;
+    }
+    
+  }catch (error) {
+    console.log(error);
+    return false;
+  }
+}
+
 const registerBook = async (book: BookItem) => {
   try {
     const user = await getCurrentUser()
     const bookshelvesRef = collection(firestore, 'users', user.uid, 'bookshelves')
     const selectedBookshelfId = selectedBookshelf.value?.doc_id || ''
     const seriesId = book?.seriesId ?? ''
+    const isAddBook = await registerBookId(selectedBookshelfId, book)
 
+    if(!isAddBook) return; 
+
+    //シリーズものじゃないとき
     if (seriesId === '') {
       const noSeriesBookCollection = collection(
         firestore,
@@ -89,7 +114,7 @@ const registerBook = async (book: BookItem) => {
       )
       const noSeriesBook: BookItemNoSeries = convertToBookItemWithoutSeries(book)
       await addDoc(noSeriesBookCollection, noSeriesBook)
-    } else {
+    } else { //シリーズもの
       const seriesRef = doc(bookshelvesRef, selectedBookshelfId, 'series', seriesId)
       const seriesSnap = await getDoc(seriesRef)
       if (seriesSnap.exists()) {
