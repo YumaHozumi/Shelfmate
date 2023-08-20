@@ -23,7 +23,6 @@ const onNavigate = (name: string): void => {
 const itemsInit: BookItem[] = []
 const items = ref(itemsInit)
 const isLoading = ref(false)
-let nowIndex = 0
 
 const searchClick = async (searchText: string) => {
   isLoading.value = true
@@ -44,8 +43,6 @@ const searchClick = async (searchText: string) => {
   .join('&');
 
   const completedURL = `${baseURL}?${queryString}`;
-
-  console.log(completedURL)
 
   await axios
     .get(completedURL)
@@ -139,17 +136,26 @@ const registerBook = async (book: BookItem) => {
       const seriesRef = doc(bookshelvesRef, selectedBookshelfId, 'series', seriesId)
       const seriesSnap = await getDoc(seriesRef)
       if (seriesSnap.exists()) {
-        // ドキュメントが存在する場合、画像のみ更新
-        await updateDoc(seriesRef, {
-          pic: book?.image_url
-        })
+        const seriesData = seriesSnap.data();
+        const shouldUpdatePic = book && (
+          (((book.orderNumber ?? 0)> (seriesData?.picOrder ?? 0)) && book.image_url !== "") ||
+          (((book.orderNumber ?? 0)< (seriesData?.picOrder ?? 0)) && seriesData?.pic === "")
+        );
+
+        if (shouldUpdatePic) {
+          await updateDoc(seriesRef, {
+            pic: book?.image_url,
+            picOrder: book?.orderNumber ?? 0
+          });
+        }
       } else {
         // ドキュメントが存在しない場合、画像とカウンターを設定
         await setDoc(seriesRef, {
           seriesId: seriesId,
-          pic: book?.image_url,
-          counter: 0
-        })
+          pic: book?.image_url ?? "",
+          counter: 0,
+          picOrder: book?.orderNumber ?? 0,
+        });
       }
 
       const booksCollection = collection(
@@ -215,7 +221,6 @@ const selectedBookshelf = ref<BookShelf | undefined>(undefined) // 選択され�
 
 const selectMenu = (index: number): void => {
   items.value = sort(items.value, menu[index])
-  nowIndex = index
 }
 
 const convertToBookItemWithoutSeries = (bookItem: BookItem): BookItemNoSeries => {
