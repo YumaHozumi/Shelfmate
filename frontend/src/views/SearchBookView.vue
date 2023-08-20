@@ -8,7 +8,7 @@ import axios from 'axios'
 import LoadingContainer from '@/containers/LoadingContainer.vue'
 import Menu from '@/components/Menu.vue'
 import { firebaseAuth, firestore, getCurrentUser } from '@/config/firebase'
-import { addDoc, collection, doc, getDoc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore'
+import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, query, setDoc, updateDoc, where } from 'firebase/firestore'
 import imageURL from '@/assets/no-image.png'
 import { onAuthStateChanged, type Unsubscribe } from 'firebase/auth'
 import { implementBookShelf, type BookItemNoSeries } from '@/interface'
@@ -29,14 +29,23 @@ const searchClick = async (searchText: string) => {
   isLoading.value = true
   //const baseURL = "https://iss.ndl.go.jp/api/opensearch"
   const baseURL = 'https://www.googleapis.com/books/v1/volumes'
-  const query = new URLSearchParams({
-    q: searchText,
+
+  const replaceText = searchText.replace(/[\s\u3000]/g, '+')
+
+  const params: Record<string, string> = {
+    q: replaceText,
     printType: 'books',
     filter: 'ebooks',
     maxResults: '5'
-  })
+  };
 
-  const completedURL = `${baseURL}?${query}`
+  const queryString = Object.keys(params)
+  .map(key => `${encodeURIComponent(key)}=${key === 'q' ? params[key] : encodeURIComponent(params[key])}`)
+  .join('&');
+
+  const completedURL = `${baseURL}?${queryString}`;
+
+  console.log(completedURL)
 
   await axios
     .get(completedURL)
@@ -59,13 +68,13 @@ const searchClick = async (searchText: string) => {
           book.image_url = 'https://iss.ndl.go.jp/thumbnail/' + book.isbn
         }
       })
-      //予めソートしたものを入れる
-      items.value = sort(books, menu[nowIndex])
+      items.value = books
+      
     })
     .catch((e) => {
       console.log(e)
     })
-
+  await setRegisteredBooks();
   isLoading.value = false
 }
 
@@ -74,15 +83,15 @@ const menu = ['発売日が新しい順', '発売日が古い順', '作品名順
 const registerBookId = async (bookShelfId: string, book: BookItem): Promise<boolean> => {
   try {
     const user = await getCurrentUser();
-    const bookshelvesRef = collection(firestore, "users", user.uid, "bookshelves");
-    const bookshelvesDoc = doc(bookshelvesRef, bookShelfId, "allBooks", book.bookId)
-    const snapshot = await getDoc(bookshelvesDoc)
-  
-    if(snapshot.exists()) {
+    const bookshelvesRef = collection(firestore, "users", user.uid, "bookshelves", bookShelfId, "allBooks")
+    const q = query(bookshelvesRef, where("bookId", "==", book.bookId))
+    const querySnapshot = await getDocs(q);
+    
+    if(querySnapshot.docs.length > 0) {
       console.log("登録済み")
       return false;
-    }else {
-      await setDoc(bookshelvesDoc, book);
+    } else {
+      await addDoc(bookshelvesRef, book);
       return true;
     }
     
@@ -90,6 +99,17 @@ const registerBookId = async (bookShelfId: string, book: BookItem): Promise<bool
     console.log(error);
     return false;
   }
+}
+
+const registeredBooks = ref<BookItem[]>([])
+
+const setRegisteredBooks = async() => {
+  const user = await getCurrentUser();
+  const selectedBookshelfId = selectedBookshelf.value?.doc_id || ''
+  const bookshelvesRef = collection(firestore, "users", user.uid, "bookshelves", selectedBookshelfId, "allBooks")
+  const booksSnapshot = await getDocs(bookshelvesRef);
+
+  registeredBooks.value = booksSnapshot.docs.map(doc => doc.data() as BookItem)
 }
 
 const registerBook = async (book: BookItem) => {
@@ -100,7 +120,8 @@ const registerBook = async (book: BookItem) => {
     const seriesId = book?.seriesId ?? ''
     const isAddBook = await registerBookId(selectedBookshelfId, book)
 
-    if(!isAddBook) return; 
+    if(!isAddBook) return;
+    await setRegisteredBooks();
 
     //シリーズものじゃないとき
     if (seriesId === '') {
@@ -143,6 +164,8 @@ const registerBook = async (book: BookItem) => {
       )
       await addDoc(booksCollection, book)
       await incrementCounter(seriesRef)
+
+      
     }
   } catch (error) {
     console.log(error)
@@ -216,12 +239,10 @@ const convertToBookItemWithoutSeries = (bookItem: BookItem): BookItemNoSeries =>
   >
   </v-select>
   <SearchBar @search="searchClick" class="mt-4 mb-4"></SearchBar>
-
   <div class="menu-container">
     <Menu :items="menu" icon="mdi-sort" class="menu" @selectItem="selectMenu"></Menu>
   </div>
-
-  <Results :items="items" v-if="!isLoading" @registerBook="registerBook"></Results>
+  <Results :items="items" v-if="!isLoading" @registerBook="registerBook" :registeredBooks="registeredBooks"></Results>
   <LoadingContainer :isLoading="isLoading"></LoadingContainer>
 </template>
 

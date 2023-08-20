@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { BookItem } from '@/interface.ts'
+import { ref } from 'vue';
 
 interface Props {
   book: BookItem
+  isRegistered: boolean
 }
 //デフォルト値設定
 const props = defineProps<Props>()
@@ -13,8 +15,23 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
-const registerBook = (): void => {
-  emit('registerBook', props.book)
+// ローディング状態を追加
+const isLoading = ref(false);
+
+// 登録処理の後に呼び出されるコールバック
+const onComplete = (): void => {
+  isLoading.value = false; // ローディング終了
+}
+
+const registerBook = async() => {
+  isLoading.value = true;
+  try {
+    await emit('registerBook', props.book)
+    onComplete();
+  }catch (error) {
+    console.log(error);
+    isLoading.value = false;
+  }
 }
 </script>
 
@@ -27,7 +44,9 @@ const registerBook = (): void => {
       <p class="book-detail">{{ book.detail }}</p>
     </div>
     <div class="book-actions">
-      <v-btn color="green" @click="registerBook">本を追加</v-btn>
+      <v-btn color="green" @click="registerBook" :disabled="isRegistered || isLoading">
+        {{ isRegistered ? '登録済み' : (isLoading ? '登録中...' : '本を追加') }}
+      </v-btn>
     </div>
   </div>
 </template>

@@ -4,6 +4,7 @@ import type { BookItem } from '@/interface.ts'
 
 interface Props {
   items: BookItem[]
+  registeredBooks: BookItem[]
 }
 
 defineProps<Props>()
@@ -25,5 +26,6 @@ const registerBook = (book: BookItem): void => {
     :key="item.bookId"
     :book="item"
     @registerBook="registerBook"
+    :isRegistered="registeredBooks.some(b => b.bookId === item.bookId)"
   ></SearchResult>
 </template>
