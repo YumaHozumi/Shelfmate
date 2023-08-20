@@ -2,11 +2,12 @@
 import SiteTitle from '@/basic/SiteTitle.vue'
 import LoginButton from '@/basic/LoginButton.vue'
 import { ref, watchEffect } from 'vue'
-import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { getAuth, onAuthStateChanged, type Unsubscribe } from 'firebase/auth'
 import MyDialog from '@/components/MyDialog.vue'
 import { getCurrentUser, firebaseAuth, firestore } from '@/config/firebase'
 import { collection, addDoc } from 'firebase/firestore'
 import type { BookShelf } from '@/interface'
+import { onUnmounted } from 'vue'
 
 interface Emits {
   (event: 'navigate', name: string): void
@@ -30,9 +31,11 @@ const onClickRegisterButton = (): void => {
 
 const isShow = ref(true);
 
+let unsubscribe: Unsubscribe
+
 watchEffect(() => {
   // watchEffect内で非同期処理を監視
-  const unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
+  unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
     if (user && user?.emailVerified) {
       console.log('ログイン済み');
       isShow.value = false;
@@ -41,10 +44,11 @@ watchEffect(() => {
       isShow.value = true;
     }
   });
-
-  // コンポーネントのアンマウント時にリスナーを解除
-  return () => unsubscribe();
 });
+
+onUnmounted(() => {
+  unsubscribe();
+})
 
 const onClickAddButton = (): void => {
   emit('navigate', 'Search')
