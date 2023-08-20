@@ -4,6 +4,8 @@ import { type BookItem, type Series } from '@/interface'
 import { collection, getDocs } from 'firebase/firestore'
 import { ref } from 'vue'
 import BookListItem from '@/components/BookListItem.vue'
+import { sort } from '@/function'
+import Menu from '@/components/Menu.vue'
 
 interface Props {
   series: Series
@@ -34,9 +36,17 @@ const onClickBook = async () => {
       snapshot.forEach((book) => {
         bookList.value.push(book.data() as BookItem)
       })
+      bookList.value = sort(bookList.value, menu[0]);
     })
   }
 }
+
+const menu = ['発売日が新しい順', '発売日が古い順', "巻数順(降順)", "巻数順(昇順)"]
+
+const selectMenu = (index: number): void => {
+  bookList.value = sort(bookList.value, menu[index])
+}
+
 </script>
 
 <template>
@@ -56,6 +66,9 @@ const onClickBook = async () => {
       </v-toolbar>
 
       <p class="text-count">件数: {{ series.counter }}件</p>
+      <div class="menu-container">
+        <Menu :items="menu" icon="mdi-sort" class="menu" @selectItem="selectMenu"></Menu>
+      </div>
       <v-list>
         <v-list-item v-for="(book, index) in bookList" :key="index">
           <BookListItem :book="book"></BookListItem>
@@ -74,5 +87,15 @@ const onClickBook = async () => {
 .text-count {
   margin-left: 1%;
   margin-top: 0.4%;
+}
+
+.menu-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-right: 2%;
+
+  .menu {
+    background-color: white;
+  }
 }
 </style>

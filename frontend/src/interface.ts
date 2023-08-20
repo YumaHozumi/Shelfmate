@@ -1,3 +1,5 @@
+import type { Timestamp } from "firebase/firestore"
+
 interface BookItem {
   bookId: string
   isbn?: number
@@ -5,7 +7,7 @@ interface BookItem {
   image_url: string | undefined
   author: string
   detail: string
-  public_date: Date
+  public_date: Timestamp
   seriesId?: string
   orderNumber?: number
 }

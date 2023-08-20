@@ -42,6 +42,8 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
+  console.log('Routing from:', from.fullPath)
+  console.log('Routing to:', to.fullPath)
   const requireAuth = to.matched.some((record) => record.meta.requireAuth);
   if (requireAuth) {
     // Promiseを使って認証状態の確認を非同期に行う

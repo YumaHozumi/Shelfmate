@@ -15,6 +15,7 @@ import { implementBookShelf, type BookItemNoSeries } from '@/interface'
 import { onUnmounted, computed } from 'vue'
 import router from '@/router'
 import { incrementCounter, sort } from '@/function'
+import { Timestamp } from "firebase/firestore"
 
 const onNavigate = (name: string): void => {
   router.push({ name: name })
@@ -55,7 +56,7 @@ const searchClick = async (searchText: string) => {
         image_url: item.volumeInfo?.imageLinks?.thumbnail ?? imageURL,
         author: item.volumeInfo?.authors?.[0] ?? '',
         detail: item.searchInfo?.textSnippet ?? '',
-        public_date: new Date(item.volumeInfo?.publishedDate || 0),
+        public_date: Timestamp.fromDate(new Date(item.volumeInfo?.publishedDate || 0)),
         seriesId: item.volumeInfo?.seriesInfo?.volumeSeries?.[0]?.seriesId ?? '',
         orderNumber: item.volumeInfo?.seriesInfo?.volumeSeries?.[0]?.orderNumber ?? 0
       }))

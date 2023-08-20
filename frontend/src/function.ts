@@ -51,16 +51,21 @@ const decrementCounter = async (docRef: DocumentReference) => {
 
 const sort = (books: BookItem[], order: string): BookItem[] => {
   if (order === '発売日が新しい順') {
-    return books.slice().sort((a, b) => b.public_date.getTime() - a.public_date.getTime())
+    return books.slice().sort((a, b) => b.public_date.toDate().getTime() - a.public_date.toDate().getTime());
   } else if (order === '発売日が古い順') {
-    return books.slice().sort((a, b) => a.public_date.getTime() - b.public_date.getTime())
+    return books.slice().sort((a, b) => a.public_date.toDate().getTime() - b.public_date.toDate().getTime());
   } else if (order === '作品名順') {
-    return books.slice().sort((a, b) => a.title.localeCompare(b.title, 'ja-u-co-natural'))
+    return books.slice().sort((a, b) => a.title.localeCompare(b.title, 'ja-u-co-natural'));
   } else if (order === '作者名順') {
-    return books.slice().sort((a, b) => a.title.localeCompare(b.author, 'ja-u-co-natural'))
+    return books.slice().sort((a, b) => a.author.localeCompare(b.author, 'ja-u-co-natural'));
+  } else if (order === '巻数順(降順)') {
+    return books.slice().sort((a, b) => (b?.orderNumber ?? 0) - (a?.orderNumber ?? 0))
+  } else if (order === '巻数順(昇順)') {
+    return books.slice().sort((a, b) => (a?.orderNumber ?? 0) - (b?.orderNumber ?? 0))
   } else {
-    return books
+    return books;
   }
 }
+
 
 export { firebaseErrorMessage, incrementCounter, decrementCounter, sort }
