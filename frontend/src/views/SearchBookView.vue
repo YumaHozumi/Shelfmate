@@ -16,6 +16,7 @@ import { onUnmounted, computed } from 'vue'
 import router from '@/router'
 import { incrementCounter, sort } from '@/function'
 import { Timestamp } from "firebase/firestore"
+import Pagination from '@/components/SearchBook/Pagination.vue'
 
 const onNavigate = (name: string): void => {
   router.push({ name: name })
@@ -25,8 +26,8 @@ const itemsInit: BookItem[] = []
 const items = ref(itemsInit)
 const isLoading = ref(false)
 
-const searchClick = async (searchText: string) => {
-  isLoading.value = true
+//Google Books APIに検索クエリ投げる
+const search = async (searchText: string): Promise<BookItem[]> => {
   //const baseURL = "https://iss.ndl.go.jp/api/opensearch"
   const baseURL = 'https://www.googleapis.com/books/v1/volumes'
 
@@ -36,7 +37,8 @@ const searchClick = async (searchText: string) => {
     q: replaceText,
     printType: 'books',
     filter: 'ebooks',
-    maxResults: '5'
+    maxResults: '5',
+    startIndex: page.value.toString()
   };
 
   const queryString = Object.keys(params)
@@ -45,11 +47,13 @@ const searchClick = async (searchText: string) => {
 
   const completedURL = `${baseURL}?${queryString}`;
 
+  let books: BookItem[] = [];
+
   await axios
     .get(completedURL)
     .then((res) => {
       const apiItems = res.data.items
-      const books: BookItem[] = apiItems.map((item: any) => ({
+      books = apiItems.map((item: any) => ({
         bookId: item.id,
         isbn: item.volumeInfo?.industryIdentifiers?.[1]?.identifier ?? 0,
         title: item.volumeInfo?.title ?? '',
@@ -66,14 +70,26 @@ const searchClick = async (searchText: string) => {
           book.image_url = 'https://iss.ndl.go.jp/thumbnail/' + book.isbn
         }
       })
-      items.value = books
-      
     })
     .catch((e) => {
       console.log(e)
     })
+
+  return books
+}
+
+let tempSearchText = "";
+
+const searchClick = async (searchText: string) => {
+  isLoading.value = true
+  resetPage();
+  tempSearchText = searchText;
+
+  const books = await search(searchText)
+  items.value = books;
+  
   await setRegisteredBooks();
-  isLoading.value = false
+  isLoading.value = false;
 }
 
 const menu = ['発売日が新しい順', '発売日が古い順', '作品名順', '作者名順']
@@ -230,6 +246,25 @@ const convertToBookItemWithoutSeries = (bookItem: BookItem): BookItemNoSeries =>
   delete copy.orderNumber
   return copy
 }
+
+//Paginationの処理
+const page = ref(0);
+
+const resetPage = () => {
+  page.value = 0;
+}
+
+const moreBtnClick = async () => {
+  if (page.value < 4) {
+    page.value++;
+    await searchMore()
+  }
+}
+
+const searchMore = async () => {
+  const books = await search(tempSearchText)
+  items.value.push(...books);
+}
 </script>
 
 <template>
@@ -249,6 +284,7 @@ const convertToBookItemWithoutSeries = (bookItem: BookItem): BookItemNoSeries =>
     <Menu :items="menu" icon="mdi-sort" class="menu" @selectItem="selectMenu"></Menu>
   </div>
   <Results :items="items" v-if="!isLoading" @registerBook="registerBook" :registeredBooks="registeredBooks"></Results>
+  <Pagination :page="page" @moreBtnClick="moreBtnClick" v-if="items.length > 0 && !isLoading" class="my-8"></Pagination>
   <LoadingContainer :isLoading="isLoading"></LoadingContainer>
 </template>
 

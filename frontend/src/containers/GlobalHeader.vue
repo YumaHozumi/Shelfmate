@@ -2,11 +2,10 @@
 import SiteTitle from '@/basic/SiteTitle.vue'
 import LoginButton from '@/basic/LoginButton.vue'
 import { ref, watchEffect } from 'vue'
-import { getAuth, onAuthStateChanged, type Unsubscribe } from 'firebase/auth'
+import { onAuthStateChanged, type Unsubscribe } from 'firebase/auth'
 import MyDialog from '@/components/MyDialog.vue'
 import { getCurrentUser, firebaseAuth, firestore } from '@/config/firebase'
 import { collection, addDoc } from 'firebase/firestore'
-import type { BookShelf } from '@/interface'
 import { onUnmounted } from 'vue'
 
 interface Emits {
