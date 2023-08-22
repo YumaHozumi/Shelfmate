@@ -1,0 +1,88 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/search": {
+            "get": {
+                "description": "Search books by keyword",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Search books",
+                "operationId": "search-books",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search keyword",
+                        "name": "key",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/object.RSS"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "object.Channel": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/object.Item"
+                    }
+                }
+            }
+        },
+        "object.Item": {
+            "type": "object",
+            "properties": {
+                "author": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "isbn": {
+                    "type": "integer"
+                },
+                "issued": {
+                    "type": "string"
+                },
+                "publisher": {
+                    "type": "string"
+                },
+                "seriesTitle": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "object.RSS": {
+            "type": "object",
+            "properties": {
+                "result": {
+                    "$ref": "#/definitions/object.Channel"
+                }
+            }
+        }
+    }
+}

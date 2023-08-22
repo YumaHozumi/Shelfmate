@@ -1,0 +1,340 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:openSearch="http://a9.com/-/spec/opensearchrss/1.0/" xmlns:dcndl="http://ndl.go.jp/dcndl/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <channel>
+    <title>2.5次元の誘惑 - 国立国会図書館サーチ OpenSearch</title>
+    <link>https://iss.ndl.go.jp/api/opensearch?cnt=10&amp;title=2.5%E6%AC%A1%E5%85%83%E3%81%AE%E8%AA%98%E6%83%91</link>
+    <description>Search results for cnt=10 title=2.5次元の誘惑 </description>
+    <language>ja</language>
+    <openSearch:totalResults>59</openSearch:totalResults>
+    <openSearch:startIndex>1</openSearch:startIndex>
+    <openSearch:itemsPerPage>10</openSearch:itemsPerPage>
+    <item>
+      <title>2.5次元の誘惑 18</title>
+      <link>https://iss.ndl.go.jp/books/R100000067-I000711734-00</link>
+<description>
+<![CDATA[<p>集英社,9784088836836</p>
+<ul><li>タイトル： 2.5次元の誘惑 18</li>
+<li>タイトル（読み）： 2テン5ジゲンノリリサ</li>
+<li>責任表示： 橋本 悠 著・文・その他,</li>
+<li>シリーズ名： ジャンプコミックス</li>
+</ul>]]>
+</description>
+      <author>橋本 悠 著・文・その他,橋本 悠,</author>
+      <category>本</category>
+      <guid isPermaLink="true">https://iss.ndl.go.jp/books/R100000067-I000711734-00</guid>
+      <dc:title>2.5次元の誘惑 18</dc:title>
+      <dcndl:titleTranscription>2テン5ジゲンノリリサ</dcndl:titleTranscription>
+      <dc:creator>橋本 悠</dc:creator>
+      <dcndl:creatorTranscription>ハシモト ユウ</dcndl:creatorTranscription>
+      <dcndl:seriesTitle>ジャンプコミックス</dcndl:seriesTitle>
+      <dc:publisher>集英社</dc:publisher>
+      <dc:publisher>集英社</dc:publisher>
+      <dcterms:issued xsi:type="dcterms:W3CDTF">2023-09-04</dcterms:issued>
+      <dcndl:price>650</dcndl:price>
+      <dc:extent>184p ; 182mm</dc:extent>
+      <dc:identifier xsi:type="dcndl:ISBN">9784088836836</dc:identifier>
+      <dc:description>判型 : B6</dc:description>
+      <dc:description>販売対象 : 雑誌扱い</dc:description>
+      <dc:description>発行形態 : コミックス</dc:description>
+      <dc:description>内容 : コミックス・劇画</dc:description>
+      <dc:description>Cコード : 9979</dc:description>
+    </item>
+    <item>
+      <title>2.5次元の誘惑 2</title>
+      <link>https://iss.ndl.go.jp/books/R100000130-I000312480-00</link>
+<description>
+<![CDATA[<p>集英社</p>
+<ul><li>タイトル： 2.5次元の誘惑 2</li>
+<li>タイトル（読み）： ニイテンゴジゲンノリリサ002</li>
+<li>責任表示： 橋本悠 著・文・その他,</li>
+<li>シリーズ名： ジャンプコミックスDIGITAL</li>
+<li>シリーズ名（読み）： ジャンプコミックスデジタル</li>
+</ul>]]>
+</description>
+      <author>橋本悠 著・文・その他,橋本悠,</author>
+      <category>デジタル資料</category>
+      <guid isPermaLink="true">https://iss.ndl.go.jp/books/R100000130-I000312480-00</guid>
+      <dc:title>2.5次元の誘惑 2</dc:title>
+      <dcndl:titleTranscription>ニイテンゴジゲンノリリサ002</dcndl:titleTranscription>
+      <dc:creator>橋本悠</dc:creator>
+      <dcndl:creatorTranscription>ハシモトユウ</dcndl:creatorTranscription>
+      <dcndl:seriesTitle>ジャンプコミックスDIGITAL</dcndl:seriesTitle>
+      <dcndl:seriesTitle>2.5次元の誘惑</dcndl:seriesTitle>
+      <dcndl:seriesTitleTranscription>ジャンプコミックスデジタル</dcndl:seriesTitleTranscription>
+      <dcndl:seriesTitleTranscription>ニイテンゴジゲンノリリサ</dcndl:seriesTitleTranscription>
+      <dc:publisher>集英社</dc:publisher>
+      <dcterms:issued xsi:type="dcterms:W3CDTF">2020-01-04</dcterms:issued>
+      <dc:description>JP-eコード : 08882182882129315501</dc:description>
+      <dc:description>ファイル種類 : EPUB</dc:description>
+      <dc:description>フィックス</dc:description>
+      <dc:description>電子書籍</dc:description>
+      <dc:description>コミック</dc:description>
+      <dc:description>リポジトリ収録資料</dc:description>
+      <rdfs:seeAlso rdf:resource="https://www.books.or.jp/book-details/08882182882129315501"/>
+    </item>
+    <item>
+      <title>2.5次元の誘惑 3</title>
+      <link>https://iss.ndl.go.jp/books/R100000130-I000312502-00</link>
+<description>
+<![CDATA[<p>集英社</p>
+<ul><li>タイトル： 2.5次元の誘惑 3</li>
+<li>タイトル（読み）： ニイテンゴジゲンノリリサ003</li>
+<li>責任表示： 橋本悠 著・文・その他,</li>
+<li>シリーズ名： ジャンプコミックスDIGITAL</li>
+<li>シリーズ名（読み）： ジャンプコミックスデジタル</li>
+</ul>]]>
+</description>
+      <author>橋本悠 著・文・その他,橋本悠,</author>
+      <category>デジタル資料</category>
+      <guid isPermaLink="true">https://iss.ndl.go.jp/books/R100000130-I000312502-00</guid>
+      <dc:title>2.5次元の誘惑 3</dc:title>
+      <dcndl:titleTranscription>ニイテンゴジゲンノリリサ003</dcndl:titleTranscription>
+      <dc:creator>橋本悠</dc:creator>
+      <dcndl:creatorTranscription>ハシモトユウ</dcndl:creatorTranscription>
+      <dcndl:seriesTitle>ジャンプコミックスDIGITAL</dcndl:seriesTitle>
+      <dcndl:seriesTitle>2.5次元の誘惑</dcndl:seriesTitle>
+      <dcndl:seriesTitleTranscription>ジャンプコミックスデジタル</dcndl:seriesTitleTranscription>
+      <dcndl:seriesTitleTranscription>ニイテンゴジゲンノリリサ</dcndl:seriesTitleTranscription>
+      <dc:publisher>集英社</dc:publisher>
+      <dcterms:issued xsi:type="dcterms:W3CDTF">2020-02-04</dcterms:issued>
+      <dc:description>JP-eコード : 08882207882129315501</dc:description>
+      <dc:description>ファイル種類 : EPUB</dc:description>
+      <dc:description>フィックス</dc:description>
+      <dc:description>電子書籍</dc:description>
+      <dc:description>コミック</dc:description>
+      <dc:description>リポジトリ収録資料</dc:description>
+      <rdfs:seeAlso rdf:resource="https://www.books.or.jp/book-details/08882207882129315501"/>
+    </item>
+    <item>
+      <title>2.5次元の誘惑 4</title>
+      <link>https://iss.ndl.go.jp/books/R100000130-I000312630-00</link>
+<description>
+<![CDATA[<p>集英社</p>
+<ul><li>タイトル： 2.5次元の誘惑 4</li>
+<li>タイトル（読み）： ニイテンゴジゲンノリリサ004</li>
+<li>責任表示： 橋本悠 著・文・その他,</li>
+<li>シリーズ名： ジャンプコミックスDIGITAL</li>
+<li>シリーズ名（読み）： ジャンプコミックスデジタル</li>
+</ul>]]>
+</description>
+      <author>橋本悠 著・文・その他,橋本悠,</author>
+      <category>デジタル資料</category>
+      <guid isPermaLink="true">https://iss.ndl.go.jp/books/R100000130-I000312630-00</guid>
+      <dc:title>2.5次元の誘惑 4</dc:title>
+      <dcndl:titleTranscription>ニイテンゴジゲンノリリサ004</dcndl:titleTranscription>
+      <dc:creator>橋本悠</dc:creator>
+      <dcndl:creatorTranscription>ハシモトユウ</dcndl:creatorTranscription>
+      <dcndl:seriesTitle>ジャンプコミックスDIGITAL</dcndl:seriesTitle>
+      <dcndl:seriesTitle>2.5次元の誘惑</dcndl:seriesTitle>
+      <dcndl:seriesTitleTranscription>ジャンプコミックスデジタル</dcndl:seriesTitleTranscription>
+      <dcndl:seriesTitleTranscription>ニイテンゴジゲンノリリサ</dcndl:seriesTitleTranscription>
+      <dc:publisher>集英社</dc:publisher>
+      <dcterms:issued xsi:type="dcterms:W3CDTF">2020-05-13</dcterms:issued>
+      <dc:description>JP-eコード : 08882337882129315501</dc:description>
+      <dc:description>ファイル種類 : EPUB</dc:description>
+      <dc:description>フィックス</dc:description>
+      <dc:description>電子書籍</dc:description>
+      <dc:description>コミック</dc:description>
+      <dc:description>リポジトリ収録資料</dc:description>
+      <rdfs:seeAlso rdf:resource="https://www.books.or.jp/book-details/08882337882129315501"/>
+    </item>
+    <item>
+      <title>2.5次元の誘惑 5</title>
+      <link>https://iss.ndl.go.jp/books/R100000130-I000312649-00</link>
+<description>
+<![CDATA[<p>集英社</p>
+<ul><li>タイトル： 2.5次元の誘惑 5</li>
+<li>タイトル（読み）： ニイテンゴジゲンノリリサ005</li>
+<li>責任表示： 橋本悠 著・文・その他,</li>
+<li>シリーズ名： ジャンプコミックスDIGITAL</li>
+<li>シリーズ名（読み）： ジャンプコミックスデジタル</li>
+</ul>]]>
+</description>
+      <author>橋本悠 著・文・その他,橋本悠,</author>
+      <category>デジタル資料</category>
+      <guid isPermaLink="true">https://iss.ndl.go.jp/books/R100000130-I000312649-00</guid>
+      <dc:title>2.5次元の誘惑 5</dc:title>
+      <dcndl:titleTranscription>ニイテンゴジゲンノリリサ005</dcndl:titleTranscription>
+      <dc:creator>橋本悠</dc:creator>
+      <dcndl:creatorTranscription>ハシモトユウ</dcndl:creatorTranscription>
+      <dcndl:seriesTitle>ジャンプコミックスDIGITAL</dcndl:seriesTitle>
+      <dcndl:seriesTitle>2.5次元の誘惑</dcndl:seriesTitle>
+      <dcndl:seriesTitleTranscription>ジャンプコミックスデジタル</dcndl:seriesTitleTranscription>
+      <dcndl:seriesTitleTranscription>ニイテンゴジゲンノリリサ</dcndl:seriesTitleTranscription>
+      <dc:publisher>集英社</dc:publisher>
+      <dcterms:issued xsi:type="dcterms:W3CDTF">2020-07-03</dcterms:issued>
+      <dc:description>JP-eコード : 08882355882129315501</dc:description>
+      <dc:description>ファイル種類 : EPUB</dc:description>
+      <dc:description>フィックス</dc:description>
+      <dc:description>電子書籍</dc:description>
+      <dc:description>コミック</dc:description>
+      <dc:description>リポジトリ収録資料</dc:description>
+      <rdfs:seeAlso rdf:resource="https://www.books.or.jp/book-details/08882355882129315501"/>
+    </item>
+    <item>
+      <title>2.5次元の誘惑 6</title>
+      <link>https://iss.ndl.go.jp/books/R100000130-I000312754-00</link>
+<description>
+<![CDATA[<p>集英社</p>
+<ul><li>タイトル： 2.5次元の誘惑 6</li>
+<li>タイトル（読み）： ニイテンゴジゲンノリリサ006</li>
+<li>責任表示： 橋本悠 著・文・その他,</li>
+<li>シリーズ名： ジャンプコミックスDIGITAL</li>
+<li>シリーズ名（読み）： ジャンプコミックスデジタル</li>
+</ul>]]>
+</description>
+      <author>橋本悠 著・文・その他,橋本悠,</author>
+      <category>デジタル資料</category>
+      <guid isPermaLink="true">https://iss.ndl.go.jp/books/R100000130-I000312754-00</guid>
+      <dc:title>2.5次元の誘惑 6</dc:title>
+      <dcndl:titleTranscription>ニイテンゴジゲンノリリサ006</dcndl:titleTranscription>
+      <dc:creator>橋本悠</dc:creator>
+      <dcndl:creatorTranscription>ハシモトユウ</dcndl:creatorTranscription>
+      <dcndl:seriesTitle>ジャンプコミックスDIGITAL</dcndl:seriesTitle>
+      <dcndl:seriesTitle>2.5次元の誘惑</dcndl:seriesTitle>
+      <dcndl:seriesTitleTranscription>ジャンプコミックスデジタル</dcndl:seriesTitleTranscription>
+      <dcndl:seriesTitleTranscription>ニイテンゴジゲンノリリサ</dcndl:seriesTitleTranscription>
+      <dc:publisher>集英社</dc:publisher>
+      <dcterms:issued xsi:type="dcterms:W3CDTF">2020-09-04</dcterms:issued>
+      <dc:description>JP-eコード : 08882464882129315501</dc:description>
+      <dc:description>ファイル種類 : EPUB</dc:description>
+      <dc:description>フィックス</dc:description>
+      <dc:description>電子書籍</dc:description>
+      <dc:description>コミック</dc:description>
+      <dc:description>リポジトリ収録資料</dc:description>
+      <rdfs:seeAlso rdf:resource="https://www.books.or.jp/book-details/08882464882129315501"/>
+    </item>
+    <item>
+      <title>2.5次元の誘惑 7</title>
+      <link>https://iss.ndl.go.jp/books/R100000130-I000312847-00</link>
+<description>
+<![CDATA[<p>集英社</p>
+<ul><li>タイトル： 2.5次元の誘惑 7</li>
+<li>タイトル（読み）： ニイテンゴジゲンノリリサ007</li>
+<li>責任表示： 橋本悠 著・文・その他,</li>
+<li>シリーズ名： ジャンプコミックスDIGITAL</li>
+<li>シリーズ名（読み）： ジャンプコミックスデジタル</li>
+</ul>]]>
+</description>
+      <author>橋本悠 著・文・その他,橋本悠,</author>
+      <category>デジタル資料</category>
+      <guid isPermaLink="true">https://iss.ndl.go.jp/books/R100000130-I000312847-00</guid>
+      <dc:title>2.5次元の誘惑 7</dc:title>
+      <dcndl:titleTranscription>ニイテンゴジゲンノリリサ007</dcndl:titleTranscription>
+      <dc:creator>橋本悠</dc:creator>
+      <dcndl:creatorTranscription>ハシモトユウ</dcndl:creatorTranscription>
+      <dcndl:seriesTitle>ジャンプコミックスDIGITAL</dcndl:seriesTitle>
+      <dcndl:seriesTitle>2.5次元の誘惑</dcndl:seriesTitle>
+      <dcndl:seriesTitleTranscription>ジャンプコミックスデジタル</dcndl:seriesTitleTranscription>
+      <dcndl:seriesTitleTranscription>ニイテンゴジゲンノリリサ</dcndl:seriesTitleTranscription>
+      <dc:publisher>集英社</dc:publisher>
+      <dcterms:issued xsi:type="dcterms:W3CDTF">2020-12-04</dcterms:issued>
+      <dc:description>JP-eコード : 08882565882129315501</dc:description>
+      <dc:description>ファイル種類 : EPUB</dc:description>
+      <dc:description>フィックス</dc:description>
+      <dc:description>電子書籍</dc:description>
+      <dc:description>コミック</dc:description>
+      <dc:description>リポジトリ収録資料</dc:description>
+      <rdfs:seeAlso rdf:resource="https://www.books.or.jp/book-details/08882565882129315501"/>
+    </item>
+    <item>
+      <title>2.5次元の誘惑 8</title>
+      <link>https://iss.ndl.go.jp/books/R100000130-I000312910-00</link>
+<description>
+<![CDATA[<p>集英社</p>
+<ul><li>タイトル： 2.5次元の誘惑 8</li>
+<li>タイトル（読み）： ニイテンゴジゲンノリリサ008</li>
+<li>責任表示： 橋本悠 著・文・その他,</li>
+<li>シリーズ名： ジャンプコミックスDIGITAL</li>
+<li>シリーズ名（読み）： ジャンプコミックスデジタル</li>
+</ul>]]>
+</description>
+      <author>橋本悠 著・文・その他,橋本悠,</author>
+      <category>デジタル資料</category>
+      <guid isPermaLink="true">https://iss.ndl.go.jp/books/R100000130-I000312910-00</guid>
+      <dc:title>2.5次元の誘惑 8</dc:title>
+      <dcndl:titleTranscription>ニイテンゴジゲンノリリサ008</dcndl:titleTranscription>
+      <dc:creator>橋本悠</dc:creator>
+      <dcndl:creatorTranscription>ハシモトユウ</dcndl:creatorTranscription>
+      <dcndl:seriesTitle>ジャンプコミックスDIGITAL</dcndl:seriesTitle>
+      <dcndl:seriesTitle>2.5次元の誘惑</dcndl:seriesTitle>
+      <dcndl:seriesTitleTranscription>ジャンプコミックスデジタル</dcndl:seriesTitleTranscription>
+      <dcndl:seriesTitleTranscription>ニイテンゴジゲンノリリサ</dcndl:seriesTitleTranscription>
+      <dc:publisher>集英社</dc:publisher>
+      <dcterms:issued xsi:type="dcterms:W3CDTF">2021-02-04</dcterms:issued>
+      <dc:description>JP-eコード : 08882635882129315501</dc:description>
+      <dc:description>ファイル種類 : EPUB</dc:description>
+      <dc:description>フィックス</dc:description>
+      <dc:description>電子書籍</dc:description>
+      <dc:description>コミック</dc:description>
+      <dc:description>リポジトリ収録資料</dc:description>
+      <rdfs:seeAlso rdf:resource="https://www.books.or.jp/book-details/08882635882129315501"/>
+    </item>
+    <item>
+      <title>2.5次元の誘惑 9</title>
+      <link>https://iss.ndl.go.jp/books/R100000130-I000312925-00</link>
+<description>
+<![CDATA[<p>集英社</p>
+<ul><li>タイトル： 2.5次元の誘惑 9</li>
+<li>タイトル（読み）： ニイテンゴジゲンノリリサ009</li>
+<li>責任表示： 橋本悠 著・文・その他,</li>
+<li>シリーズ名： ジャンプコミックスDIGITAL</li>
+<li>シリーズ名（読み）： ジャンプコミックスデジタル</li>
+</ul>]]>
+</description>
+      <author>橋本悠 著・文・その他,橋本悠,</author>
+      <category>デジタル資料</category>
+      <guid isPermaLink="true">https://iss.ndl.go.jp/books/R100000130-I000312925-00</guid>
+      <dc:title>2.5次元の誘惑 9</dc:title>
+      <dcndl:titleTranscription>ニイテンゴジゲンノリリサ009</dcndl:titleTranscription>
+      <dc:creator>橋本悠</dc:creator>
+      <dcndl:creatorTranscription>ハシモトユウ</dcndl:creatorTranscription>
+      <dcndl:seriesTitle>ジャンプコミックスDIGITAL</dcndl:seriesTitle>
+      <dcndl:seriesTitle>2.5次元の誘惑</dcndl:seriesTitle>
+      <dcndl:seriesTitleTranscription>ジャンプコミックスデジタル</dcndl:seriesTitleTranscription>
+      <dcndl:seriesTitleTranscription>ニイテンゴジゲンノリリサ</dcndl:seriesTitleTranscription>
+      <dc:publisher>集英社</dc:publisher>
+      <dcterms:issued xsi:type="dcterms:W3CDTF">2021-04-02</dcterms:issued>
+      <dc:description>JP-eコード : 08882664882129315501</dc:description>
+      <dc:description>ファイル種類 : EPUB</dc:description>
+      <dc:description>フィックス</dc:description>
+      <dc:description>電子書籍</dc:description>
+      <dc:description>コミック</dc:description>
+      <dc:description>リポジトリ収録資料</dc:description>
+      <rdfs:seeAlso rdf:resource="https://www.books.or.jp/book-details/08882664882129315501"/>
+    </item>
+    <item>
+      <title>2.5次元の誘惑 10</title>
+      <link>https://iss.ndl.go.jp/books/R100000130-I000315270-00</link>
+<description>
+<![CDATA[<p>集英社</p>
+<ul><li>タイトル： 2.5次元の誘惑 10</li>
+<li>タイトル（読み）： ニイテンゴジゲンノリリサ010</li>
+<li>責任表示： 橋本悠 著・文・その他,</li>
+<li>シリーズ名： ジャンプコミックスDIGITAL</li>
+<li>シリーズ名（読み）： ジャンプコミックスデジタル</li>
+</ul>]]>
+</description>
+      <author>橋本悠 著・文・その他,橋本悠,</author>
+      <category>デジタル資料</category>
+      <guid isPermaLink="true">https://iss.ndl.go.jp/books/R100000130-I000315270-00</guid>
+      <dc:title>2.5次元の誘惑 10</dc:title>
+      <dcndl:titleTranscription>ニイテンゴジゲンノリリサ010</dcndl:titleTranscription>
+      <dc:creator>橋本悠</dc:creator>
+      <dcndl:creatorTranscription>ハシモトユウ</dcndl:creatorTranscription>
+      <dcndl:seriesTitle>ジャンプコミックスDIGITAL</dcndl:seriesTitle>
+      <dcndl:seriesTitle>2.5次元の誘惑</dcndl:seriesTitle>
+      <dcndl:seriesTitleTranscription>ジャンプコミックスデジタル</dcndl:seriesTitleTranscription>
+      <dcndl:seriesTitleTranscription>ニイテンゴジゲンノリリサ</dcndl:seriesTitleTranscription>
+      <dc:publisher>集英社</dc:publisher>
+      <dcterms:issued xsi:type="dcterms:W3CDTF">2021-07-02</dcterms:issued>
+      <dc:description>JP-eコード : 08X10000000015040200</dc:description>
+      <dc:description>ファイル種類 : EPUB</dc:description>
+      <dc:description>フィックス</dc:description>
+      <dc:description>電子書籍</dc:description>
+      <dc:description>コミック</dc:description>
+      <dc:description>リポジトリ収録資料</dc:description>
+      <rdfs:seeAlso rdf:resource="https://www.books.or.jp/book-details/08X10000000015040200"/>
+    </item>
+  </channel>
+</rss>
