@@ -11,16 +11,16 @@ import (
 // @ID search-books
 // @Accept  json
 // @Produce  json
-// @Param   key     query    string     true        "Search keyword"
+// @Param   isbn     query    string     true        "Search keyword"
 // @Success 200 {array} object.RSS
-// @Router /search [get]
+// @Router /api/books/search [get]
 func (h *handler) Search(w http.ResponseWriter, r *http.Request) {
-	word := r.URL.Query().Get("key")
+	isbn := r.URL.Query().Get("isbn")
 
-	fmt.Println(word)
+	fmt.Println(isbn)
 	ctx := r.Context()
 
-	rss, err := h.rr.SearchBooks(ctx, word)
+	rss, err := h.rr.SearchBooks(ctx, isbn)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

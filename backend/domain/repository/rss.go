@@ -6,5 +6,5 @@ import (
 )
 
 type RSS interface {
-	SearchBooks(ctx context.Context, word string) (*object.RSS, error)
+	SearchBooks(ctx context.Context, isbn string) (*object.RSS, error)
 }

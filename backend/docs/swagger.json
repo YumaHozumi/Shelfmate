@@ -4,7 +4,7 @@
         "contact": {}
     },
     "paths": {
-        "/search": {
+        "/api/books/search": {
             "get": {
                 "description": "Search books by keyword",
                 "consumes": [
@@ -19,7 +19,7 @@
                     {
                         "type": "string",
                         "description": "Search keyword",
-                        "name": "key",
+                        "name": "isbn",
                         "in": "query",
                         "required": true
                     }

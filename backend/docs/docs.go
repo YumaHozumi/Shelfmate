@@ -16,7 +16,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/search": {
+        "/api/books/search": {
             "get": {
                 "description": "Search books by keyword",
                 "consumes": [
@@ -31,7 +31,7 @@ const docTemplate = `{
                     {
                         "type": "string",
                         "description": "Search keyword",
-                        "name": "key",
+                        "name": "isbn",
                         "in": "query",
                         "required": true
                     }

@@ -7,9 +7,12 @@ import (
 	"bookshelf/domain/repository"
 	"bookshelf/handler/rss"
 
+	_ "bookshelf/docs"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func NewRouter(rr repository.RSS) http.Handler {
@@ -23,6 +26,7 @@ func NewRouter(rr repository.RSS) http.Handler {
 
 	r.Use(middleware.Timeout(60 * time.Second))
 
+	r.Get("/swagger/*", httpSwagger.WrapHandler)
 	r.Mount("/api/books", books.NewRouter(rr))
 
 	return r

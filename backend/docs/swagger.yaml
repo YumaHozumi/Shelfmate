@@ -31,7 +31,7 @@ definitions:
 info:
   contact: {}
 paths:
-  /search:
+  /api/books/search:
     get:
       consumes:
       - application/json
@@ -40,7 +40,7 @@ paths:
       parameters:
       - description: Search keyword
         in: query
-        name: key
+        name: isbn
         required: true
         type: string
       produces:
