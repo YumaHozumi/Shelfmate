@@ -21,13 +21,10 @@ func (r *rss) SearchBooks(ctx context.Context, isbn string) (*object.RSS, error)
 	if err != nil {
 		return nil, err
 	}
-	//クエリパラメータを作成
 	params := url.Values{}
 	params.Add("cnt", "1")
 	params.Add("isbn", isbn)
 	params.Add("dpid", "iss-ndl-opac")
-
-	//クエリパラメータをURLに追加
 	baseURL.RawQuery = params.Encode()
 
 	fmt.Println(baseURL.String())
@@ -38,7 +35,6 @@ func (r *rss) SearchBooks(ctx context.Context, isbn string) (*object.RSS, error)
 	}
 
 	var rss *object.RSS
-
 	if err := xml.NewDecoder(res.Body).Decode(&rss); err != nil {
 		return nil, err
 	}

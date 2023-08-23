@@ -68,19 +68,13 @@ const docTemplate = `{
                 "author": {
                     "type": "string"
                 },
-                "description": {
+                "detail": {
                     "type": "string"
                 },
                 "isbn": {
-                    "type": "integer"
-                },
-                "issued": {
                     "type": "string"
                 },
-                "publisher": {
-                    "type": "string"
-                },
-                "seriesTitle": {
+                "public_date": {
                     "type": "string"
                 },
                 "title": {

@@ -9,4 +9,4 @@ WORKDIR /app
 COPY . .
 
 # Run air for hot reloading
-CMD ["air"]
+CMD ["air", "-c", ".air.toml"]
