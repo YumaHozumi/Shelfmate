@@ -16,7 +16,8 @@ type Item struct {
 	Author         string `xml:"author" json:"author"`
 	PublicDate     string `xml:"pubDate" json:"public_date"`
 	ISBNIdentifier string `json:"isbn"`
-	// 他のフィールド
+	OrderNumber    int    `xml:"volume" json:"order_number"`
+	ImageURL       string `json:"image_url"`
 }
 
 func (item *Item) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
@@ -30,6 +31,10 @@ func (item *Item) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 			switch t.Name.Local {
 			case "title":
 				if err := d.DecodeElement(&item.Title, &t); err != nil {
+					return err
+				}
+			case "volume":
+				if err := d.DecodeElement(&item.OrderNumber, &t); err != nil {
 					return err
 				}
 			case "author":
@@ -48,6 +53,10 @@ func (item *Item) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 							return err
 						}
 						item.ISBNIdentifier = isbn
+						if isbn != "" {
+							picImage := "https://iss.ndl.go.jp/thumbnail/" + isbn
+							item.ImageURL = picImage
+						}
 					}
 				}
 			case "description":

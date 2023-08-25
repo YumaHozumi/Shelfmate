@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
+interface Props {
+  label?: string;
+}
+
+defineProps<Props>();
+
 interface Emits {
   (event: 'search', searchText: string): void
 }
@@ -18,7 +24,7 @@ const searchClick = (): void => {
 
 <template>
   <v-toolbar class="pa-2 search-bar">
-    <v-text-field hide-details v-model="inputText" @keyup.enter="searchClick"></v-text-field>
+    <v-text-field hide-details v-model="inputText" @keyup.enter="searchClick" :label="label"></v-text-field>
     <v-btn icon @click="searchClick">
       <v-icon>mdi-magnify</v-icon>
     </v-btn>

@@ -17,6 +17,7 @@ import router from '@/router'
 import { incrementCounter, sort } from '@/function'
 import { Timestamp } from "firebase/firestore"
 import Pagination from '@/components/SearchBook/Pagination.vue'
+import SearchButton from '@/components/SearchButton.vue'
 
 const onNavigate = (name: string): void => {
   router.push({ name: name })
@@ -281,6 +282,7 @@ const searchMore = async () => {
   </v-select>
   <SearchBar @search="searchClick" class="mt-4 mb-4"></SearchBar>
   <div class="menu-container">
+    <SearchButton></SearchButton>
     <Menu :items="menu" icon="mdi-sort" class="menu" @selectItem="selectMenu"></Menu>
   </div>
   <Results :items="items" v-if="!isLoading" @registerBook="registerBook" :registeredBooks="registeredBooks"></Results>

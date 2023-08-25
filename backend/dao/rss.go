@@ -5,7 +5,6 @@ import (
 	"bookshelf/domain/repository"
 	"context"
 	"encoding/xml"
-	"fmt"
 	"net/http"
 	"net/url"
 )
@@ -26,8 +25,6 @@ func (r *rss) SearchBooks(ctx context.Context, isbn string) (*object.RSS, error)
 	params.Add("isbn", isbn)
 	params.Add("dpid", "iss-ndl-opac")
 	baseURL.RawQuery = params.Encode()
-
-	fmt.Println(baseURL.String())
 
 	res, err := http.Get(baseURL.String())
 	if err != nil {
