@@ -7,6 +7,7 @@ import (
 	"encoding/xml"
 	"net/http"
 	"net/url"
+	"strconv"
 )
 
 type rss struct{}
@@ -35,6 +36,9 @@ func (r *rss) SearchBooks(ctx context.Context, isbn string) (*object.RSS, error)
 	if err := xml.NewDecoder(res.Body).Decode(&rss); err != nil {
 		return nil, err
 	}
+
+	item := rss.Channel.Items[0]
+	rss.Channel.Items[0].Title = item.Title + " " + strconv.Itoa(item.OrderNumber)
 
 	return rss, nil
 }

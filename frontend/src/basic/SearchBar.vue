@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { debounce } from "lodash";
 
 interface Props {
   label?: string;
@@ -15,10 +16,14 @@ const emit = defineEmits<Emits>()
 
 const inputText = ref('')
 
+const debouncedSearch = debounce((searthText: string) => {
+  emit("search", searthText);
+}, 300)
+
 //検索ボタン押したら
 const searchClick = (): void => {
   if (inputText.value === '') return
-  emit('search', inputText.value)
+  debouncedSearch(inputText.value)
 }
 </script>
 

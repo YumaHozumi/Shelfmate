@@ -8,9 +8,9 @@ import axios from 'axios'
 import LoadingContainer from '@/containers/LoadingContainer.vue'
 import Menu from '@/components/Menu.vue'
 import { firebaseAuth, firestore, getCurrentUser } from '@/config/firebase'
-import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, query, setDoc, updateDoc, where } from 'firebase/firestore'
+import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, query, setDoc, updateDoc, where, type Unsubscribe } from 'firebase/firestore'
 import imageURL from '@/assets/no-image.png'
-import { onAuthStateChanged, type Unsubscribe } from 'firebase/auth'
+import { onAuthStateChanged } from 'firebase/auth'
 import { implementBookShelf, type BookItemNoSeries } from '@/interface'
 import { onUnmounted, computed } from 'vue'
 import router from '@/router'
@@ -127,6 +127,13 @@ const setRegisteredBooks = async() => {
   registeredBooks.value = booksSnapshot.docs.map(doc => doc.data() as BookItem)
 }
 
+//シリーズの部分のテキストだけを抽出する正規表現
+const extractSeriesTitle = (str: string): string => {
+  const regex = /^(.*?)(?:\s*\d+)?(?:\s*（[^）]+）)?(?:\s*【[^】]+】)?\s*$/;
+  const match = str.match(regex);
+  return match ? match[1].trim() : '';
+};
+
 const registerBook = async (book: BookItem) => {
   try {
     const user = await getCurrentUser()
@@ -168,11 +175,14 @@ const registerBook = async (book: BookItem) => {
         }
       } else {
         // ドキュメントが存在しない場合、画像とカウンターを設定
+        const seriesTitle = extractSeriesTitle(book.title);
+
         await setDoc(seriesRef, {
           seriesId: seriesId,
           pic: book?.image_url ?? "",
           counter: 0,
           picOrder: book?.orderNumber ?? 0,
+          seriesTitle: seriesTitle
         });
       }
 
