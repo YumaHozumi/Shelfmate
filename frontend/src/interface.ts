@@ -24,6 +24,12 @@ interface Series {
   counter: number
 }
 
+interface SelectSeriesItem {
+  seriesId: string
+  pic: string
+  seriesTitle: string
+}
+
 type BookItemNoSeries = Omit<BookItem, 'seriesId' | 'orderNumber'>
 
 //ユーザ定義タイプガード
@@ -45,12 +51,5 @@ const isBookItem = (obj: any): obj is BookItem =>  {
   );
 }
 
-type OnSnapshotType<T extends DocumentData> = (
-  query: Query<T, T>,
-  onNext: (snapshot: QuerySnapshot<T, T>) => void,
-  onError?: (error: FirestoreError) => void,
-  onCompletion?: () => void
-) => Unsubscribe;
-
-export type { BookItem, BookShelf, Series, BookItemNoSeries, OnSnapshotType }
+export type { BookItem, BookShelf, Series, BookItemNoSeries, SelectSeriesItem }
 export { implementBookShelf, isBookItem }

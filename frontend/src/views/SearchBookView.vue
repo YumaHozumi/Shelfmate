@@ -182,7 +182,7 @@ const registerBook = async (book: BookItem) => {
           pic: book?.image_url ?? "",
           counter: 0,
           picOrder: book?.orderNumber ?? 0,
-          seriesTitle: seriesTitle
+          seriesTitle: seriesTitle,
         });
       }
 

@@ -3,17 +3,19 @@ import SearchBar from '@/basic/SearchBar.vue';
 import axios from 'axios';
 import { watch } from 'vue';
 import { ref, computed } from 'vue';
-import { implementBookShelf, type BookItem, type BookShelf } from '@/interface';
-import { Timestamp, collection, onSnapshot, type Unsubscribe } from "firebase/firestore"
+import { implementBookShelf, type BookItem, type BookShelf, type SelectSeriesItem } from '@/interface';
+import { Timestamp, collection, onSnapshot, type Unsubscribe, getDocs } from "firebase/firestore"
 import imageURL from '@/assets/no-image.png'
 import { onAuthStateChanged } from 'firebase/auth';
-import { firebaseAuth, firestore } from '@/config/firebase';
+import { firebaseAuth, firestore, getCurrentUser } from '@/config/firebase';
 import { onUnmounted } from 'vue';
 import SearchResult from '@/components/SearchBook/SearchResult.vue'
+import DropdownMenu from './DropdownMenu.vue';
 
 const dialog = ref(false);
 const inputText = ref("");
 const book = ref<BookItem>();
+const selectedRadio = ref("one");
 
 let unsubscribe: Unsubscribe
 
@@ -96,6 +98,38 @@ const bookshelfOptions = computed(() => {
 })
 
 const selectedBookshelf = ref<BookShelf | undefined>(undefined) // 選択されたbookshelfのIDを保持するためのref
+const seriesList = ref<SelectSeriesItem[]>([])
+
+watch(selectedBookshelf, async (newVal) => {
+  if(newVal === undefined) return;
+
+  const user = await getCurrentUser();
+
+  const selectedBookshelfId = selectedBookshelf.value?.doc_id
+
+  if(selectedBookshelfId !== undefined){
+    const seriesCollection = collection(
+      firestore,
+      "users",
+      user.uid,
+      "bookshelves",
+      selectedBookshelfId,
+      "series"
+    )
+    await getDocs(seriesCollection).then((snapshot) => {
+      snapshot.forEach(series => {
+        const data = series.data();
+        const item: SelectSeriesItem = {
+          seriesId: data.seriesId,
+          pic: data.pic,
+          seriesTitle: data.seriesTitle
+        }
+        seriesList.value.push(item);
+      })
+    })
+  }
+  
+})
 
 const registerBook = (book: BookItem): void => {
     nestDialog.value = true;
@@ -140,8 +174,22 @@ const nestDialog = ref(false);
         </v-card>
     </v-dialog>
 
-    <v-dialog v-model="nestDialog" max-width="400px">
-      <v-card>test</v-card>
+    <v-dialog v-model="nestDialog" max-width="500px">
+      <v-card height="300px">
+        <v-card-text>
+          <v-radio-group v-model="selectedRadio">
+            <v-radio label="単体で登録" value="one"></v-radio>
+            <v-radio label="シリーズもので登録" value="series"></v-radio>
+          </v-radio-group>
+          <DropdownMenu :seriesList="seriesList" :isDisabled="selectedRadio === 'one'"></DropdownMenu>
+
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="registerBtn">登録</v-btn>
+        </v-card-actions>
+      </v-card>
+      
     </v-dialog>
 </template>
 
@@ -161,5 +209,16 @@ const nestDialog = ref(false);
 .select-btn {
     margin-left: 10%;
     margin-right: 10%;
+}
+
+.button-wrapper {
+  text-align: right;
+  /* もしくは margin-left: auto; */
+}
+
+.registerBtn {
+  background-color: #4CAF50;
+  color: white;
+  font-weight: bold;
 }
 </style>
