@@ -10,6 +10,12 @@ interface Props {
 
 const prop = defineProps<Props>();
 
+interface Emits {
+  (event: "selectItem", item: SelectSeriesItem): void
+}
+
+const emit = defineEmits<Emits>();
+
 const isOpen = ref(false);
 const selected = ref<SelectSeriesItem | undefined>(undefined);
 
@@ -25,14 +31,13 @@ watch(
 const toggleDropdown = () => {
   if (prop.isDisabled) return;  // isDisabledがtrueなら操作を無効にする
   isOpen.value = !isOpen.value;
-  console.log('isOpen is now: ', isOpen.value); // デバッグ用
 };
 
 const selectItem = (item: SelectSeriesItem) => {
-    console.log(prop.isDisabled)
     if(prop.isDisabled) return; // isDisabledがtrueなら操作を無効にする
     selected.value = item;
     isOpen.value = false;
+    emit("selectItem", item);
   };
 </script>
 
@@ -40,6 +45,7 @@ const selectItem = (item: SelectSeriesItem) => {
     <div class="dropdown" :class="{ 'disabled-button': isDisabled }">
       <button @click="toggleDropdown" class="togglebtn">
         {{ selected ? selected.seriesTitle : 'シリーズを選択' }}
+        <v-icon class="arrow-icon">mdi-chevron-down</v-icon>
       </button>
       <transition name="fade">
         <div class="dropdown-menu" v-show="isOpen">
@@ -68,6 +74,13 @@ const selectItem = (item: SelectSeriesItem) => {
     .togglebtn {
         width: 100%;
         text-align: start;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .arrow-icon {
+      margin-left: auto;
     }
 
     &.disabled-button {

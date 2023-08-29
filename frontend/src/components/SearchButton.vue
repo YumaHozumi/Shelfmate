@@ -3,14 +3,15 @@ import SearchBar from '@/basic/SearchBar.vue';
 import axios from 'axios';
 import { watch } from 'vue';
 import { ref, computed } from 'vue';
-import { implementBookShelf, type BookItem, type BookShelf, type SelectSeriesItem } from '@/interface';
-import { Timestamp, collection, onSnapshot, type Unsubscribe, getDocs } from "firebase/firestore"
+import { implementBookShelf, type BookItem, type BookShelf, type SelectSeriesItem, type BookItemNoSeries } from '@/interface';
+import { Timestamp, collection, onSnapshot, type Unsubscribe, getDocs, addDoc, doc, getDoc, updateDoc, setDoc } from "firebase/firestore"
 import imageURL from '@/assets/no-image.png'
 import { onAuthStateChanged } from 'firebase/auth';
 import { firebaseAuth, firestore, getCurrentUser } from '@/config/firebase';
 import { onUnmounted } from 'vue';
 import SearchResult from '@/components/SearchBook/SearchResult.vue'
 import DropdownMenu from './DropdownMenu.vue';
+import { incrementCounter } from '@/function';
 
 const dialog = ref(false);
 const inputText = ref("");
@@ -131,9 +132,98 @@ watch(selectedBookshelf, async (newVal) => {
   
 })
 
-const registerBook = (book: BookItem): void => {
-    nestDialog.value = true;
+const selectItem = ref<SelectSeriesItem | undefined>(undefined);
+
+const updateSelectItem = (item: SelectSeriesItem): void => {
+  selectItem.value = item;
 }
+
+const nowBook = ref<BookItem | undefined>(undefined);
+
+const registerBook = async (book: BookItem) => {
+  nestDialog.value = true;
+  nowBook.value = book;
+}
+
+const submit = async () => {
+  const user = await getCurrentUser()
+    const selectedBookshelfId = selectedBookshelf.value?.doc_id || ''
+    console.log(selectedRadio.value)
+    const book = nowBook.value
+    // シリーズものじゃないとき
+    if(selectedRadio.value === "one" && book !== undefined) {
+      const noSeriesBookCollection = collection(
+        firestore,
+        'users',
+        user.uid,
+        'bookshelves',
+        selectedBookshelfId,
+        'books'
+      )
+      const noSeriesBook: BookItemNoSeries = convertToBookItemWithoutSeries(book)
+      await addDoc(noSeriesBookCollection, noSeriesBook)
+    } else { // シリーズもの
+      if(selectItem.value !== undefined && book !== undefined) {
+        const bookshelvesRef = collection(firestore, 'users', user.uid, 'bookshelves')
+        const seriesRef = doc(bookshelvesRef, selectedBookshelfId, 'series', selectItem.value.seriesId)
+        console.log("seriesId" + selectItem.value.seriesId)
+        console.log(book)
+        const seriesSnap = await getDoc(seriesRef)
+      if (seriesSnap.exists()) {
+        const seriesData = seriesSnap.data();
+        const shouldUpdatePic = book && (
+          (((book.orderNumber ?? 0)> (seriesData?.picOrder ?? 0)) && book.image_url !== "") ||
+          (((book.orderNumber ?? 0)< (seriesData?.picOrder ?? 0)) && seriesData?.pic === "")
+        );
+
+        if (shouldUpdatePic) {
+          await updateDoc(seriesRef, {
+            pic: book?.image_url,
+            picOrder: book?.orderNumber ?? 0
+          });
+        }
+      } else {
+        // ドキュメントが存在しない場合、画像とカウンターを設定
+        const seriesTitle = extractSeriesTitle(book.title);
+
+        await setDoc(seriesRef, {
+          seriesId: selectItem.value.seriesId,
+          pic: book?.image_url ?? "",
+          counter: 0,
+          picOrder: book?.orderNumber ?? 0,
+          seriesTitle: seriesTitle,
+        });
+      }
+
+      const booksCollection = collection(
+        firestore,
+        'users',
+        user.uid,
+        'bookshelves',
+        selectedBookshelfId,
+        'series',
+        selectItem.value.seriesId,
+        'books'
+      )
+      await addDoc(booksCollection, book)
+      await incrementCounter(seriesRef)
+      }
+    }
+}
+
+const convertToBookItemWithoutSeries = (bookItem: BookItem): BookItemNoSeries => {
+  const copy = { ...bookItem }
+  delete copy.seriesId
+  delete copy.orderNumber
+  return copy
+}
+
+//シリーズの部分のテキストだけを抽出する正規表現
+const extractSeriesTitle = (str: string): string => {
+  const regex = /^(.*?)(?:\s*\d+)?(?:\s*（[^）]+）)?(?:\s*【[^】]+】)?\s*$/;
+  const match = str.match(regex);
+  return match ? match[1].trim() : '';
+};
 
 const nestDialog = ref(false);
 </script>
@@ -181,12 +271,13 @@ const nestDialog = ref(false);
             <v-radio label="単体で登録" value="one"></v-radio>
             <v-radio label="シリーズもので登録" value="series"></v-radio>
           </v-radio-group>
-          <DropdownMenu :seriesList="seriesList" :isDisabled="selectedRadio === 'one'"></DropdownMenu>
+          <DropdownMenu :seriesList="seriesList" :isDisabled="selectedRadio === 'one'"
+          @selectItem="updateSelectItem"></DropdownMenu>
 
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn class="registerBtn">登録</v-btn>
+          <v-btn class="registerBtn" @click="submit">登録</v-btn>
         </v-card-actions>
       </v-card>
       
