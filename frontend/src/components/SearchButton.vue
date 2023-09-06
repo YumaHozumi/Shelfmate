@@ -103,6 +103,7 @@ const seriesList = ref<SelectSeriesItem[]>([])
 
 watch(selectedBookshelf, async (newVal) => {
   if(newVal === undefined) return;
+  seriesList.value.length = 0;
 
   const user = await getCurrentUser();
 
