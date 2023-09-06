@@ -65,6 +65,10 @@ defineProps<Props>()
     }
   }
 
-
+  .book-badge {
+    position: absolute;
+    right: 35px;
+    top: 12px;
+  }
 }
 </style>
