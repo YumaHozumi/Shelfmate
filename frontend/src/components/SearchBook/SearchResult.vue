@@ -4,7 +4,7 @@ import { ref } from 'vue';
 
 interface Props {
   book: BookItem
-  isRegistered: boolean
+  isRegistered?: boolean
 }
 //デフォルト値設定
 const props = defineProps<Props>()

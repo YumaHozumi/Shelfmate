@@ -1,0 +1,369 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:openSearch="http://a9.com/-/spec/opensearchrss/1.0/" xmlns:dcndl="http://ndl.go.jp/dcndl/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <channel>
+    <title>マリーアントワネット - 国立国会図書館サーチ OpenSearch</title>
+    <link>https://iss.ndl.go.jp/api/opensearch?cnt=10&amp;title=%E3%83%9E%E3%83%AA%E3%83%BC%E3%82%A2%E3%83%B3%E3%83%88%E3%83%AF%E3%83%8D%E3%83%83%E3%83%88</link>
+    <description>Search results for cnt=10 title=マリーアントワネット </description>
+    <language>ja</language>
+    <openSearch:totalResults>781</openSearch:totalResults>
+    <openSearch:startIndex>1</openSearch:startIndex>
+    <openSearch:itemsPerPage>10</openSearch:itemsPerPage>
+    <item>
+      <title>"私たち"のソフィア・コッポラ</title>
+      <link>https://iss.ndl.go.jp/books/R000000004-I029401326-00</link>
+<description>
+<![CDATA[<p>青土社</p>
+<ul><li>タイトル： &quot;私たち&quot;のソフィア・コッポラ</li>
+<li>タイトル（読み）： &quot;ワタクシ タチ&quot;ノ ソフィア ・ コッポラ</li>
+<li>責任表示： 渥美 喜子,</li>
+<li>シリーズ名： 特集 ソフィア・コッポラ : 『ヴァージン・スーサイズ』から『ロスト・イン・トランスレーション』『マリー・アントワネット』、そして『The Beguiled/ビガイルド 欲望のめざめ』…豪奢と洗練の映画</li>
+<li>シリーズ名（読み）： トクシュウ ソフィア ・ コッポラ : 『 ヴァージン ・ スーサイズ 』 カラ 『 ロスト ・ イン ・ トランスレーション 』 『 マリー ・ アントワネット 』 、 ソシテ 『 The Beguiled/ビガイルド ヨクボウ ノメ ザメ 』 … ゴウシャ ト センレン ノ エイガ</li>
+</ul>]]>
+</description>
+      <author>渥美 喜子,渥美 喜子,</author>
+      <category>記事・論文</category>
+      <guid isPermaLink="true">https://iss.ndl.go.jp/books/R000000004-I029401326-00</guid>
+      <pubDate>Thu, 27 Dec 2018 09:00:00 +0900</pubDate>
+      <dc:title>"私たち"のソフィア・コッポラ</dc:title>
+      <dcndl:titleTranscription>"ワタクシ タチ"ノ ソフィア ・ コッポラ</dcndl:titleTranscription>
+      <dc:creator>渥美 喜子</dc:creator>
+      <dcndl:creatorTranscription>アツミ ヨシコ</dcndl:creatorTranscription>
+      <dcndl:seriesTitle>特集 ソフィア・コッポラ : 『ヴァージン・スーサイズ』から『ロスト・イン・トランスレーション』『マリー・アントワネット』、そして『The Beguiled/ビガイルド 欲望のめざめ』…豪奢と洗練の映画</dcndl:seriesTitle>
+      <dcndl:seriesTitleTranscription>トクシュウ ソフィア ・ コッポラ : 『 ヴァージン ・ スーサイズ 』 カラ 『 ロスト ・ イン ・ トランスレーション 』 『 マリー ・ アントワネット 』 、 ソシテ 『 The Beguiled/ビガイルド ヨクボウ ノメ ザメ 』 … ゴウシャ ト センレン ノ エイガ</dcndl:seriesTitleTranscription>
+      <dc:publisher>青土社</dc:publisher>
+      <dc:date>50(4)=719:2018.3</dc:date>
+      <dcterms:issued xsi:type="dcterms:W3CDTF">2018-03</dcterms:issued>
+      <dcterms:isPartOf rdf:resource="http://iss.ndl.go.jp/books/R100000002-I000000023644-00"/>
+      <dcterms:isPartOf rdf:resource="http://iss.ndl.go.jp/issn/13425641"/>
+      <dcterms:isPartOf rdf:resource="http://iss.ndl.go.jp/issnl/13425641"/>
+      <dc:identifier xsi:type="dcndl:NDLBibID">029401326</dc:identifier>
+      <dc:subject xsi:type="dcndl:NDLC">ZK24</dc:subject>
+      <rdfs:seeAlso rdf:resource="http://id.ndl.go.jp/bib/029401326"/>
+<dc:description>掲載誌：ユリイカ 50(4) (通号 719) 2018-03 p.79-84</dc:description>
+    </item>
+    <item>
+      <title>10分で読める伝記</title>
+      <link>https://iss.ndl.go.jp/books/R100000002-I000011230787-00</link>
+<description>
+<![CDATA[<p>4年生,学研教育出版,9784052033865</p>
+<ul><li>タイトル： 10分で読める伝記</li>
+<li>タイトル（読み）： 10プン デ ヨメル デンキ</li>
+<li>責任表示： 塩谷京子 監修,</li>
+<li>NDC(9)： 280</li>
+</ul>]]>
+</description>
+      <author>塩谷京子 監修,塩谷, 京子,</author>
+      <category>児童書</category>
+      <guid isPermaLink="true">https://iss.ndl.go.jp/books/R100000002-I000011230787-00</guid>
+      <pubDate>Mon, 27 Jun 2022 09:00:00 +0900</pubDate>
+      <dc:title>10分で読める伝記</dc:title>
+      <dcndl:titleTranscription>10プン デ ヨメル デンキ</dcndl:titleTranscription>
+      <dc:creator>塩谷, 京子</dc:creator>
+      <dcndl:creatorTranscription>シオヤ, キョウコ</dcndl:creatorTranscription>
+      <dcndl:volume>4年生</dcndl:volume>
+      <dc:publisher>学研教育出版</dc:publisher>
+      <dc:publisher>学研マーケティング</dc:publisher>
+      <dc:date>2011.7</dc:date>
+      <dcterms:issued xsi:type="dcterms:W3CDTF">2011</dcterms:issued>
+      <dcndl:price>800円</dcndl:price>
+      <dc:extent>195p ; 21cm</dc:extent>
+      <dc:identifier xsi:type="dcndl:ISBN">9784052033865</dc:identifier>
+      <dc:identifier xsi:type="dcndl:NDLBibID">000011230787</dc:identifier>
+      <dc:identifier xsi:type="dcndl:JPNO">21958058</dc:identifier>
+      <dc:identifier xsi:type="dcndl:NSMARCNO">123450400</dc:identifier>
+      <dc:subject>伝記</dc:subject>
+      <dcndl:genre>児童図書</dcndl:genre>
+      <dc:subject xsi:type="dcndl:NDLC">Y3</dc:subject>
+      <dc:subject xsi:type="dcndl:NDC9">280</dc:subject>
+      <rdfs:seeAlso rdf:resource="http://id.ndl.go.jp/bib/000011230787"/>
+      <rdfs:seeAlso rdf:resource="https://web.oml.city.osaka.lg.jp/webopac_i_ja/0012331871"/>
+      <rdfs:seeAlso rdf:resource="https://www.library.pref.osaka.jp/licsxp-opac/WOpacMsgNewListToTifTilDetailAction.do?tilcod=10021101905083"/>
+      <rdfs:seeAlso rdf:resource="https://www.library.pref.miyagi.jp/wo/opc_srh/srh_detail/1100363298/"/>
+      <rdfs:seeAlso rdf:resource="http://library.pref.yamaguchi.lg.jp/wo/opc_srh/srh_detail/1000889538/"/>
+      <rdfs:seeAlso rdf:resource="https://www.lib.pref.ibaraki.jp/licsxp-kopac/WOpacMsgNewListToTifTilDetailAction.do?tilcod=1001001945515"/>
+      <rdfs:seeAlso rdf:resource="http://www.library.pref.tottori.jp/winj/opac/switch-detail-iccap.do?bibid=1101791635"/>
+      <rdfs:seeAlso rdf:resource="https://www.ehimetosyokan.jp/winj/opac/switch-detail-iccap.do?bibid=1101048059"/>
+      <rdfs:seeAlso rdf:resource="https://opac.libnet.pref.okayama.jp/licsxp-opac/WOpacMsgNewListToTifTilDetailAction.do?tilcod=1009811448435"/>
+      <rdfs:seeAlso rdf:resource="https://opac.libnet.pref.okayama.jp/licsxp-opac/WOpacMsgNewListToTifTilDetailAction.do?tilcod=1009811448435"/>
+      <rdfs:seeAlso rdf:resource="http://www.shiga-pref-library.jp/wo/opc_srh/srh_detail/4047600/"/>
+      <rdfs:seeAlso rdf:resource="http://www.library.city.hiroshima.jp/winj/opac/switch-detail-iccap.do?bibid=1103316823"/>
+      <rdfs:seeAlso rdf:resource="https://www.lib-sakai.jp/licsxp-opac/WOpacMsgNewListToTifTilDetailAction.do?tilcod=1007000108262"/>
+      <rdfs:seeAlso rdf:resource="https://opac.libnet.pref.okayama.jp/licsxp-opac/WOpacMsgNewListToTifTilDetailAction.do?tilcod=1009811448435"/>
+      <rdfs:seeAlso rdf:resource="https://opac.libnet.pref.okayama.jp/licsxp-opac/WOpacMsgNewListToTifTilDetailAction.do?tilcod=1009811448435"/>
+      <rdfs:seeAlso rdf:resource="https://www.lib.city.saitama.jp/bookdetail?num=148632&amp;ctg=1"/>
+      <rdfs:seeAlso rdf:resource="https://alislibopac.bunmori.tokushima.jp/winj/opac/switch-detail-iccap.do?bibid=1103304938"/>
+      <rdfs:seeAlso rdf:resource="http://www.lib.wakayama-c.ed.jp/winj/opac/switch-detail-iccap.do?bibid=1102305060"/>
+      <rdfs:seeAlso rdf:resource="https://www.library.pref.okinawa.jp/winj/opac/switch-detail-iccap.do?bibid=1100820544"/>
+      <rdfs:seeAlso rdf:resource="http://www.lib.pref.fukuoka.jp/winj/opac/switch-detail-iccap.do?bibid=1109260839"/>
+      <rdfs:seeAlso rdf:resource="https://opac.lib.city.yokohama.lg.jp/opac/OPP1500?SELDATA=TOSHO&amp;SSNO=3-0211048580"/>
+      <rdfs:seeAlso rdf:resource="https://web.oml.city.osaka.lg.jp/webopac_i_ja/0014041726"/>
+      <rdfs:seeAlso rdf:resource="https://www.lib.pref.saitama.jp//winj/opac/switch-detail-iccap.do?bibid=1101178247"/>
+      <rdfs:seeAlso rdf:resource="https://opac.miraionlibrary.jp/licsxp-opac/WOpacMsgNewListToTifTilDetailAction.do?tilcod=1000001047060"/>
+      <rdfs:seeAlso rdf:resource="https://www.library.city.sapporo.jp/licsxp-opac/WOpacMsgNewListToTifTilDetailAction.do?tilcod=1008000428057"/>
+      <rdfs:seeAlso rdf:resource="https://www.library.city.sapporo.jp/licsxp-opac/WOpacMsgNewListToTifTilDetailAction.do?tilcod=1008000428057"/>
+      <rdfs:seeAlso rdf:resource="https://opac.library.fcs.ed.jp/winj/opac/switch-detail-iccap.do?bibid=1102805729"/>
+      <rdfs:seeAlso rdf:resource="https://www2.library.pref.kagoshima.jp/kento/opac/switch-detail-iccap.do?bibid=1111058751"/>
+      <rdfs:seeAlso rdf:resource="https://catalog.library.metro.tokyo.lg.jp/winj/opac/switch-detail-iccap.do?bibid=1108456506"/>
+      <rdfs:seeAlso rdf:resource="https://www.tosyokan.pref.shizuoka.jp/licsxp-opac/WOpacMsgNewListToTifTilDetailAction.do?tilcod=1002000130312"/>
+    </item>
+    <item>
+      <title>12の場所からたどるマリー・アントワネット</title>
+      <link>https://iss.ndl.go.jp/books/R100000096-I012352751-00</link>
+<description>
+<![CDATA[<p>上,原書房</p>
+<ul><li>タイトル： 12の場所からたどるマリー・アントワネット</li>
+<li>タイトル（読み）： 12 ノ バショ カラ タドル マリー アントワネット</li>
+<li>責任表示： ジャン=クリスティアン・プティフィス編 ; 土居佳代子訳,</li>
+<li>NDC(10)： 289.3</li>
+<li>NDC(9)： 289.3</li>
+</ul>]]>
+</description>
+      <author>ジャン=クリスティアン・プティフィス編 ; 土居佳代子訳,Petitfils, Jean Christian,土居, 佳代子,</author>
+      <category>本</category>
+      <guid isPermaLink="true">https://iss.ndl.go.jp/books/R100000096-I012352751-00</guid>
+      <dc:title>12の場所からたどるマリー・アントワネット</dc:title>
+      <dcndl:titleTranscription>12 ノ バショ カラ タドル マリー アントワネット</dcndl:titleTranscription>
+      <dc:creator>Petitfils, Jean Christian</dc:creator>
+      <dc:creator>土居, 佳代子</dc:creator>
+      <dcndl:creatorTranscription>ドイ, カヨコ</dcndl:creatorTranscription>
+      <dcndl:volume>上</dcndl:volume>
+      <dc:publisher>原書房</dc:publisher>
+      <dc:date>2020.12</dc:date>
+      <dcterms:issued xsi:type="dcterms:W3CDTF">2020</dcterms:issued>
+      <dc:extent>235p, 図版 [6] p</dc:extent>
+      <dc:extent>20cm</dc:extent>
+      <dc:identifier xsi:type="dcndl:NIIBibID">BC04512181</dc:identifier>
+      <dc:subject>Marie Antoinette</dc:subject>
+      <dc:subject xsi:type="dcndl:NDC10">289.3</dc:subject>
+      <dc:subject xsi:type="dcndl:NDC9">289.3</dc:subject>
+      <dc:subject xsi:type="dcndl:NDC8">288.4935</dc:subject>
+      <dc:description>各巻のISBN : 9784562058617(上)</dc:description>
+      <rdfs:seeAlso rdf:resource="https://ci.nii.ac.jp/ncid/BC04512181"/>
+    </item>
+    <item>
+      <title>12の場所からたどるマリー・アントワネット</title>
+      <link>https://iss.ndl.go.jp/books/R100000096-I012352759-00</link>
+<description>
+<![CDATA[<p>下,原書房</p>
+<ul><li>タイトル： 12の場所からたどるマリー・アントワネット</li>
+<li>タイトル（読み）： 12 ノ バショ カラ タドル マリー アントワネット</li>
+<li>責任表示： ジャン=クリスティアン・プティフィス編 ; 土居佳代子訳,</li>
+<li>NDC(10)： 289.3</li>
+<li>NDC(9)： 289.3</li>
+</ul>]]>
+</description>
+      <author>ジャン=クリスティアン・プティフィス編 ; 土居佳代子訳,Petitfils, Jean Christian,土居, 佳代子,</author>
+      <category>本</category>
+      <guid isPermaLink="true">https://iss.ndl.go.jp/books/R100000096-I012352759-00</guid>
+      <dc:title>12の場所からたどるマリー・アントワネット</dc:title>
+      <dcndl:titleTranscription>12 ノ バショ カラ タドル マリー アントワネット</dcndl:titleTranscription>
+      <dc:creator>Petitfils, Jean Christian</dc:creator>
+      <dc:creator>土居, 佳代子</dc:creator>
+      <dcndl:creatorTranscription>ドイ, カヨコ</dcndl:creatorTranscription>
+      <dcndl:volume>下</dcndl:volume>
+      <dc:publisher>原書房</dc:publisher>
+      <dc:date>2020.12</dc:date>
+      <dcterms:issued xsi:type="dcterms:W3CDTF">2020</dcterms:issued>
+      <dc:extent>194p, 図版 [6] p</dc:extent>
+      <dc:extent>20cm</dc:extent>
+      <dc:identifier xsi:type="dcndl:NIIBibID">BC04512261</dc:identifier>
+      <dc:subject>Marie Antoinette</dc:subject>
+      <dc:subject xsi:type="dcndl:NDC10">289.3</dc:subject>
+      <dc:subject xsi:type="dcndl:NDC9">289.3</dc:subject>
+      <dc:subject xsi:type="dcndl:NDC8">288.4935</dc:subject>
+      <dc:description>各巻のISBN : 9784562058624(下)</dc:description>
+      <dc:description>参考文献: p171-187</dc:description>
+      <rdfs:seeAlso rdf:resource="https://ci.nii.ac.jp/ncid/BC04512261"/>
+    </item>
+    <item>
+      <title>2006宝塚歌劇全主題歌集</title>
+      <link>https://iss.ndl.go.jp/books/R100000002-I000010904955-00</link>
+<description>
+<![CDATA[<p>宝塚クリエイティブアーツ</p>
+<ul><li>タイトル： 2006宝塚歌劇全主題歌集</li>
+<li>タイトル（読み）： 2006 タカラズカ カゲキ ゼンシュダイカシュウ</li>
+</ul>]]>
+</description>
+      <category>本</category>
+      <guid isPermaLink="true">https://iss.ndl.go.jp/books/R100000002-I000010904955-00</guid>
+      <pubDate>Tue, 27 Jul 2010 09:00:00 +0900</pubDate>
+      <dc:title>2006宝塚歌劇全主題歌集</dc:title>
+      <dcndl:titleTranscription>2006 タカラズカ カゲキ ゼンシュダイカシュウ</dcndl:titleTranscription>
+      <dc:publisher>宝塚クリエイティブアーツ</dc:publisher>
+      <dc:date>2007.4</dc:date>
+      <dcterms:issued xsi:type="dcterms:W3CDTF">2007</dcterms:issued>
+      <dcndl:price>3150円 (税込)</dcndl:price>
+      <dc:extent>録音ディスク 1枚 : CD</dc:extent>
+      <dc:identifier xsi:type="dcndl:RIS502">TCAC-296</dc:identifier>
+      <dc:identifier xsi:type="dcndl:NDLBibID">000010904955</dc:identifier>
+      <dc:identifier xsi:type="dcndl:JPNO">21781438</dc:identifier>
+      <dc:subject xsi:type="dcndl:NDLC">YMC11</dc:subject>
+      <dc:description>資料種別 : [録音資料]</dc:description>
+      <dc:description>レーベル名 : 宝塚クリエイティブアーツ</dc:description>
+      <rdfs:seeAlso rdf:resource="http://id.ndl.go.jp/bib/000010904955"/>
+    </item>
+    <item>
+      <title>Fairy-A・I-愛 : limited edition</title>
+      <link>https://iss.ndl.go.jp/books/R100000002-I031581757-00</link>
+<description>
+<![CDATA[<p>ビクターエンタテインメント</p>
+<ul><li>タイトル： Fairy-A・I-愛 : limited edition</li>
+<li>タイトル（読み）： Fairy - A ・ I - アイ</li>
+<li>責任表示： Suzukaze Mayo,</li>
+</ul>]]>
+</description>
+      <author>Suzukaze Mayo,</author>
+      <category>本</category>
+      <guid isPermaLink="true">https://iss.ndl.go.jp/books/R100000002-I031581757-00</guid>
+      <pubDate>Fri, 05 Nov 2021 09:00:00 +0900</pubDate>
+      <dc:title>Fairy-A・I-愛 : limited edition</dc:title>
+      <dcndl:titleTranscription>Fairy - A ・ I - アイ</dcndl:titleTranscription>
+      <dc:publisher>ビクターエンタテインメント</dc:publisher>
+      <dc:date>2021.9</dc:date>
+      <dcterms:issued xsi:type="dcterms:W3CDTF">2021</dcterms:issued>
+      <dcndl:price>9000円</dcndl:price>
+      <dc:extent>CD 1枚 ; 12 cm + DVD 1枚 (12 cm) + 111 p</dc:extent>
+      <dc:identifier xsi:type="dcndl:RIS502">VIZL-1933</dc:identifier>
+      <dc:identifier xsi:type="dcndl:NDLBibID">031581757</dc:identifier>
+      <dc:identifier xsi:type="dcndl:JPNO">23603714</dc:identifier>
+      <dc:subject xsi:type="dcndl:NDLC">YMC11</dc:subject>
+      <dc:description>録音の方式 : デジタル</dc:description>
+      <dc:description>録音の手段 : 光学</dc:description>
+      <dc:description>再生チャンネル : ステレオ</dc:description>
+      <dc:description>ファイル種別 : オーディオ・ファイル</dc:description>
+      <dc:description>デジタル・コンテンツ・フォーマット : CD audio</dc:description>
+      <dc:description>所要時間: 65分59秒</dc:description>
+      <dc:description>付属資料: DVD 1枚 (12 cm) : 涼風真世&amp;京フィルドリームコンサートin春秋座2021</dc:description>
+      <dc:description>機器種別 : オーディオ</dc:description>
+      <dc:description>機器種別 : ビデオ</dc:description>
+      <dc:description>キャリア種別 : オーディオ・ディスク</dc:description>
+      <dc:description>キャリア種別 : ビデオディスク</dc:description>
+      <dc:description>表現種別 : 演奏</dc:description>
+      <dc:description>表現種別 : 二次元動画</dc:description>
+      <dc:description>レーベル名 : ビクター</dc:description>
+      <rdfs:seeAlso rdf:resource="http://id.ndl.go.jp/bib/031581757"/>
+    </item>
+    <item>
+      <title>Ｊｅａｎ－Ｌｏｕｉｓ　Ｆａｒｇｅｏｎ，　ｐａｒｆｕｍｅｕｒ　ｄｅ　Ｍａｒｉｅ－Ａｎｔｏｉｎｅｔｔｅ</title>
+      <link>https://iss.ndl.go.jp/books/R100000001-I107885225-00</link>
+<description>
+<![CDATA[<p>Ｐｅｒｒｉｎ,2262019460</p>
+<ul><li>タイトル： Ｊｅａｎ－Ｌｏｕｉｓ　Ｆａｒｇｅｏｎ，　ｐａｒｆｕｍｅｕｒ　ｄｅ　Ｍａｒｉｅ－Ａｎｔｏｉｎｅｔｔｅ</li>
+<li>タイトル（読み）： ＪＥＡＮ　ＬＯＵＩＳ　ＦＡＲＧＥＯＮ　ＰＡＲＦＵＭＥＵＲ　ＤＥ　ＭＡＲＩＥ　ＡＮＴＯＩＮＥＴＴＥ</li>
+<li>責任表示： Ｅｌｉｓａｂｅｔｈ　ｄｅ　Ｆｅｙｄｅａｕ／著,</li>
+<li>NDC(9)： 289.3</li>
+<li>NDC(9)： 289.3</li>
+</ul>]]>
+</description>
+      <author>Ｅｌｉｓａｂｅｔｈ　ｄｅ　Ｆｅｙｄｅａｕ／著,Feydeau Elisabeth de,Feydeau Elisabeth de,</author>
+      <category>本</category>
+      <guid isPermaLink="true">https://iss.ndl.go.jp/books/R100000001-I107885225-00</guid>
+      <dc:title>Ｊｅａｎ－Ｌｏｕｉｓ　Ｆａｒｇｅｏｎ，　ｐａｒｆｕｍｅｕｒ　ｄｅ　Ｍａｒｉｅ－Ａｎｔｏｉｎｅｔｔｅ</dc:title>
+      <dcndl:titleTranscription>ＪＥＡＮ　ＬＯＵＩＳ　ＦＡＲＧＥＯＮ　ＰＡＲＦＵＭＥＵＲ　ＤＥ　ＭＡＲＩＥ　ＡＮＴＯＩＮＥＴＴＥ</dcndl:titleTranscription>
+      <dc:creator>Feydeau Elisabeth de</dc:creator>
+      <dc:creator>Feydeau Elisabeth de</dc:creator>
+      <dcndl:creatorTranscription>フェドー エリザベット・ド</dcndl:creatorTranscription>
+      <dcndl:creatorTranscription>フェドー エリザベット・ド</dcndl:creatorTranscription>
+      <dc:publisher>Ｐｅｒｒｉｎ</dc:publisher>
+      <dc:date>２００４．１２</dc:date>
+      <dcterms:issued xsi:type="dcterms:W3CDTF">2004-12</dcterms:issued>
+      <dcndl:price>￥４８１６</dcndl:price>
+      <dc:extent>２２９ｐ．，　［１６］ｐ． ｏｆ　ｐｌａｔｅｓ</dc:extent>
+      <dc:extent>２２ｃｍ</dc:extent>
+      <dc:identifier xsi:type="dcndl:ISBN">2262019460</dc:identifier>
+      <dc:subject>Fargeon Jean‐Louis</dc:subject>
+      <dc:subject xsi:type="dcndl:NDC9">289.3</dc:subject>
+      <dc:subject xsi:type="dcndl:NDC9">289.3</dc:subject>
+      <dc:description>日本語訳は『マリー・アントワネットの調香師　ジャン・ルイ・ファージョンの秘められた生涯』（田村　愛／訳，原書房，２００７．９）。パルファム、匂い袋、入浴剤を次々に生み出したジャン・ルイ・ファージョンは、香水商として成功を収めていた。だが、フランス革命の嵐が彼の立場をおびやかし…。秘められていたその生涯を鮮やかに描き出す。</dc:description>
+      <rdfs:seeAlso rdf:resource="https://www.library.city.sapporo.jp/licsxp-opac/WOpacMsgNewListToTifTilDetailAction.do?tilcod=1000701492797"/>
+    </item>
+    <item>
+      <title>Le biscuit a la Reyne Marie-Antoinette : 王妃マリー=アントワネットのビスキュイ</title>
+      <link>https://iss.ndl.go.jp/books/R000000004-I031956008-00</link>
+<description>
+<![CDATA[<p>早川書房</p>
+<ul><li>タイトル： Le biscuit a la Reyne Marie-Antoinette : 王妃マリー=アントワネットのビスキュイ</li>
+<li>タイトル（読み）： Le biscuit a la Reyne Marie-Antoinette : オウヒ マリー=アントワネット ノ ビスキュイ</li>
+<li>責任表示： 宮園 ありあ,</li>
+</ul>]]>
+</description>
+      <author>宮園 ありあ,宮園 ありあ,</author>
+      <category>記事・論文</category>
+      <guid isPermaLink="true">https://iss.ndl.go.jp/books/R000000004-I031956008-00</guid>
+      <pubDate>Tue, 08 Feb 2022 09:00:00 +0900</pubDate>
+      <dc:title>Le biscuit a la Reyne Marie-Antoinette : 王妃マリー=アントワネットのビスキュイ</dc:title>
+      <dcndl:titleTranscription>Le biscuit a la Reyne Marie-Antoinette : オウヒ マリー=アントワネット ノ ビスキュイ</dcndl:titleTranscription>
+      <dc:creator>宮園 ありあ</dc:creator>
+      <dc:publisher>早川書房</dc:publisher>
+      <dc:date>67(2)=751:2022.3</dc:date>
+      <dcterms:issued xsi:type="dcterms:W3CDTF">2022-03</dcterms:issued>
+      <dcterms:isPartOf rdf:resource="http://iss.ndl.go.jp/books/R100000002-I000009175994-00"/>
+      <dc:identifier xsi:type="dcndl:NDLBibID">031956008</dc:identifier>
+      <dc:subject xsi:type="dcndl:NDLC">ZK21</dc:subject>
+      <rdfs:seeAlso rdf:resource="http://id.ndl.go.jp/bib/031956008"/>
+<dc:description>掲載誌：ハヤカワミステリマガジン = Hayakawa&#39;s mystery magazine 67(2) (通号 751) 2022-03 p.126-143</dc:description>
+    </item>
+    <item>
+      <title>Live moments inよみうりホール2010</title>
+      <link>https://iss.ndl.go.jp/books/R100000002-I000010897772-00</link>
+<description>
+<![CDATA[<p>ポニーキャニオン</p>
+<ul><li>タイトル： Live moments inよみうりホール2010</li>
+<li>タイトル（読み）： Live moments in ヨミウリ ホール 2010</li>
+<li>責任表示： 新妻聖子,</li>
+</ul>]]>
+</description>
+      <author>新妻聖子,</author>
+      <category>本</category>
+      <guid isPermaLink="true">https://iss.ndl.go.jp/books/R100000002-I000010897772-00</guid>
+      <pubDate>Mon, 05 Jul 2010 09:00:00 +0900</pubDate>
+      <dc:title>Live moments inよみうりホール2010</dc:title>
+      <dcndl:titleTranscription>Live moments in ヨミウリ ホール 2010</dcndl:titleTranscription>
+      <dc:publisher>ポニーキャニオン</dc:publisher>
+      <dc:date>2010.5</dc:date>
+      <dcterms:issued xsi:type="dcterms:W3CDTF">2010</dcterms:issued>
+      <dcndl:price>7800円 (税込)</dcndl:price>
+      <dc:extent>ビデオディスク 2枚 (108分) : DVD</dc:extent>
+      <dc:identifier xsi:type="dcndl:RIS502">PCBP-51977</dc:identifier>
+      <dc:identifier xsi:type="dcndl:NDLBibID">000010897772</dc:identifier>
+      <dc:identifier xsi:type="dcndl:JPNO">21770405</dc:identifier>
+      <dc:subject xsi:type="dcndl:NDLC">YL321</dc:subject>
+      <dc:description>資料種別 : [映像資料]</dc:description>
+      <dc:description>収録: 2010年2月 よみうりホール (東京)</dc:description>
+      <dc:description>カラー ステレオ ワイド 音声: PCM</dc:description>
+      <dc:description>レーベル名 : ポニーキャニオン</dc:description>
+      <rdfs:seeAlso rdf:resource="http://id.ndl.go.jp/bib/000010897772"/>
+    </item>
+    <item>
+      <title>Redoute : マリー・アントワネット、ジョゼフィーヌが愛した宮廷画家ルドゥーテの描いた美しきバラの世界</title>
+      <link>https://iss.ndl.go.jp/books/R100000002-I000011220077-00</link>
+<description>
+<![CDATA[<p>宝島社,9784796683340</p>
+<ul><li>タイトル： Redoute : マリー・アントワネット、ジョゼフィーヌが愛した宮廷画家ルドゥーテの描いた美しきバラの世界</li>
+<li>タイトル（読み）： Redoute : マリー アントワネット ジョゼフィーヌ ガ アイシタ キュウテイ ガカ ルドゥーテ ノ エガイタ ウツクシキ バラ ノ セカイ</li>
+<li>シリーズ名： e-mook</li>
+<li>シリーズ名（読み）： e mook</li>
+</ul>]]>
+</description>
+      <category>本</category>
+      <guid isPermaLink="true">https://iss.ndl.go.jp/books/R100000002-I000011220077-00</guid>
+      <pubDate>Thu, 14 Jul 2011 09:00:00 +0900</pubDate>
+      <dc:title>Redoute : マリー・アントワネット、ジョゼフィーヌが愛した宮廷画家ルドゥーテの描いた美しきバラの世界</dc:title>
+      <dcndl:titleTranscription>Redoute : マリー アントワネット ジョゼフィーヌ ガ アイシタ キュウテイ ガカ ルドゥーテ ノ エガイタ ウツクシキ バラ ノ セカイ</dcndl:titleTranscription>
+      <dcndl:seriesTitle>e-mook</dcndl:seriesTitle>
+      <dcndl:seriesTitleTranscription>e mook</dcndl:seriesTitleTranscription>
+      <dc:publisher>宝島社</dc:publisher>
+      <dc:date>2011.7</dc:date>
+      <dcterms:issued xsi:type="dcterms:W3CDTF">2011</dcterms:issued>
+      <dcndl:price>1429円</dcndl:price>
+      <dc:extent>64p ; 30cm</dc:extent>
+      <dc:identifier xsi:type="dcndl:ISBN">9784796683340</dc:identifier>
+      <dc:identifier xsi:type="dcndl:NDLBibID">000011220077</dc:identifier>
+      <dc:identifier xsi:type="dcndl:JPNO">21950315</dc:identifier>
+      <dc:identifier xsi:type="dcndl:NSMARCNO">135839600</dc:identifier>
+      <dc:subject xsi:type="dcndl:NDLC">Y94</dc:subject>
+      <rdfs:seeAlso rdf:resource="http://id.ndl.go.jp/bib/000011220077"/>
+      <rdfs:seeAlso rdf:resource="https://opac.lib.city.yokohama.lg.jp/opac/OPP1500?SELDATA=TOSHO&amp;SSNO=3-0211043840"/>
+    </item>
+  </channel>
+</rss>

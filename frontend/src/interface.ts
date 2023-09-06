@@ -1,4 +1,5 @@
-import type { Timestamp } from "firebase/firestore"
+import type { Query, Timestamp, QuerySnapshot, FirestoreError, Unsubscribe, DocumentData } from "firebase/firestore"
+import { Timestamp as FirestoreTimestamp } from 'firebase/firestore';
 
 interface BookItem {
   bookId: string
@@ -21,6 +22,13 @@ interface Series {
   seriesId?: string
   pic: string
   counter: number
+  seriesTitle: string
+}
+
+interface SelectSeriesItem {
+  seriesId: string
+  pic: string
+  seriesTitle: string
 }
 
 type BookItemNoSeries = Omit<BookItem, 'seriesId' | 'orderNumber'>
@@ -30,5 +38,19 @@ const implementBookShelf = (arg: any): arg is BookShelf => {
   return arg !== null && typeof arg === 'object' && typeof arg.shelf_name === 'string'
 }
 
-export type { BookItem, BookShelf, Series, BookItemNoSeries }
-export { implementBookShelf }
+const isBookItem = (obj: any): obj is BookItem =>  {
+  return (
+    typeof obj.bookId === 'string' &&
+    (typeof obj.isbn === 'number' || obj.isbn === undefined) &&
+    typeof obj.title === 'string' &&
+    (typeof obj.image_url === 'string' || obj.image_url === undefined) &&
+    typeof obj.author === 'string' &&
+    typeof obj.detail === 'string' &&
+    obj.public_date instanceof FirestoreTimestamp &&
+    (typeof obj.seriesId === 'string' || obj.seriesId === undefined) &&
+    (typeof obj.orderNumber === 'number' || obj.orderNumber === undefined)
+  );
+}
+
+export type { BookItem, BookShelf, Series, BookItemNoSeries, SelectSeriesItem }
+export { implementBookShelf, isBookItem }
