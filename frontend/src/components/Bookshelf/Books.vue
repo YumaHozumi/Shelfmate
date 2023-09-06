@@ -12,6 +12,9 @@ defineProps<Props>()
 <template>
   <div class="book-container book-stack">
     <img class="book-image" :src="series.pic" />
+    <div class="title-container">
+      {{ series.seriesTitle }}
+    </div>
     <v-badge color="blue" overlap class="book-badge">
       <template v-slot:badge>
         <span>{{ series.counter }}冊</span>
@@ -22,6 +25,7 @@ defineProps<Props>()
 
 <style scoped lang="scss">
 .book-container {
+  position: relative;
   margin: 0 auto;
   position: relative;
   display: flex;
@@ -33,6 +37,20 @@ defineProps<Props>()
   cursor: pointer;
   overflow: hidden; //拡大時に画像がコンテナからはみ出さないようにする
   outline: 2px solid rgb(155, 155, 155);
+
+  .title-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    text-align: center;
+    padding: 5px;
+    white-space: nowrap;  // 改行を防ぐ
+    overflow: hidden;     // オーバーフローしたテキストを隠す
+    text-overflow: ellipsis; // オーバーフローしたテキストを「...」で表示
+  }
 
   &.book-stack {
     box-shadow: 7px -7px 0 0 rgb(208, 208, 208), 12px -12px 0 0 rgb(163, 163, 163);
@@ -54,7 +72,7 @@ defineProps<Props>()
   .book-badge {
     position: absolute;
     right: 35px;
-    bottom: 18px;
+    top: 12px;
   }
 }
 </style>

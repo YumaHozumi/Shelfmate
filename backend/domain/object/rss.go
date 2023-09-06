@@ -21,7 +21,7 @@ type Item struct {
 	Author         string `xml:"author" json:"author"`
 	PublicDate     string `xml:"pubDate" json:"public_date"`
 	ISBNIdentifier int64  `json:"isbn"`
-	OrderNumber    int    `xml:"volume" json:"order_number"`
+	OrderNumber    int    `xml:"volume" json:"orderNumber"`
 	ImageURL       string `json:"image_url"`
 }
 

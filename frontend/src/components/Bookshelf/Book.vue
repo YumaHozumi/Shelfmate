@@ -11,11 +11,15 @@ defineProps<Props>()
 <template>
   <div class="book-container">
     <img class="book-image" :src="book.image_url" />
+    <div class="title-container">
+      {{ book.title }}
+    </div>
   </div>
 </template>
 
 <style scoped lang="scss">
 .book-container {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -25,6 +29,20 @@ defineProps<Props>()
   cursor: pointer;
   overflow: hidden; //拡大時に画像がコンテナからはみ出さないようにする
   outline: 2px solid rgb(155, 155, 155);
+
+  .title-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    text-align: center;
+    padding: 5px;
+    white-space: nowrap;  // 改行を防ぐ
+    overflow: hidden;     // オーバーフローしたテキストを隠す
+    text-overflow: ellipsis; // オーバーフローしたテキストを「...」で表示
+  }
 
   .book-image {
     max-width: 100%; //画像がコンテナをはみ出さないようにする

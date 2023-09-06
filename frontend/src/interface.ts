@@ -22,6 +22,7 @@ interface Series {
   seriesId?: string
   pic: string
   counter: number
+  seriesTitle: string
 }
 
 interface SelectSeriesItem {
