@@ -19,7 +19,14 @@ const isSeries = (input: Series | BookItem): input is Series => {
 
 <template>
   <FullDialog v-if="isSeries(item)" :series="item" :selectBookshelfId="selectBookshelfId">
-    <Books :series="item"></Books>
+    <span class="books">
+      <Books :series="item"></Books>
+      <v-badge color="blue" overlap class="book-badge">
+        <template v-slot:badge>
+          <span class="count">{{ item.counter }}冊</span>
+        </template>
+      </v-badge>
+    </span>
   </FullDialog>
 
   <BookDialog v-else :book="item">
@@ -28,6 +35,20 @@ const isSeries = (input: Series | BookItem): input is Series => {
 </template>
 
 <style scoped lang="scss">
+.books {
+  position: relative;
+}
+
+.book-badge {
+    position: absolute;
+    right: 25%;
+    top: -5%;
+  
+    .count {
+      font-size: larger;
+    }
+}
+
 .book-container {
   margin: 0 auto;
   position: relative;
@@ -56,10 +77,5 @@ const isSeries = (input: Series | BookItem): input is Series => {
     }
   }
 
-  .book-badge {
-    position: absolute;
-    right: 35px;
-    bottom: 18px;
-  }
 }
 </style>

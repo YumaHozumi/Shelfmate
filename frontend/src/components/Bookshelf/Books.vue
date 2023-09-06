@@ -15,11 +15,7 @@ defineProps<Props>()
     <div class="title-container">
       {{ series.seriesTitle }}
     </div>
-    <v-badge color="blue" overlap class="book-badge">
-      <template v-slot:badge>
-        <span>{{ series.counter }}冊</span>
-      </template>
-    </v-badge>
+    
   </div>
 </template>
 
@@ -69,10 +65,6 @@ defineProps<Props>()
     }
   }
 
-  .book-badge {
-    position: absolute;
-    right: 35px;
-    top: 12px;
-  }
+
 }
 </style>
