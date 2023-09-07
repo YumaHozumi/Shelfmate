@@ -45,7 +45,9 @@ defineProps<Props>()
   }
 
   .book-image {
-    max-width: 100%; //画像がコンテナをはみ出さないようにする
+    width: 100%; // コンテナの幅に合わせる
+    height: 100%; // コンテナの高さに合わせる
+    object-fit: cover; // アスペクト比を保持しながら、コンテナに画像をフィットさせる
     transition: transform 0.2s ease-in-out;
   }
 

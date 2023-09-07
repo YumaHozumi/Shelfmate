@@ -2,7 +2,7 @@
 import GlobalHeader from '@/containers/GlobalHeader.vue'
 import Results from '@/components/SearchBook/Results.vue'
 import { type BookShelf, type BookItem } from '@/interface'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import SearchBar from '@/basic/SearchBar.vue'
 import axios from 'axios'
 import LoadingContainer from '@/containers/LoadingContainer.vue'
@@ -276,6 +276,10 @@ const searchMore = async () => {
   const books = await search(tempSearchText)
   items.value.push(...books);
 }
+
+watch(selectedBookshelf, async () => {
+  await setRegisteredBooks()
+})
 </script>
 
 <template>
