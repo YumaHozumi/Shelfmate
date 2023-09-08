@@ -96,10 +96,8 @@ const searchClick = async (searchText: string) => {
             case 500:
               errorMsg.value = "サーバーとの通信でエラーが発生しました。時間おいてお試しください。";
               break;
-            case 400:
-              errorMsg.value = error.response["data"];
-              break;
             default:
+              errorMsg.value = error.response["data"];
               break;
           }
         })

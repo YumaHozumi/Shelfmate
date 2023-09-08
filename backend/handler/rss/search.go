@@ -1,9 +1,9 @@
 package books
 
 import (
+	"bookshelf/domain/object"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 )
@@ -27,11 +27,13 @@ func (h *handler) Search(w http.ResponseWriter, r *http.Request) {
 
 	rss, err := h.rr.SearchBooks(ctx, isbn)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		if errors.Is(err, object.ErrBookNotFound) {
+			http.Error(w, err.Error(), http.StatusNotFound)
+		} else {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
 		return
 	}
-
-	fmt.Println(rss)
 
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(rss); err != nil {

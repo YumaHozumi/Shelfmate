@@ -37,6 +37,10 @@ func (r *rss) SearchBooks(ctx context.Context, isbn string) (*object.RSS, error)
 		return nil, err
 	}
 
+	if rss == nil || len(rss.Channel.Items) == 0 {
+		return nil, object.ErrBookNotFound
+	}
+
 	item := rss.Channel.Items[0]
 	rss.Channel.Items[0].Title = item.Title + " " + strconv.Itoa(item.OrderNumber)
 
