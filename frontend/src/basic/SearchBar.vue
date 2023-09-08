@@ -4,6 +4,7 @@ import { debounce } from "lodash";
 
 interface Props {
   label?: string;
+  rules: Array<(value: string) => true | string> //バリデーション
 }
 
 defineProps<Props>();
@@ -28,9 +29,11 @@ const searchClick = (): void => {
 </script>
 
 <template>
-  <v-toolbar class="pa-2 search-bar">
-    <v-text-field hide-details v-model="inputText" @keyup.enter="searchClick" :label="label"></v-text-field>
-    <v-btn icon @click="searchClick">
+  <v-toolbar class="px-4 pt-6 pb-2 search-bar">
+    <v-text-field v-model="inputText" @keyup.enter="searchClick" :label="label"
+    :rules="rules"
+    ></v-text-field>
+    <v-btn icon @click="searchClick" class="btn-pos">
       <v-icon>mdi-magnify</v-icon>
     </v-btn>
   </v-toolbar>
@@ -40,5 +43,9 @@ const searchClick = (): void => {
 .search-bar {
   max-width: 80%;
   margin: auto;
+}
+
+.btn-pos {
+  margin-bottom: 2%;
 }
 </style>

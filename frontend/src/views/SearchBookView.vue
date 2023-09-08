@@ -294,7 +294,7 @@ watch(selectedBookshelf, async () => {
     class="select"
   >
   </v-select>
-  <SearchBar @search="searchClick" class="mt-4 mb-4"></SearchBar>
+  <SearchBar @search="searchClick" class="mt-4 mb-4" :rules="[]"></SearchBar>
   <div class="menu-container">
     <SearchButton></SearchButton>
     <Menu :items="menu" icon="mdi-sort" class="menu" @selectItem="selectMenu"></Menu>
