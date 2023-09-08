@@ -18,6 +18,7 @@ import { incrementCounter, sort } from '@/function'
 import { Timestamp } from "firebase/firestore"
 import Pagination from '@/components/SearchBook/Pagination.vue'
 import SearchButton from '@/components/SearchButton.vue'
+import ErrorMessage from '@/basic/ErrorMessage.vue'
 
 const onNavigate = (name: string): void => {
   router.push({ name: name })
@@ -26,13 +27,12 @@ const onNavigate = (name: string): void => {
 const itemsInit: BookItem[] = []
 const items = ref(itemsInit)
 const isLoading = ref(false)
+const errorMsg = ref("")
 
 //Google Books APIに検索クエリ投げる
 const search = async (searchText: string): Promise<BookItem[]> => {
-  //const baseURL = "https://iss.ndl.go.jp/api/opensearch"
-  const baseURL = 'https://www.googleapis.com/books/v1/volumes'
-
-  const replaceText = searchText.replace(/[\s\u3000]/g, '+')
+  const baseURL = 'https://www.googleapis.com/books/v1/volumes';
+  const replaceText = searchText.replace(/[\s\u3000]/g, '+');
 
   const params: Record<string, string> = {
     q: replaceText,
@@ -50,34 +50,41 @@ const search = async (searchText: string): Promise<BookItem[]> => {
 
   let books: BookItem[] = [];
 
-  await axios
-    .get(completedURL)
-    .then((res) => {
-      const apiItems = res.data.items
-      books = apiItems.map((item: any) => ({
-        bookId: item.id,
-        isbn: item.volumeInfo?.industryIdentifiers?.[1]?.identifier ?? 0,
-        title: item.volumeInfo?.title ?? '',
-        image_url: item.volumeInfo?.imageLinks?.thumbnail ?? imageURL,
-        author: item.volumeInfo?.authors?.[0] ?? '',
-        detail: item.searchInfo?.textSnippet ?? '',
-        public_date: Timestamp.fromDate(new Date(item.volumeInfo?.publishedDate || 0)),
-        seriesId: item.volumeInfo?.seriesInfo?.volumeSeries?.[0]?.seriesId ?? '',
-        orderNumber: item.volumeInfo?.seriesInfo?.volumeSeries?.[0]?.orderNumber ?? 0
-      }))
+  try {
+    errorMsg.value = ""
+    const res = await axios.get(completedURL);
+    const apiItems = res.data.items;
 
-      books.forEach((book) => {
-        if (book.isbn !== undefined && book.image_url === undefined) {
-          book.image_url = 'https://iss.ndl.go.jp/thumbnail/' + book.isbn
-        }
-      })
-    })
-    .catch((e) => {
-      console.log(e)
-    })
+    if (!apiItems || apiItems.length === 0) {
+      errorMsg.value = "本が見つかりませんでした"; // 404エラーメッセージを設定
+      return books; // 空の本の配列を返す
+    }
 
-  return books
+    books = apiItems.map((item: any) => ({
+      bookId: item.id,
+      isbn: item.volumeInfo?.industryIdentifiers?.[1]?.identifier ?? 0,
+      title: item.volumeInfo?.title ?? '',
+      image_url: item.volumeInfo?.imageLinks?.thumbnail ?? imageURL,
+      author: item.volumeInfo?.authors?.[0] ?? '',
+      detail: item.searchInfo?.textSnippet ?? '',
+      public_date: Timestamp.fromDate(new Date(item.volumeInfo?.publishedDate || 0)),
+      seriesId: item.volumeInfo?.seriesInfo?.volumeSeries?.[0]?.seriesId ?? '',
+      orderNumber: item.volumeInfo?.seriesInfo?.volumeSeries?.[0]?.orderNumber ?? 0
+    }));
+
+    books.forEach((book) => {
+      if (book.isbn !== undefined && book.image_url === undefined) {
+        book.image_url = 'https://iss.ndl.go.jp/thumbnail/' + book.isbn;
+      }
+    });
+  } catch (error) {
+    console.log(error);
+    errorMsg.value = "サーバーとの通信でエラーが発生しました。時間おいてお試しください。"; // その他のエラーメッセージを設定
+  }
+
+  return books;
 }
+
 
 let tempSearchText = "";
 
@@ -295,6 +302,7 @@ watch(selectedBookshelf, async () => {
   >
   </v-select>
   <SearchBar @search="searchClick" class="mt-4 mb-4" :rules="[]"></SearchBar>
+  <ErrorMessage :errorMessage="errorMsg"></ErrorMessage>
   <div class="menu-container">
     <SearchButton></SearchButton>
     <Menu :items="menu" icon="mdi-sort" class="menu" @selectItem="selectMenu"></Menu>
@@ -328,5 +336,9 @@ watch(selectedBookshelf, async () => {
   .menu {
     background-color: white;
   }
+}
+
+.error {
+  margin-left: 10%;
 }
 </style>
