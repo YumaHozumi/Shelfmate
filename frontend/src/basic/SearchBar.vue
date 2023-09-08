@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { debounce } from "lodash";
 
 interface Props {
@@ -7,7 +7,7 @@ interface Props {
   rules: Array<(value: string) => true | string> //バリデーション
 }
 
-defineProps<Props>();
+const props = defineProps<Props>();
 
 interface Emits {
   (event: 'search', searchText: string): void
@@ -16,6 +16,7 @@ interface Emits {
 const emit = defineEmits<Emits>()
 
 const inputText = ref('')
+const valid = ref(true)
 
 const debouncedSearch = debounce((searthText: string) => {
   emit("search", searthText);
@@ -26,14 +27,25 @@ const searchClick = (): void => {
   if (inputText.value === '') return
   debouncedSearch(inputText.value)
 }
+
+// バリデーションの結果を計算
+const validationResults = computed(() => {
+  return props.rules.map(rule => rule(inputText.value));
+});
+
+// 全てのバリデーションが成功したかどうかをチェック
+const allValid = computed(() => {
+  return validationResults.value.every(result => result === true);
+});
 </script>
 
 <template>
   <v-toolbar class="px-4 pt-6 pb-2 search-bar">
-    <v-text-field v-model="inputText" @keyup.enter="searchClick" :label="label"
+    <v-text-field v-model="inputText" @keyup.enter="searchClick" :label="label" 
     :rules="rules"
+    @input="() => valid = allValid"
     ></v-text-field>
-    <v-btn icon @click="searchClick" class="btn-pos">
+    <v-btn :disabled="!valid" icon @click="searchClick" class="btn-pos">
       <v-icon>mdi-magnify</v-icon>
     </v-btn>
   </v-toolbar>

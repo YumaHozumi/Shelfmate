@@ -17,7 +17,7 @@ import ErrorMessage from '@/basic/ErrorMessage.vue';
 
 const dialog = ref(false);
 const inputText = ref("");
-const book = ref<BookItem>();
+const book = ref<BookItem | undefined>(undefined);
 const selectedRadio = ref("one");
 
 const errorMsg = ref("")
@@ -248,6 +248,11 @@ const localRules = ref([
   rules.zenkaku,
   rules.isbn,
 ])
+
+const closeDialog = () => {
+  dialog.value = false;
+  book.value = undefined;
+}
 </script>
 
 <template>
@@ -260,7 +265,7 @@ const localRules = ref([
         </template>
         <v-card>
             <v-card-actions class="justify-end">
-                <v-btn @click="dialog = false" class="btn-style">
+                <v-btn @click="closeDialog" class="btn-style">
                     <v-icon>mdi-close</v-icon>
                     閉じる
                 </v-btn>
