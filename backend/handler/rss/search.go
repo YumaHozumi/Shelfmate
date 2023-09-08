@@ -3,6 +3,7 @@ package books
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 )
@@ -30,6 +31,8 @@ func (h *handler) Search(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	fmt.Println(rss)
+
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(rss); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -47,7 +50,7 @@ func validateISBN(isbn string) error {
 		for i := 0; i < 12; i++ {
 			digit, err := strconv.Atoi(string(isbn[i]))
 			if err != nil {
-				return errors.New("ISBN must contain only digits")
+				return errors.New("ISBNは数字のみ含める必要があります")
 			}
 			if i%2 == 0 {
 				sum += digit
@@ -61,10 +64,10 @@ func validateISBN(isbn string) error {
 		}
 		lastDigit, err := strconv.Atoi(string(isbn[12]))
 		if err != nil {
-			return errors.New("ISBN must contain only digits")
+			return errors.New("ISBNは数字のみ含める必要があります")
 		}
 		if checkDigit != lastDigit {
-			return errors.New("invalid ISBN-13 check digit")
+			return errors.New("無効なISBN-13チェックデジット")
 		}
 		return nil
 	}
@@ -75,7 +78,7 @@ func validateISBN(isbn string) error {
 		for i := 0; i < 9; i++ {
 			digit, err := strconv.Atoi(string(isbn[i]))
 			if err != nil {
-				return errors.New("ISBN must contain only digits")
+				return errors.New("ISBNは数字のみ含める必要があります")
 			}
 			sum += digit * (10 - i)
 		}
@@ -87,14 +90,14 @@ func validateISBN(isbn string) error {
 			var err error
 			lastDigit, err = strconv.Atoi(string(isbn[9]))
 			if err != nil {
-				return errors.New("ISBN-10 check digit must be a digit or 'X'")
+				return errors.New("ISBN-10のチェックデジットは数字または'X'である必要があります")
 			}
 		}
 		if checkDigit != lastDigit {
-			return errors.New("invalid ISBN-10 check digit")
+			return errors.New("無効なISBN-10チェックデジット")
 		}
 		return nil
 	}
 
-	return errors.New("ISBN must be 10 or 13 characters long")
+	return errors.New("ISBNは10文字または13文字である必要があります")
 }

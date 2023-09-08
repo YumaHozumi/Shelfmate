@@ -13,11 +13,14 @@ import SearchResult from '@/components/SearchBook/SearchResult.vue'
 import DropdownMenu from './DropdownMenu.vue';
 import { incrementCounter } from '@/function';
 import {rules} from "@/validation"
+import ErrorMessage from '@/basic/ErrorMessage.vue';
 
 const dialog = ref(false);
 const inputText = ref("");
 const book = ref<BookItem>();
 const selectedRadio = ref("one");
+
+const errorMsg = ref("")
 
 let unsubscribe: Unsubscribe
 
@@ -60,6 +63,7 @@ const searchClick = async (searchText: string) => {
 
     await axios.get(completedURL)
         .then((res) => {
+          errorMsg.value = ""
             const item = res.data?.result?.items?.[0];
             if(item){
                 const removeTagsAndAddNewLines = (input: string): string => {
@@ -86,7 +90,18 @@ const searchClick = async (searchText: string) => {
             }
         })
         .catch(error => {
-            console.log(error);
+          console.log(error)
+          const status = error.response["status"]
+          switch (status) {
+            case 500:
+              errorMsg.value = "サーバーとの通信でエラーが発生しました。時間おいてお試しください。";
+              break;
+            case 400:
+              errorMsg.value = error.response["data"];
+              break;
+            default:
+              break;
+          }
         })
 }
 
@@ -268,6 +283,7 @@ const localRules = ref([
                 >
                 </v-select>
                 <SearchBar label="ISBN(13桁または10桁) ※ハイフンなし" @search="searchClick" :rules="localRules"></SearchBar>
+                <ErrorMessage :errorMessage="errorMsg"></ErrorMessage>
                 <SearchResult :book="book" v-if="book" class="book-item" @registerBook="registerBook"></SearchResult>
             </v-card-text>
         </v-card>
@@ -320,5 +336,9 @@ const localRules = ref([
   background-color: #4CAF50;
   color: white;
   font-weight: bold;
+}
+
+.error {
+  margin-left: 10%;
 }
 </style>
