@@ -1,4 +1,4 @@
-import type { Query, Timestamp, QuerySnapshot, FirestoreError, Unsubscribe, DocumentData } from "firebase/firestore"
+import type { Timestamp } from "firebase/firestore"
 import { Timestamp as FirestoreTimestamp } from 'firebase/firestore';
 
 interface BookItem {
