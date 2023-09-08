@@ -7,11 +7,12 @@ import {
   GoogleAuthProvider,
   signInWithRedirect,
 } from 'firebase/auth'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { FirebaseError } from 'firebase/app'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
 import { firebaseErrorMessage } from '@/function'
 import { firebaseAuth } from '@/config/firebase'
+import { rules } from "@/validation"
 
 interface Emits {
   (event: 'navigate', name: string): void
@@ -20,7 +21,9 @@ interface Emits {
 const emit = defineEmits<Emits>()
 
 const email = ref('')
+const emailError = ref('');
 const password = ref('')
+const passwordError = ref('')
 const errorMessage = ref('')
 
 const onClickLogin = () => {
@@ -50,6 +53,24 @@ const clickGoogleButton = async () => {
     }
   }
 }
+
+watch(email, (newVal) => {
+  const validationResult = rules.email(newVal);
+  if (typeof validationResult === 'string') {
+    emailError.value = validationResult;
+  } else {
+    emailError.value = '';
+  }
+});
+
+watch(password, (newVal) => {
+  const validationResult = rules.required(newVal);
+  if (typeof validationResult === 'string') {
+    passwordError.value = validationResult;
+  } else {
+    passwordError.value = '';
+  }
+});
 </script>
 
 <template>
@@ -66,9 +87,11 @@ const clickGoogleButton = async () => {
             </v-col>
             <v-col cols="12">
               <input type="text" class="input-form ps-2" v-model="email" />
+              <div v-if="emailError" class="error-message">{{ emailError }}</div>
             </v-col>
             <v-col cols="12">
               <input type="password" class="input-form ps-2" v-model="password" />
+              <div v-if="passwordError" class="error-message">{{ passwordError }}</div>
             </v-col>
             <v-col cols="12">
               <SubmitButton
@@ -114,5 +137,12 @@ const clickGoogleButton = async () => {
     border: 1px solid grey;
     width: 100%;
   }
+
+  .error-message {
+    color: red;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+
 }
 </style>

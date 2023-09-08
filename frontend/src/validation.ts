@@ -1,8 +1,45 @@
+import * as yup from "yup";
+
+const validateWithYup = (schema: yup.StringSchema, value: string) => {
+    try {
+      schema.validateSync(value);
+      return true;
+    } catch (err) {
+      if (err instanceof Error) {
+        return err.message;
+      }
+      return 'An unknown error occurred';
+    }
+  };
+  
+  
 const rules = {
-    hyphen: (value: string) => !value.includes('-') || "ハイフンなしで入力してください",
-    zenkaku: (value: string) => !/[０-９]/.test(value) || "半角数字で入力してください",
-    isbn: (value: string) => validateISBN(value) || "無効なISBNです",
-}
+    hyphen: (value: string) => validateWithYup(
+        yup.string().test('hyphen', 'ハイフンなしで入力してください', val => !val?.includes('-')),
+        value
+    ),
+    zenkaku: (value: string) => validateWithYup(
+        yup.string().test('zenkaku', '半角数字で入力してください', val => !/[０-９]/.test(val || '')),
+        value
+    ),
+    isbn: (value: string) => validateWithYup(
+        yup.string().test('isbn', '無効なISBNです', val => validateISBN(val || '')),
+        value
+    ),
+    email: (value: string) => validateWithYup(
+        yup.string().email('有効なメールアドレスを入力してください').required('メールアドレスは必須です'),
+        value
+    ),
+    required: (value: string) => validateWithYup(
+        yup.string().required("入力は必須です"),
+        value
+    ),
+    password: (value: string) => validateWithYup(
+        yup.string() 
+          .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{6,}$/, 'パスワードは6文字以上であり、少なくとも1つの大文字、1つの小文字、1つの数字を含む必要があります'),
+        value
+      ), 
+};
 
 const validateISBN = (isbn: string): boolean => {
     const length = isbn.length;

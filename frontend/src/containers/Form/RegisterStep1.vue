@@ -12,6 +12,8 @@ import { FirebaseError } from 'firebase/app'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
 import { firebaseErrorMessage } from '@/function'
 import { firebaseAuth } from '@/config/firebase'
+import { watch } from 'vue'
+import { rules } from '@/validation'
 
 interface Emits {
   (event: 'submitButton'): void
@@ -20,7 +22,9 @@ interface Emits {
 const emit = defineEmits<Emits>()
 
 const email = ref('')
+const emailError = ref('');
 const password = ref('')
+const passwordError = ref('')
 const errorMessage = ref('')
 
 const submitButton = async () => {
@@ -44,6 +48,24 @@ const submitButton = async () => {
     }
   }
 }
+
+watch(email, (newVal) => {
+  const validationResult = rules.email(newVal);
+  if (typeof validationResult === 'string') {
+    emailError.value = validationResult;
+  } else {
+    emailError.value = '';
+  }
+});
+
+watch(password, (newVal) => {
+  const validationResult = rules.password(newVal);
+  if (typeof validationResult === 'string') {
+    passwordError.value = validationResult;
+  } else {
+    passwordError.value = '';
+  }
+});
 </script>
 
 <template>
@@ -63,10 +85,12 @@ const submitButton = async () => {
       <v-col cols="12">
         <Label text="メールアドレス" class="mb-3"></Label>
         <input type="text" class="input-form ps-2 py-1" v-model="email" />
+        <div v-if="emailError" class="error-message">{{ emailError }}</div>
       </v-col>
       <v-col cols="12" class="mt-3">
         <Label text="パスワード" class="mb-3"></Label>
         <input type="password" class="input-form ps-2 py-1" v-model="password" />
+        <div v-if="passwordError" class="error-message">{{ passwordError }}</div>
       </v-col>
       <v-col cols="12" class="mb-3">
         <SubmitButton
@@ -85,4 +109,11 @@ const submitButton = async () => {
   border: 1px solid rgb(206, 205, 205);
   width: 100%;
 }
+
+.error-message {
+    color: red;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+  }
+
 </style>
