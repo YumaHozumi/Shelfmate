@@ -78,6 +78,8 @@ watch(selectedBookshelf, async () => {
         :key="index"
         :item="element"
         :selectBookshelfId="selectedBookshelf?.doc_id || ''"
+        :isEdit="false"
+        :isSelected="false"
       ></BookComp>
     </div>
   </v-container>

@@ -44,12 +44,16 @@ const initializeSelectedBookshelf = async () => {
 }
 
 initializeSelectedBookshelf() // 関数を呼び出し、selectedBookshelfを初期化
+
+const clickEdit = () => {
+  console.log("hoge")
+}
 </script>
 
 <template>
   <Header @navigate="onNavigate"></Header>
   <LocalHeader @clickLocalHeaderBtn="clickLocalHeaderBtn"></LocalHeader>
-  <OptionContainer :count="num"></OptionContainer>
+  <OptionContainer :count="num" @clickEdit="clickEdit"></OptionContainer>
   <BookshelfContainer
     :selectedBookshelf="selectedBookshelf"
     v-if="selectedBookshelf"

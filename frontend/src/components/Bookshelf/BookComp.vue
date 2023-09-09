@@ -8,6 +8,8 @@ import BookDialog from '@/components/Bookshelf/BookDialog.vue'
 interface Props {
   item: Series | BookItem
   selectBookshelfId: string
+  isEdit: boolean
+  isSelected: boolean
 }
 
 defineProps<Props>()
@@ -19,7 +21,7 @@ const isSeries = (input: Series | BookItem): input is Series => {
 
 <template>
   <FullDialog v-if="isSeries(item)" :series="item" :selectBookshelfId="selectBookshelfId">
-    <span class="books">
+    <span class="books" :class="{ editable: isEdit}">
       <Books :series="item"></Books>
       <v-badge color="blue" overlap class="book-badge">
         <template v-slot:badge>
@@ -30,13 +32,20 @@ const isSeries = (input: Series | BookItem): input is Series => {
   </FullDialog>
 
   <BookDialog v-else :book="item">
-    <Book :book="item"></Book>
+    <span :class="{ editable: isEdit}">
+      <Book :book="item" ></Book>
+    </span>
   </BookDialog>
 </template>
 
 <style scoped lang="scss">
 .books {
   position: relative;
+}
+
+.editable {
+  position: relative;
+  filter: brightness(0.7);
 }
 
 .book-badge {
