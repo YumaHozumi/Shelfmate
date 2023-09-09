@@ -9,6 +9,7 @@ import BookComp from '@/components/Bookshelf/BookComp.vue'
 
 interface Props {
   selectedBookshelf: BookShelf | undefined
+  isEdit: boolean
 }
 
 const prop = defineProps<Props>()
@@ -78,7 +79,7 @@ watch(selectedBookshelf, async () => {
         :key="index"
         :item="element"
         :selectBookshelfId="selectedBookshelf?.doc_id || ''"
-        :isEdit="false"
+        :isEdit="isEdit"
         :isSelected="false"
       ></BookComp>
     </div>

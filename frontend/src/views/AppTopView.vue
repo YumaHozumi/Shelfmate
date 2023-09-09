@@ -44,19 +44,21 @@ const initializeSelectedBookshelf = async () => {
 }
 
 initializeSelectedBookshelf() // 関数を呼び出し、selectedBookshelfを初期化
+const isEdit = ref(false);
 
-const clickEdit = () => {
-  console.log("hoge")
+const clickBtn = (editMode: boolean) => {
+  isEdit.value = editMode;
 }
 </script>
 
 <template>
   <Header @navigate="onNavigate"></Header>
   <LocalHeader @clickLocalHeaderBtn="clickLocalHeaderBtn"></LocalHeader>
-  <OptionContainer :count="num" @clickEdit="clickEdit"></OptionContainer>
+  <OptionContainer :count="num" @clickBtn="clickBtn"></OptionContainer>
   <BookshelfContainer
     :selectedBookshelf="selectedBookshelf"
     v-if="selectedBookshelf"
     @count="getCount"
+    :isEdit="isEdit"
   ></BookshelfContainer>
 </template>

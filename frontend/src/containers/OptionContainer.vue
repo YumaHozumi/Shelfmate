@@ -12,20 +12,19 @@ interface Props {
 defineProps<Props>();
 
 interface Emits {
-  (event: "clickEdit"): void
-  (event: "clickCancel"): void
+  (event: "clickBtn", editMode: boolean): void
 }
 
 const emit = defineEmits<Emits>();
 
 const clickEdit = () => {
   editMode.value = true;
-  emit("clickEdit")
+  emit("clickBtn", editMode.value)
 }
 
 const clickCancel = () => {
   editMode.value = false;
-  emit("clickCancel")
+  emit("clickBtn", editMode.value)
 }
 </script>
 
