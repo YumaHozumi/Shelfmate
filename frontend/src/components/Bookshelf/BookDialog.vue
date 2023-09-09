@@ -5,17 +5,22 @@ import BookListItem from '../BookListItem.vue'
 
 interface Props {
   book: BookItem
+  isEdit: boolean
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
 
 const dialog = ref(false)
+
+const click = () => {
+  if(!props.isEdit) dialog.value = true
+}
 </script>
 
 <template>
-  <v-dialog v-model="dialog">
+  <v-dialog v-model="dialog" :disabled="isEdit">
     <template v-slot:activator="{ props }">
-      <div v-bind="props" @click="dialog = true">
+      <div v-bind="props" @click="click">
         <slot></slot>
       </div>
     </template>

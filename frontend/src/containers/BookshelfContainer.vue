@@ -4,7 +4,7 @@ import { ref, watch, toRef } from 'vue'
 import { onMounted } from 'vue'
 import { collection, getDocs } from 'firebase/firestore'
 import { firestore, getCurrentUser } from '@/config/firebase'
-import { type Series } from '@/interface'
+import { type Series, isSeries, isBookItem } from '@/interface'
 import BookComp from '@/components/Bookshelf/BookComp.vue'
 
 interface Props {
@@ -69,6 +69,25 @@ watch(selectedBookshelf, async () => {
   items.value.length = 0
   await getSeries()
 })
+
+const listBookItem: BookItem[] = []
+const listSeries: Series[] = []
+
+const clickBook = (item: Series | BookItem): void => {
+  if (isSeries(item)) {
+    listSeries.push(item);
+  } else if (isBookItem(item)) {
+    listBookItem.push(item);
+  }
+}
+
+watch(() => prop.isEdit, (newVal) => {
+  if (!newVal) {
+    //editがfalseになったら初期化
+    listBookItem.length = 0;
+    listSeries.length = 0
+  }
+});
 </script>
 
 <template>
@@ -81,6 +100,7 @@ watch(selectedBookshelf, async () => {
         :selectBookshelfId="selectedBookshelf?.doc_id || ''"
         :isEdit="isEdit"
         :isSelected="false"
+        @clickBook="clickBook"
       ></BookComp>
     </div>
   </v-container>

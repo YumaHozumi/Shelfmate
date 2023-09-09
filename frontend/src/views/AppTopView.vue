@@ -49,6 +49,10 @@ const isEdit = ref(false);
 const clickBtn = (editMode: boolean) => {
   isEdit.value = editMode;
 }
+
+const deleteBook = () => {
+  
+}
 </script>
 
 <template>
@@ -61,4 +65,21 @@ const clickBtn = (editMode: boolean) => {
     @count="getCount"
     :isEdit="isEdit"
   ></BookshelfContainer>
+  <v-footer fixed dark class="footer" v-show="isEdit">
+    <v-col class="text-center">
+      <v-btn color="red" class="btn">削除する</v-btn>
+    </v-col>
+  </v-footer>
 </template>
+
+
+<style scoped lang="scss">
+.footer {
+  padding: 1.4%;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3);
+  .btn {
+    font-size: 14px;
+    font-weight: bolder;
+  }
+}
+</style>

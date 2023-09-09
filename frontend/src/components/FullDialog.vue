@@ -10,6 +10,7 @@ import Menu from '@/components/Menu.vue'
 interface Props {
   series: Series
   selectBookshelfId: string
+  isEdit: boolean
 }
 
 const prop = defineProps<Props>()
@@ -19,6 +20,7 @@ const bookList = ref<BookItem[]>([])
 
 const onClickBook = async () => {
   const user = await getCurrentUser()
+  if(prop.isEdit) return;
 
   if (prop.series.seriesId) {
     const booksCollection = collection(
@@ -50,7 +52,7 @@ const selectMenu = (index: number): void => {
 </script>
 
 <template>
-  <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
+  <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition" :disabled="isEdit">
     <template v-slot:activator="{ props }">
       <div v-bind="props" @click="onClickBook">
         <slot></slot>

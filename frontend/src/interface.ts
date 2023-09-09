@@ -52,5 +52,15 @@ const isBookItem = (obj: any): obj is BookItem =>  {
   );
 }
 
+// 新たな型ガードを定義
+const isSeries = (obj: any): obj is Series => {
+  return (
+    (typeof obj.seriesId === 'string' || obj.seriesId === undefined) &&
+    typeof obj.pic === 'string' &&
+    typeof obj.counter === 'number' &&
+    typeof obj.seriesTitle === 'string'
+  );
+};
+
 export type { BookItem, BookShelf, Series, BookItemNoSeries, SelectSeriesItem }
-export { implementBookShelf, isBookItem }
+export { implementBookShelf, isBookItem, isSeries }

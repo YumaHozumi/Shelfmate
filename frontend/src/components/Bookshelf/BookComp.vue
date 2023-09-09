@@ -4,36 +4,65 @@ import Books from '@/components/Bookshelf/Books.vue'
 import Book from '@/components/Bookshelf/Book.vue'
 import FullDialog from '@/components/FullDialog.vue'
 import BookDialog from '@/components/Bookshelf/BookDialog.vue'
+import { ref, watch } from 'vue'
 
 interface Props {
   item: Series | BookItem
   selectBookshelfId: string
   isEdit: boolean
-  isSelected: boolean
 }
 
-defineProps<Props>()
+const props = defineProps<Props>()
+
+interface Emits {
+  (event: "clickBook", item: Series | BookItem): void
+}
+
+const emit = defineEmits<Emits>();
+
+const clickBook = (): void => {
+  emit("clickBook", props.item);
+}
 
 const isSeries = (input: Series | BookItem): input is Series => {
   return (input as Series).counter !== undefined
 }
+
+const isSelected = ref(false);
+
+const handleClick = () => {
+  if(props.isEdit) {
+    isSelected.value = !isSelected.value;
+    clickBook();
+  }
+};
+
+//editモードがfalseになったらselectは外す
+watch(() => props.isEdit, (newVal) => {
+  if (!newVal) {
+    isSelected.value = false;
+  }
+});
+
 </script>
 
 <template>
-  <FullDialog v-if="isSeries(item)" :series="item" :selectBookshelfId="selectBookshelfId">
-    <span class="books" :class="{ editable: isEdit}">
-      <Books :series="item"></Books>
-      <v-badge color="blue" overlap class="book-badge">
+  <FullDialog v-if="isSeries(item)" :series="item" :selectBookshelfId="selectBookshelfId" :isEdit="isEdit">
+    <span class="books" :class="{ selected: isSelected }" @click="handleClick">
+      <Books :series="item" :class="{dark: isEdit}"></Books>
+      <v-badge color="blue" overlap class="book-badge" :class="{dark: isEdit}">
         <template v-slot:badge>
           <span class="count">{{ item.counter }}冊</span>
         </template>
       </v-badge>
+      <v-icon class="check" v-show="isSelected">mdi-check</v-icon>
     </span>
   </FullDialog>
 
-  <BookDialog v-else :book="item">
-    <span :class="{ editable: isEdit}">
-      <Book :book="item" ></Book>
+  <BookDialog v-else :book="item" :isEdit="isEdit">
+    <span :class="{ editable: isEdit, selected: isSelected }" @click="handleClick">
+      <Book :book="item" :class="{dark: isEdit}"></Book>
+      <v-icon class="check" v-show="isSelected">mdi-check</v-icon>
     </span>
   </BookDialog>
 </template>
@@ -43,9 +72,24 @@ const isSeries = (input: Series | BookItem): input is Series => {
   position: relative;
 }
 
-.editable {
+.selected {
   position: relative;
-  filter: brightness(0.7);
+
+  .dark {
+    filter: brightness(0.7);
+  }
+}
+
+.check {
+  position: absolute;
+  left: 20%;
+  top: 2%;
+  color: white;
+  background-color: orange;
+  border-radius: 50%;
+  padding: 15px;
+  border: 3px solid white;
+  
 }
 
 .book-badge {
