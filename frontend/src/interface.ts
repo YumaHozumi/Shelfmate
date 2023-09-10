@@ -31,6 +31,11 @@ interface SelectSeriesItem {
   seriesTitle: string
 }
 
+enum Action {
+  DELETE = "DELETE",
+  UPDATE = "UPDATE"
+}
+
 type BookItemNoSeries = Omit<BookItem, 'seriesId' | 'orderNumber'>
 
 //ユーザ定義タイプガード
@@ -62,5 +67,5 @@ const isSeries = (obj: any): obj is Series => {
   );
 };
 
-export type { BookItem, BookShelf, Series, BookItemNoSeries, SelectSeriesItem }
-export { implementBookShelf, isBookItem, isSeries }
+export type { BookItem, BookShelf, Series, BookItemNoSeries, SelectSeriesItem, }
+export { implementBookShelf, isBookItem, isSeries, Action }

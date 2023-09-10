@@ -5,7 +5,7 @@ import BookshelfContainer from '@/containers/BookshelfContainer.vue'
 import OptionContainer from '@/containers/OptionContainer.vue'
 import router from '@/router'
 import { ref } from 'vue'
-import { implementBookShelf, type BookShelf } from '@/interface'
+import { implementBookShelf, type BookShelf, type BookItem, type Series, Action } from '@/interface'
 import { firestore, getCurrentUser } from '@/config/firebase'
 import { collection, getDocs } from 'firebase/firestore'
 
@@ -50,6 +50,39 @@ const clickBtn = (editMode: boolean) => {
   isEdit.value = editMode;
 }
 
+const listBookItem = ref<BookItem[]>([])
+const listSeries = ref<Series[]>([]);
+
+const clearList = () => {
+  listBookItem.value.length = 0;
+  listSeries.value.length = 0;
+}
+
+const clickBookItem = (item: BookItem, action: Action) => {
+  if (action === Action.UPDATE) {
+    // アイテムがまだリストに存在しない場合にのみ、アイテムをリストに追加します
+    if (!listBookItem.value.some(existingItem => existingItem.bookId === item.bookId)) {
+      listBookItem.value.push(item);
+    }
+  } else if (action === Action.DELETE) {
+    // 指定した bookId を持つアイテムをリストから削除します
+    listBookItem.value = listBookItem.value.filter(existingItem => existingItem.bookId !== item.bookId);
+  }
+}
+
+const clickSeries = (item: Series, action: Action) => {
+  if (action === Action.UPDATE) {
+    // アイテムがまだリストに存在しない場合にのみ、アイテムをリストに追加します
+    if (!listSeries.value.some(existingItem => existingItem.seriesId === item.seriesId)) {
+      listSeries.value.push(item);
+    }
+  } else if (action === Action.DELETE) {
+    // 指定した seriesId を持つアイテムをリストから削除します
+    listSeries.value = listSeries.value.filter(existingItem => existingItem.seriesId !== item.seriesId);
+  }
+}
+
+
 const deleteBook = () => {
   
 }
@@ -63,6 +96,9 @@ const deleteBook = () => {
     :selectedBookshelf="selectedBookshelf"
     v-if="selectedBookshelf"
     @count="getCount"
+    @clearList="clearList"
+    @clickBookItem="clickBookItem"
+    @clickSeries="clickSeries"
     :isEdit="isEdit"
   ></BookshelfContainer>
   <v-footer fixed dark class="footer" v-show="isEdit">
@@ -73,8 +109,10 @@ const deleteBook = () => {
 </template>
 
 
-<style scoped lang="scss">
-.footer {
+<style scoped lang="scss">.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
   padding: 1.4%;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3);
   .btn {
@@ -82,4 +120,5 @@ const deleteBook = () => {
     font-weight: bolder;
   }
 }
+
 </style>

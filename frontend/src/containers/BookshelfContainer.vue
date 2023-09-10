@@ -4,7 +4,7 @@ import { ref, watch, toRef } from 'vue'
 import { onMounted } from 'vue'
 import { collection, getDocs } from 'firebase/firestore'
 import { firestore, getCurrentUser } from '@/config/firebase'
-import { type Series, isSeries, isBookItem } from '@/interface'
+import { type Series, isSeries, isBookItem, Action } from '@/interface'
 import BookComp from '@/components/Bookshelf/BookComp.vue'
 
 interface Props {
@@ -16,6 +16,9 @@ const prop = defineProps<Props>()
 
 interface Emits {
   (event: "count", count: number): void
+  (event: "clickBookItem", item: BookItem, action: Action): void
+  (event: "clickSeries", series: Series, action: Action): void
+  (event: "clearList"): void
 }
 
 const emit = defineEmits<Emits>();
@@ -70,22 +73,20 @@ watch(selectedBookshelf, async () => {
   await getSeries()
 })
 
-const listBookItem: BookItem[] = []
-const listSeries: Series[] = []
-
-const clickBook = (item: Series | BookItem): void => {
-  if (isSeries(item)) {
-    listSeries.push(item);
-  } else if (isBookItem(item)) {
-    listBookItem.push(item);
+const clickBook = (item: Series | BookItem, isSelected: boolean): void => {
+  if(isSelected) {
+    if (isSeries(item)) emit("clickSeries", item as Series, Action.UPDATE);
+    else if (isBookItem(item)) emit("clickBookItem", item as BookItem, Action.UPDATE);
+  }else{
+    if(isSeries(item)) emit("clickSeries", item as Series, Action.DELETE);
+    else if (isBookItem(item)) emit("clickBookItem", item as BookItem, Action.DELETE);
   }
 }
 
 watch(() => prop.isEdit, (newVal) => {
   if (!newVal) {
     //editがfalseになったら初期化
-    listBookItem.length = 0;
-    listSeries.length = 0
+    emit("clearList");
   }
 });
 </script>
@@ -99,7 +100,6 @@ watch(() => prop.isEdit, (newVal) => {
         :item="element"
         :selectBookshelfId="selectedBookshelf?.doc_id || ''"
         :isEdit="isEdit"
-        :isSelected="false"
         @clickBook="clickBook"
       ></BookComp>
     </div>

@@ -15,13 +15,13 @@ interface Props {
 const props = defineProps<Props>()
 
 interface Emits {
-  (event: "clickBook", item: Series | BookItem): void
+  (event: "clickBook", item: Series | BookItem, isSelected: boolean): void
 }
 
 const emit = defineEmits<Emits>();
 
 const clickBook = (): void => {
-  emit("clickBook", props.item);
+  emit("clickBook", props.item, isSelected.value);
 }
 
 const isSeries = (input: Series | BookItem): input is Series => {
