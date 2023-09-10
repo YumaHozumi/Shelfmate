@@ -77,7 +77,7 @@ const searchClick = async (searchText: string) => {
                 const output = removeTagsAndAddNewLines(item.detail);
 
                 book.value = {
-                    bookId: "",
+                    bookId: item.bookId,
                     isbn: item.isbn ?? 0,
                     title: item.title,
                     image_url: item.image_url && item.image_url.trim() !== '' ? item.image_url : imageURL,
@@ -161,6 +161,7 @@ const registerBook = async (book: BookItem) => {
 }
 
 const submit = async () => {
+  nestDialog.value = false;
   const user = await getCurrentUser()
     const selectedBookshelfId = selectedBookshelf.value?.doc_id || ''
     console.log(selectedRadio.value)

@@ -1,8 +1,9 @@
 package object
 
 import (
+	"encoding/base64"
 	"encoding/xml"
-	"fmt"
+	"math/big"
 	"net/http"
 	"strconv"
 )
@@ -16,6 +17,7 @@ type Channel struct {
 }
 
 type Item struct {
+	BookId         string `json:"bookId"`
 	Title          string `xml:"title" json:"title"`
 	Detail         string `json:"detail"` // 読み込むのはカスタム関数で
 	Author         string `xml:"author" json:"author"`
@@ -59,6 +61,12 @@ func (item *Item) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 						}
 						item.ISBNIdentifier = isbn
 
+						num := big.NewInt(isbn)
+						bytes := num.Bytes()
+						// Base64エンコーディングを使用してbytesを文字列に変換
+						bookId := base64.URLEncoding.EncodeToString(bytes)
+						item.BookId = bookId
+
 						if strISBN := strconv.FormatInt(isbn, 10); strISBN != "" {
 							picImage := "https://iss.ndl.go.jp/thumbnail/" + strISBN
 
@@ -67,7 +75,6 @@ func (item *Item) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 								return err
 							}
 							defer resp.Body.Close()
-							fmt.Println(resp)
 
 							if resp.StatusCode == http.StatusNotFound {
 								item.ImageURL = ""

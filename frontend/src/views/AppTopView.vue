@@ -7,7 +7,7 @@ import router from '@/router'
 import { ref } from 'vue'
 import { implementBookShelf, type BookShelf, type BookItem, type Series, Action } from '@/interface'
 import { firestore, getCurrentUser } from '@/config/firebase'
-import { collection, getDocs } from 'firebase/firestore'
+import { collection, deleteDoc, doc, getDocs, query } from 'firebase/firestore'
 
 const onNavigate = (name: string): void => {
   router.push({ name: name })
@@ -83,8 +83,39 @@ const clickSeries = (item: Series, action: Action) => {
 }
 
 
-const deleteBook = () => {
-  
+const deleteBook = async () => {
+  console.log(selectedBookshelf.value)
+  try {
+    const user = await getCurrentUser();
+    
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const uid = user.uid;
+    
+    // listBookItemの各アイテムを削除
+    for (const item of listBookItem.value) {
+      const bookDocRef = doc(firestore, 'users', uid, 'bookshelves', selectedBookshelf.value?.doc_id || '', 'books', item.bookId);
+      await deleteDoc(bookDocRef);
+    }
+    
+    // listSeriesの各シリーズ下の全てのbooksを削除
+    for (const series of listSeries.value) {
+      if (!series.seriesId) continue;
+
+      const seriesBooksQuery = query(
+        collection(firestore, 'users', uid, 'bookshelves', selectedBookshelf.value?.doc_id || '', 'series', series.seriesId, 'books')
+      );
+      
+      const seriesBooksSnapshot = await getDocs(seriesBooksQuery);
+      for (const doc of seriesBooksSnapshot.docs) {
+        await deleteDoc(doc.ref);
+      }
+    }
+  } catch (e) {
+    console.error('Error deleting books:', e);
+  }
 }
 </script>
 
@@ -103,7 +134,7 @@ const deleteBook = () => {
   ></BookshelfContainer>
   <v-footer fixed dark class="footer" v-show="isEdit">
     <v-col class="text-center">
-      <v-btn color="red" class="btn">削除する</v-btn>
+      <v-btn color="red" class="btn" @click="deleteBook">削除する</v-btn>
     </v-col>
   </v-footer>
 </template>
