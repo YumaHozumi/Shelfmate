@@ -44,6 +44,8 @@ const implementBookShelf = (arg: any): arg is BookShelf => {
 }
 
 const isBookItem = (obj: any): obj is BookItem =>  {
+  console.log(obj.public_date.constructor.name);
+
   return (
     typeof obj.bookId === 'string' &&
     (typeof obj.isbn === 'number' || obj.isbn === undefined) &&

@@ -78,10 +78,10 @@ watch(selectedBookshelf, async () => {
 const clickBook = (item: Series | BookItem, isSelected: boolean): void => {
   if(isSelected) {
     if (isSeries(item)) emit("clickSeries", item as Series, Action.UPDATE);
-    else if (isBookItem(item)) emit("clickBookItem", item as BookItem, Action.UPDATE);
+    else emit("clickBookItem", item as BookItem, Action.UPDATE);
   }else{
     if(isSeries(item)) emit("clickSeries", item as Series, Action.DELETE);
-    else if (isBookItem(item)) emit("clickBookItem", item as BookItem, Action.DELETE);
+    else emit("clickBookItem", item as BookItem, Action.DELETE);
   }
 }
 

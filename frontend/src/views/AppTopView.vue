@@ -93,11 +93,27 @@ const deleteBook = async () => {
 
     const uid = user.uid;
     const bookshelfId = selectedBookshelf.value?.doc_id || ''
+    console.log(listBookItem.value)
     
     // listBookItemの各アイテムを削除
     for (const item of listBookItem.value) {
-      const bookDocRef = doc(firestore, 'users', uid, 'bookshelves', bookshelfId, 'books', item.bookId);
-      await deleteDoc(bookDocRef);
+      const bookCollection = collection(firestore, "users", uid, "bookshelves", bookshelfId, "books");
+      const qBook = query(bookCollection, where('bookId', '==', item.bookId));
+      const querySnapshotBook = await getDocs(qBook);
+
+      if(!querySnapshotBook.empty) {
+        const docFirst = querySnapshotBook.docs[0];
+        await deleteDoc(docFirst.ref);
+      }
+
+      const allBooksCollection = collection(firestore, 'users', uid, 'bookshelves', bookshelfId, 'allBooks');
+      const q = query(allBooksCollection, where('bookId', '==', item.bookId));
+      const querySnapshot = await getDocs(q);
+
+      if(!querySnapshot.empty) {
+        const docFirst = querySnapshot.docs[0];
+        await deleteDoc(docFirst.ref);
+      }
     }
     
     // listSeriesの各シリーズ下の全てのbooksを削除
@@ -110,8 +126,6 @@ const deleteBook = async () => {
       const seriesBooksSnapshot = await getDocs(seriesBooksQuery);
       for (const docSnapshot of seriesBooksSnapshot.docs) {
         const bookData = docSnapshot.data() as BookItem;
-        console.log(bookData)
-        console.log(bookData.bookId)
 
         const allBooksCollection = collection(firestore, 'users', uid, 'bookshelves', bookshelfId, 'allBooks');
         const q = query(allBooksCollection, where('bookId', '==', bookData.bookId));
