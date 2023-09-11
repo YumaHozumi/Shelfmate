@@ -53,7 +53,6 @@ const isBookItem = (obj: any): obj is BookItem =>  {
     (typeof obj.image_url === 'string' || obj.image_url === undefined) &&
     typeof obj.author === 'string' &&
     typeof obj.detail === 'string' &&
-    obj.public_date instanceof FirestoreTimestamp &&
     (typeof obj.seriesId === 'string' || obj.seriesId === undefined) &&
     (typeof obj.orderNumber === 'number' || obj.orderNumber === undefined)
   );

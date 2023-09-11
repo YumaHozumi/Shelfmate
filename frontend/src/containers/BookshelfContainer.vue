@@ -27,9 +27,57 @@ const emit = defineEmits<Emits>();
 
 const items = ref<(Series | BookItem)[]>([])
 
+let unsubBook: Unsubscribe;
+let unsubSeries: Unsubscribe
+
+onAuthStateChanged(firebaseAuth, (user) => {
+  const doc_id = prop.selectedBookshelf?.doc_id;
+  if(user && doc_id) {
+    unsubBook = onSnapshot(
+      collection(firestore,'users',user.uid,'bookshelves',doc_id,'books'), 
+      (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          if(change.type === "removed"){
+            const data = change.doc.data() as BookItem;
+            
+            items.value = items.value.filter(item => {
+              if(isBookItem(item)) {
+                return item.bookId !== data.bookId;
+              }
+            })
+            emit("count", items.value.length);
+          }
+       })
+      }
+    )
+
+    unsubSeries = onSnapshot(
+      collection(firestore, "users", user.uid, "bookshelves", doc_id, "series"),
+      (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          if(change.type === "removed") {
+            const data = change.doc.data() as Series;
+
+            items.value = items.value.filter(item => {
+              if(isSeries(item))  return item.seriesId !== data.seriesId;
+            })
+            emit("count", items.value.length);
+          }
+        })
+      }
+    )
+  }
+})
+
 onMounted(async () => {
   await getSeries()
 })
+
+onUnmounted(() => {
+  unsubBook()
+  unsubSeries()
+})
+
 
 const getSeries = async () => {
   const user = await getCurrentUser()
@@ -54,7 +102,6 @@ const getSeries = async () => {
     )
     await getDocs(seriesCollectionRef).then((snapshot) => {
       snapshot.forEach((e) => {
-        console.log("aaaa")
         items.value.push(e.data() as Series)
       })
     })
