@@ -7,7 +7,7 @@ import router from '@/router'
 import { ref } from 'vue'
 import { implementBookShelf, type BookShelf, type BookItem, type Series, Action } from '@/interface'
 import { firestore, getCurrentUser } from '@/config/firebase'
-import { collection, deleteDoc, doc, getDocs, query } from 'firebase/firestore'
+import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore'
 
 const onNavigate = (name: string): void => {
   router.push({ name: name })
@@ -84,7 +84,6 @@ const clickSeries = (item: Series, action: Action) => {
 
 
 const deleteBook = async () => {
-  console.log(selectedBookshelf.value)
   try {
     const user = await getCurrentUser();
     
@@ -93,26 +92,44 @@ const deleteBook = async () => {
     }
 
     const uid = user.uid;
+    const bookshelfId = selectedBookshelf.value?.doc_id || ''
     
     // listBookItemの各アイテムを削除
     for (const item of listBookItem.value) {
-      const bookDocRef = doc(firestore, 'users', uid, 'bookshelves', selectedBookshelf.value?.doc_id || '', 'books', item.bookId);
+      const bookDocRef = doc(firestore, 'users', uid, 'bookshelves', bookshelfId, 'books', item.bookId);
       await deleteDoc(bookDocRef);
     }
     
     // listSeriesの各シリーズ下の全てのbooksを削除
     for (const series of listSeries.value) {
       if (!series.seriesId) continue;
-
       const seriesBooksQuery = query(
-        collection(firestore, 'users', uid, 'bookshelves', selectedBookshelf.value?.doc_id || '', 'series', series.seriesId, 'books')
+        collection(firestore, 'users', uid, 'bookshelves', bookshelfId, 'series', series.seriesId, 'books')
       );
-      
+
       const seriesBooksSnapshot = await getDocs(seriesBooksQuery);
-      for (const doc of seriesBooksSnapshot.docs) {
-        await deleteDoc(doc.ref);
+      for (const docSnapshot of seriesBooksSnapshot.docs) {
+        const bookData = docSnapshot.data() as BookItem;
+        console.log(bookData)
+        console.log(bookData.bookId)
+
+        const allBooksCollection = collection(firestore, 'users', uid, 'bookshelves', bookshelfId, 'allBooks');
+        const q = query(allBooksCollection, where('bookId', '==', bookData.bookId));
+        const querySnapshot = await getDocs(q);
+
+        if(!querySnapshot.empty) {
+          const docFirst = querySnapshot.docs[0];
+          await deleteDoc(docFirst.ref);
+        }
+
+        await deleteDoc(docSnapshot.ref);
       }
+
+      // After deleting all books in the series, delete the series itself
+      const seriesDocRef = doc(firestore, "users", uid, "bookshelves", bookshelfId, "series", series.seriesId);
+      await deleteDoc(seriesDocRef);
     }
+
   } catch (e) {
     console.error('Error deleting books:', e);
   }

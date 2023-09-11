@@ -2,10 +2,12 @@
 import type { BookItem, BookShelf } from '@/interface'
 import { ref, watch, toRef } from 'vue'
 import { onMounted } from 'vue'
-import { collection, getDocs } from 'firebase/firestore'
-import { firestore, getCurrentUser } from '@/config/firebase'
+import { collection, getDocs, onSnapshot } from 'firebase/firestore'
+import { firebaseAuth, firestore, getCurrentUser } from '@/config/firebase'
 import { type Series, isSeries, isBookItem, Action } from '@/interface'
 import BookComp from '@/components/Bookshelf/BookComp.vue'
+import { onAuthStateChanged, type Unsubscribe } from 'firebase/auth'
+import { onUnmounted } from 'vue'
 
 interface Props {
   selectedBookshelf: BookShelf | undefined
@@ -52,6 +54,7 @@ const getSeries = async () => {
     )
     await getDocs(seriesCollectionRef).then((snapshot) => {
       snapshot.forEach((e) => {
+        console.log("aaaa")
         items.value.push(e.data() as Series)
       })
     })
@@ -65,7 +68,6 @@ const getSeries = async () => {
     emit("count", items.value.length);
   }
 }
-
 const selectedBookshelf = toRef(prop, 'selectedBookshelf')
 
 watch(selectedBookshelf, async () => {
