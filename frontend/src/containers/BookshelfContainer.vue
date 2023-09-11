@@ -41,10 +41,9 @@ onAuthStateChanged(firebaseAuth, (user) => {
             const data = change.doc.data() as BookItem;
             
             items.value = items.value.filter(item => {
-              if(isBookItem(item)) {
-                return item.bookId !== data.bookId;
-              }
-            })
+              if(isBookItem(item)) return item.bookId !== data.bookId;
+              return true; // この行を追加
+            });
             emit("count", items.value.length);
           }
        })
@@ -60,6 +59,7 @@ onAuthStateChanged(firebaseAuth, (user) => {
 
             items.value = items.value.filter(item => {
               if(isSeries(item))  return item.seriesId !== data.seriesId;
+              return true;
             })
             emit("count", items.value.length);
           }
@@ -108,7 +108,12 @@ const getSeries = async () => {
 
     await getDocs(noSeriesBookCollection).then((snapshot) => {
       snapshot.forEach((e) => {
-        items.value.push(e.data() as BookItem)
+        const data = e.data() as BookItem; // ここでBookItemとしてデータを取得
+        // isbnをstringからnumberに変換します（isbnが存在する場合）
+        if (data.isbn) {
+          data.isbn = Number(data.isbn);
+        }
+        items.value.push(data); // 更新したデータを配列に追加
       })
     })
 
@@ -125,10 +130,10 @@ watch(selectedBookshelf, async () => {
 const clickBook = (item: Series | BookItem, isSelected: boolean): void => {
   if(isSelected) {
     if (isSeries(item)) emit("clickSeries", item as Series, Action.UPDATE);
-    else emit("clickBookItem", item as BookItem, Action.UPDATE);
+    else if(isBookItem(item)) emit("clickBookItem", item as BookItem, Action.UPDATE);
   }else{
     if(isSeries(item)) emit("clickSeries", item as Series, Action.DELETE);
-    else emit("clickBookItem", item as BookItem, Action.DELETE);
+    else if(isBookItem(item)) emit("clickBookItem", item as BookItem, Action.DELETE);
   }
 }
 
@@ -144,8 +149,8 @@ watch(() => prop.isEdit, (newVal) => {
   <v-container>
     <div class="bookshelf">
       <BookComp
-        v-for="(element, index) in items"
-        :key="index"
+        v-for="element in items"
+        :key="isSeries(element) ? element.seriesId : element.bookId"
         :item="element"
         :selectBookshelfId="selectedBookshelf?.doc_id || ''"
         :isEdit="isEdit"

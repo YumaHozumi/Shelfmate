@@ -93,7 +93,6 @@ const deleteBook = async () => {
 
     const uid = user.uid;
     const bookshelfId = selectedBookshelf.value?.doc_id || ''
-    console.log(listBookItem.value)
     
     // listBookItemの各アイテムを削除
     for (const item of listBookItem.value) {
@@ -142,7 +141,10 @@ const deleteBook = async () => {
       // After deleting all books in the series, delete the series itself
       const seriesDocRef = doc(firestore, "users", uid, "bookshelves", bookshelfId, "series", series.seriesId);
       await deleteDoc(seriesDocRef);
+
     }
+    listBookItem.value.length = 0;
+    listSeries.value.length = 0;
 
   } catch (e) {
     console.error('Error deleting books:', e);
