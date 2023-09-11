@@ -110,7 +110,6 @@ const registerBookId = async (bookShelfId: string, book: BookItem): Promise<bool
     const querySnapshot = await getDocs(q);
     
     if(querySnapshot.docs.length > 0) {
-      console.log("登録済み")
       return false;
     } else {
       await addDoc(bookshelvesRef, book);

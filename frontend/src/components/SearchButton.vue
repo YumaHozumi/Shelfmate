@@ -4,7 +4,7 @@ import axios from 'axios';
 import { watch } from 'vue';
 import { ref, computed } from 'vue';
 import { implementBookShelf, type BookItem, type BookShelf, type SelectSeriesItem, type BookItemNoSeries } from '@/interface';
-import { Timestamp, collection, onSnapshot, type Unsubscribe, getDocs, addDoc, doc, getDoc, updateDoc, setDoc } from "firebase/firestore"
+import { Timestamp, collection, onSnapshot, type Unsubscribe, getDocs, addDoc, doc, getDoc, updateDoc, setDoc, query, where } from "firebase/firestore"
 import imageURL from '@/assets/no-image.png'
 import { onAuthStateChanged } from 'firebase/auth';
 import { firebaseAuth, firestore, getCurrentUser } from '@/config/firebase';
@@ -164,7 +164,6 @@ const submit = async () => {
   nestDialog.value = false;
   const user = await getCurrentUser()
     const selectedBookshelfId = selectedBookshelf.value?.doc_id || ''
-    console.log(selectedRadio.value)
     const book = nowBook.value
     // シリーズものじゃないとき
     if(selectedRadio.value === "one" && book !== undefined) {
@@ -178,12 +177,17 @@ const submit = async () => {
       )
       const noSeriesBook: BookItemNoSeries = convertToBookItemWithoutSeries(book)
       await addDoc(noSeriesBookCollection, noSeriesBook)
+
+      const allBookCollection = collection(firestore, "users", user.uid, "bookshelves", selectedBookshelfId, "allBooks")
+      const q = query(allBookCollection, where("bookId", "==", book.bookId));
+      const querySnapshot = await getDocs(q);
+
+      if(querySnapshot.docs.length === 0) await addDoc(allBookCollection, book);
+
     } else { // シリーズもの
       if(selectItem.value !== undefined && book !== undefined) {
         const bookshelvesRef = collection(firestore, 'users', user.uid, 'bookshelves')
         const seriesRef = doc(bookshelvesRef, selectedBookshelfId, 'series', selectItem.value.seriesId)
-        console.log("seriesId" + selectItem.value.seriesId)
-        console.log(book)
         const seriesSnap = await getDoc(seriesRef)
       if (seriesSnap.exists()) {
         const seriesData = seriesSnap.data();
