@@ -23,25 +23,52 @@ const selectedRadio = ref("one");
 const errorMsg = ref("")
 
 let unsubscribe: Unsubscribe
+let localCache = localStorage.getItem("bookshelfData")
+let isInitialLoad = true;
 
 onAuthStateChanged(firebaseAuth, (user) => {
   if (user) {
     unsubscribe = onSnapshot(
       collection(firestore, 'users', user.uid, 'bookshelves'),
       (snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-          const data = change.doc.data()
-          if (implementBookShelf(data)) {
-            if (change.type === 'added') {
-              const bookShelfData: BookShelf = { doc_id: change.doc.id, ...data } // doc_idを設定し直します
-              buttons.value.push(bookShelfData)
-            }
+        if(isInitialLoad) {
+          isInitialLoad = false;
+          if(!localCache) {
+            //ローカルキャッシュがない場合、Firestoreからデータを取得
+            buttons.value = snapshot.docs.map(doc => {
+              const data = doc.data();
+              if(implementBookShelf(data)) {
+                const bookShelfData: BookShelf = { doc_id: doc.id, ...data }
+                return bookShelfData
+              }
+              return undefined;
+            }).filter((item): item is BookShelf => item !== undefined);
 
-            if (selectedBookshelf.value === undefined) {
-              selectedBookshelf.value = buttons.value?.[0]
-            }
+            // 取得したデータをローカルストレージに保存
+            localStorage.setItem('bookshelfData', JSON.stringify(buttons.value));
+          }else { //ある場合
+            //ローカルキャッシュからデータを取得
+            const localCacheData: BookShelf[] = JSON.parse(localCache);
+            buttons.value = localCacheData;
           }
-        })
+        }else {
+          snapshot.docChanges().forEach((change) => {
+            const data = change.doc.data()
+            if (implementBookShelf(data)) {
+              if (change.type === 'added') {
+                const bookShelfData: BookShelf = { doc_id: change.doc.id, ...data } // doc_idを設定し直します
+                buttons.value.push(bookShelfData)
+                localStorage.setItem("bookshelfData", JSON.stringify(buttons.value));
+              }
+
+            }
+          })
+          
+        }
+        
+        if (selectedBookshelf.value === undefined) {
+          selectedBookshelf.value = buttons.value?.[0]
+        }
 
       }
     )
