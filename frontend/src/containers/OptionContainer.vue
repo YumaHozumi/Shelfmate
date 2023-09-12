@@ -2,7 +2,7 @@
 import Menu from '@/components/Menu.vue'
 import { ref } from 'vue';
 
-const menu = ['作品名順', '発売日順']
+const menu = ['作品名順']
 const editMode = ref(false);
 
 interface Props {
@@ -13,6 +13,7 @@ defineProps<Props>();
 
 interface Emits {
   (event: "clickBtn", editMode: boolean): void
+  (event: "optionClick", selectedMenu: string): void
 }
 
 const emit = defineEmits<Emits>();
@@ -26,6 +27,10 @@ const clickCancel = () => {
   editMode.value = false;
   emit("clickBtn", editMode.value)
 }
+
+const selectMenu = (index: number): void => {
+  emit("optionClick", menu[index])
+}
 </script>
 
 <template>
@@ -34,7 +39,7 @@ const clickCancel = () => {
     </v-toolbar-title>
     <v-btn color="blue" @click="clickCancel" v-if="editMode">キャンセル</v-btn>
     <v-btn color="blue" @click="clickEdit" v-else>編集</v-btn>
-    <Menu :items="menu" icon="mdi-sort"></Menu>
+    <Menu :items="menu" icon="mdi-sort" @selectItem="selectMenu"></Menu>
   </v-app-bar>
 </template>
 

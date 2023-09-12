@@ -13,6 +13,8 @@ const onNavigate = (name: string): void => {
   router.push({ name: name })
 }
 
+const items = ref<(Series | BookItem)[]>([])
+
 const clickLocalHeaderBtn = (bookshelf: BookShelf): void => {
   selectedBookshelf.value = bookshelf
 }
@@ -150,12 +152,26 @@ const deleteBook = async () => {
     console.error('Error deleting books:', e);
   }
 }
+
+const selectMenu = (selectedMenu: string): void => {
+  if(selectedMenu === "作品名順") {
+    items.value.sort((a, b) => {
+      const titleA = "title" in a ? a.title : a.seriesTitle;
+      const titleB = "title" in b ? b.title : b.seriesTitle;
+      return titleA.localeCompare(titleB);
+    })
+  }
+}
+
+const initComp = (): void => {
+  selectMenu("作品名順")
+}
 </script>
 
 <template>
   <Header @navigate="onNavigate"></Header>
   <LocalHeader @clickLocalHeaderBtn="clickLocalHeaderBtn"></LocalHeader>
-  <OptionContainer :count="num" @clickBtn="clickBtn"></OptionContainer>
+  <OptionContainer :count="num" @clickBtn="clickBtn" @optionClick="selectMenu"></OptionContainer>
   <BookshelfContainer
     :selectedBookshelf="selectedBookshelf"
     v-if="selectedBookshelf"
@@ -163,7 +179,9 @@ const deleteBook = async () => {
     @clearList="clearList"
     @clickBookItem="clickBookItem"
     @clickSeries="clickSeries"
+    @initComp="initComp"
     :isEdit="isEdit"
+    v-model:propItems="items"
   ></BookshelfContainer>
   <v-footer fixed dark class="footer" v-show="isEdit">
     <v-col class="text-center">

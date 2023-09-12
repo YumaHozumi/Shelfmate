@@ -12,6 +12,7 @@ import { onUnmounted } from 'vue'
 interface Props {
   selectedBookshelf: BookShelf | undefined
   isEdit: boolean
+  propItems: (Series | BookItem)[]
 }
 
 const prop = defineProps<Props>()
@@ -21,6 +22,8 @@ interface Emits {
   (event: "clickBookItem", item: BookItem, action: Action): void
   (event: "clickSeries", series: Series, action: Action): void
   (event: "clearList"): void
+  (event: "update:propItems", items: (Series | BookItem)[]): void
+  (event: "initComp"): void
 }
 
 const emit = defineEmits<Emits>();
@@ -45,6 +48,7 @@ onAuthStateChanged(firebaseAuth, (user) => {
               return true; // この行を追加
             });
             emit("count", items.value.length);
+            emit("update:propItems", items.value)
           }
        })
       }
@@ -62,6 +66,7 @@ onAuthStateChanged(firebaseAuth, (user) => {
               return true;
             })
             emit("count", items.value.length);
+            emit("update:propItems", items.value)
           }
         })
       }
@@ -118,12 +123,15 @@ const getSeries = async () => {
     })
 
     emit("count", items.value.length);
+    emit("update:propItems", items.value)
+    emit("initComp")
   }
 }
 const selectedBookshelf = toRef(prop, 'selectedBookshelf')
 
 watch(selectedBookshelf, async () => {
   items.value.length = 0
+  emit("update:propItems", items.value)
   await getSeries()
 })
 
