@@ -55,6 +55,7 @@ onAuthStateChanged(firebaseAuth, (user) => {
     unsubscribe = onSnapshot(
       collection(firestore, 'users', user.uid, 'bookshelves'),
       (snapshot) => {
+        console.log(localCache)
         if(isInitialLoad) {
           isInitialLoad = false;
           if(!localCache) {
