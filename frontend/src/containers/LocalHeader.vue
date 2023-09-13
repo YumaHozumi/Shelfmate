@@ -7,6 +7,7 @@ import { collection, onSnapshot } from 'firebase/firestore'
 import { firestore, firebaseAuth } from '@/config/firebase'
 import { onAuthStateChanged, type Unsubscribe } from 'firebase/auth'
 import { implementBookShelf } from '@/interface'
+import { setBookshelvesData, getBookshelvesData} from "@/function"
 
 interface Emits {
   (event: 'clickLocalHeaderBtn', bookshelf: BookShelf): void
@@ -46,7 +47,6 @@ onUnmounted(() => {
   window.removeEventListener('resize', updateWidth)
 })
 
-let localCache = localStorage.getItem("bookshelfData")
 let isInitialLoad = true;
 let unsubscribe: Unsubscribe
 
@@ -54,10 +54,10 @@ onAuthStateChanged(firebaseAuth, (user) => {
   if (user) {
     unsubscribe = onSnapshot(
       collection(firestore, 'users', user.uid, 'bookshelves'),
-      (snapshot) => {
-        console.log(localCache)
+      async (snapshot) => {
         if(isInitialLoad) {
           isInitialLoad = false;
+          const localCache = await getBookshelvesData(user.uid);
           if(!localCache) {
             //ローカルキャッシュがない場合、Firestoreからデータを取得
             buttons.value = snapshot.docs.map(doc => {
@@ -69,21 +69,20 @@ onAuthStateChanged(firebaseAuth, (user) => {
               return undefined;
             }).filter((item): item is BookShelf => item !== undefined);
 
-            // 取得したデータをローカルストレージに保存
-            localStorage.setItem('bookshelfData', JSON.stringify(buttons.value));
+            // 取得したデータをIndexDBに保存
+            await setBookshelvesData(user.uid, buttons.value);
           }else { //ある場合
             //ローカルキャッシュからデータを取得
-            const localCacheData: BookShelf[] = JSON.parse(localCache);
-            buttons.value = localCacheData;
+            buttons.value = localCache;
           }
         }else {
-          snapshot.docChanges().forEach((change) => {
+          snapshot.docChanges().forEach(async (change) => {
             const data = change.doc.data()
             if (implementBookShelf(data)) {
               if (change.type === 'added') {
                 const bookShelfData: BookShelf = { doc_id: change.doc.id, ...data } // doc_idを設定し直します
                 buttons.value.push(bookShelfData)
-                localStorage.setItem("bookshelfData", JSON.stringify(buttons.value));
+                await setBookshelvesData(user.uid, buttons.value);
               }
             }
           })

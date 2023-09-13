@@ -14,6 +14,7 @@ import DropdownMenu from './DropdownMenu.vue';
 import { incrementCounter } from '@/function';
 import {rules} from "@/validation"
 import ErrorMessage from '@/basic/ErrorMessage.vue';
+import { setBookshelvesData, getBookshelvesData} from "@/function"
 
 const dialog = ref(false);
 const inputText = ref("");
@@ -23,16 +24,16 @@ const selectedRadio = ref("one");
 const errorMsg = ref("")
 
 let unsubscribe: Unsubscribe
-let localCache = localStorage.getItem("bookshelfData")
 let isInitialLoad = true;
 
 onAuthStateChanged(firebaseAuth, (user) => {
   if (user) {
     unsubscribe = onSnapshot(
       collection(firestore, 'users', user.uid, 'bookshelves'),
-      (snapshot) => {
+      async (snapshot) => {
         if(isInitialLoad) {
           isInitialLoad = false;
+          const localCache = await getBookshelvesData(user.uid);
           if(!localCache) {
             //ローカルキャッシュがない場合、Firestoreからデータを取得
             buttons.value = snapshot.docs.map(doc => {
@@ -44,21 +45,18 @@ onAuthStateChanged(firebaseAuth, (user) => {
               return undefined;
             }).filter((item): item is BookShelf => item !== undefined);
 
-            // 取得したデータをローカルストレージに保存
-            localStorage.setItem('bookshelfData', JSON.stringify(buttons.value));
+            await setBookshelvesData(user.uid, buttons.value);
           }else { //ある場合
-            //ローカルキャッシュからデータを取得
-            const localCacheData: BookShelf[] = JSON.parse(localCache);
-            buttons.value = localCacheData;
+            buttons.value = localCache;
           }
         }else {
-          snapshot.docChanges().forEach((change) => {
+          snapshot.docChanges().forEach(async (change) => {
             const data = change.doc.data()
             if (implementBookShelf(data)) {
               if (change.type === 'added') {
                 const bookShelfData: BookShelf = { doc_id: change.doc.id, ...data } // doc_idを設定し直します
                 buttons.value.push(bookShelfData)
-                localStorage.setItem("bookshelfData", JSON.stringify(buttons.value));
+                await setBookshelvesData(user.uid, buttons.value);
               }
 
             }

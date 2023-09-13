@@ -7,7 +7,6 @@ import { getRedirectResult } from 'firebase/auth'
 import { firebaseAuth, getCurrentUser, firestore } from '@/config/firebase'
 import LoadingContainer from '@/containers/LoadingContainer.vue'
 import { collection, addDoc, getDocs } from 'firebase/firestore'
-import type { BookShelf } from '@/interface'
 
 const onNavigate = (name: string): void => {
   router.push({ name: name })
@@ -22,16 +21,10 @@ const onInitBookshelf = async () => {
 
   // コレクションからドキュメントをクエリ
   const querySnapshot = await getDocs(bookShelfCollection)
-  console.log(querySnapshot.empty)
+
   // クエリが空の場合、ドキュメントを追加
   if (querySnapshot.empty) {
-    const booksheves: BookShelf[] = [];
-    const name = "始まりの本棚"
-    const bookshelfRef = await addDoc(bookShelfCollection, { shelf_name: name })
-    
-    const newBookShelf: BookShelf = { doc_id: bookshelfRef.id, shelf_name: name }
-    booksheves.push(newBookShelf);
-    localStorage.setItem("bookshelfData", JSON.stringify(booksheves));
+    await addDoc(bookShelfCollection, { shelf_name: '始まりの本棚' })
   }
 }
 

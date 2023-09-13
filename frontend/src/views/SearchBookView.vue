@@ -19,6 +19,7 @@ import { Timestamp } from "firebase/firestore"
 import Pagination from '@/components/SearchBook/Pagination.vue'
 import SearchButton from '@/components/SearchButton.vue'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
+import { setBookshelvesData, getBookshelvesData} from "@/function"
 
 const onNavigate = (name: string): void => {
   router.push({ name: name })
@@ -214,7 +215,6 @@ const registerBook = async (book: BookItem) => {
 
 const buttons = ref<BookShelf[]>([])
 
-let localCache = localStorage.getItem("bookshelfData")
 let isInitialLoad = true;
 
 let unsubscribe: Unsubscribe
@@ -223,9 +223,10 @@ onAuthStateChanged(firebaseAuth, (user) => {
   if (user) {
     unsubscribe = onSnapshot(
       collection(firestore, 'users', user.uid, 'bookshelves'),
-      (snapshot) => {
+      async (snapshot) => {
         if(isInitialLoad) {
           isInitialLoad = false;
+          const localCache = await getBookshelvesData(user.uid);
           if(!localCache) {
             //ローカルキャッシュがない場合、Firestoreからデータを取得
             buttons.value = snapshot.docs.map(doc => {
@@ -237,21 +238,19 @@ onAuthStateChanged(firebaseAuth, (user) => {
               return undefined;
             }).filter((item): item is BookShelf => item !== undefined);
 
-            // 取得したデータをローカルストレージに保存
-            localStorage.setItem('bookshelfData', JSON.stringify(buttons.value));
+            await setBookshelvesData(user.uid, buttons.value);
           }else { //ある場合
             //ローカルキャッシュからデータを取得
-            const localCacheData: BookShelf[] = JSON.parse(localCache);
-            buttons.value = localCacheData;
+            buttons.value = localCache;
           }
         }else {
-          snapshot.docChanges().forEach((change) => {
+          snapshot.docChanges().forEach(async (change) => {
             const data = change.doc.data()
             if (implementBookShelf(data)) {
               if (change.type === 'added') {
                 const bookShelfData: BookShelf = { doc_id: change.doc.id, ...data } // doc_idを設定し直します
                 buttons.value.push(bookShelfData)
-                localStorage.setItem("bookshelfData", JSON.stringify(buttons.value));
+                await setBookshelvesData(user.uid, buttons.value);
               }
 
             }

@@ -1,6 +1,7 @@
 import { FirebaseError } from 'firebase/app'
 import { DocumentReference, getDoc, increment, updateDoc } from 'firebase/firestore'
-import type { BookItem } from './interface'
+import type { BookItem, BookShelf } from './interface'
+import { openDB } from 'idb';
 
 const firebaseErrorMessage = (e: FirebaseError): string => {
   switch (e.code) {
@@ -67,5 +68,22 @@ const sort = (books: BookItem[], order: string): BookItem[] => {
   }
 }
 
+const dbPromise = openDB('my-database', 1, {
+  upgrade(db) {
+    db.createObjectStore('bookshelves');
+  },
+});
 
-export { firebaseErrorMessage, incrementCounter, decrementCounter, sort }
+const setBookshelvesData = async (uid: string, data: BookShelf[]) => {
+  const db = await dbPromise;
+  await db.put('bookshelves', JSON.stringify(data), uid);
+};
+
+const getBookshelvesData = async (uid: string) => {
+  const db = await dbPromise;
+  const data = await db.get('bookshelves', uid);
+  return data ? JSON.parse(data) : null;
+};
+
+
+export { firebaseErrorMessage, incrementCounter, decrementCounter, sort, setBookshelvesData, getBookshelvesData }

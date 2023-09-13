@@ -13,8 +13,6 @@ import { firebaseErrorMessage } from '@/function'
 import { firebaseAuth, getCurrentUser, firestore } from '@/config/firebase'
 import LoadingContainer from '@/containers/LoadingContainer.vue'
 import { collection, addDoc, getDocs } from 'firebase/firestore'
-import type { BookShelf } from '@/interface'
-import { ButtonInteraction } from 'discord.js'
 
 const onNavigate = (name: string): void => {
   router.push({ name: name })
@@ -60,13 +58,7 @@ const onInitBookshelf = async () => {
 
   // クエリが空の場合、ドキュメントを追加
   if (querySnapshot.empty) {
-    const booksheves: BookShelf[] = [];
-    const name = "始まりの本棚"
-    const bookshelfRef = await addDoc(bookShelfCollection, { shelf_name: name })
-    
-    const newBookShelf: BookShelf = { doc_id: bookshelfRef.id, shelf_name: name }
-    booksheves.push(newBookShelf);
-    localStorage.setItem("bookshelfData", JSON.stringify(booksheves));
+    await addDoc(bookShelfCollection, { shelf_name: '始まりの本棚' })
   }
 }
 onMounted(async () => {
