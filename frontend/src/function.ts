@@ -76,13 +76,26 @@ const dbPromise = openDB('my-database', 1, {
 
 const setBookshelvesData = async (uid: string, data: BookShelf[]) => {
   const db = await dbPromise;
-  await db.put('bookshelves', JSON.stringify(data), uid);
+  const timestamp = Date.now();
+  await db.put('bookshelves', JSON.stringify({ data, timestamp }), uid);
 };
 
 const getBookshelvesData = async (uid: string) => {
   const db = await dbPromise;
-  const data = await db.get('bookshelves', uid);
-  return data ? JSON.parse(data) : null;
+  const result = await db.get('bookshelves', uid);
+  if (result) {
+    const { data, timestamp } = JSON.parse(result);
+
+    // 有効期限を12時間と設定（43200000ミリ秒 = 12時間）
+    const expiryTime = 43200000;
+    if (Date.now() - timestamp < expiryTime) {
+      return data;
+    } else {
+      // 有効期限が切れている場合はnullを返す
+      return null;
+    }
+  }
+  return null;
 };
 
 
