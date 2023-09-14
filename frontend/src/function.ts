@@ -1,6 +1,6 @@
 import { FirebaseError } from 'firebase/app'
 import { DocumentReference, getDoc, increment, updateDoc } from 'firebase/firestore'
-import type { BookItem, BookShelf } from './interface'
+import { isSeries, type BookItem, type BookShelf, type Series } from './interface'
 import { openDB } from 'idb';
 
 const firebaseErrorMessage = (e: FirebaseError): string => {
@@ -71,6 +71,7 @@ const sort = (books: BookItem[], order: string): BookItem[] => {
 const dbPromise = openDB('my-database', 1, {
   upgrade(db) {
     db.createObjectStore('bookshelves');
+    db.createObjectStore('series');
   },
 });
 
@@ -98,5 +99,60 @@ const getBookshelvesData = async (uid: string) => {
   return null;
 };
 
+const setSeriesData = async (uid: string, doc_id: string, data: (Series | BookItem)[]) => {
+  const db = await dbPromise;
+  const timestamp = Date.now();
+  await db.put('series', JSON.stringify({ data, timestamp }), `${uid}-${doc_id}`);
+};
 
-export { firebaseErrorMessage, incrementCounter, decrementCounter, sort, setBookshelvesData, getBookshelvesData }
+const getSeriesData = async (uid: string, doc_id: string) => {
+  const db = await dbPromise;
+  const result = await db.get('series', `${uid}-${doc_id}`);
+  if (result) {
+    const { data, timestamp } = JSON.parse(result);
+
+    // 有効期限を12時間と設定（43200000ミリ秒 = 12時間）
+    const expiryTime = 43200000;
+    if (Date.now() - timestamp < expiryTime) {
+      return data;
+    } else {
+      // 有効期限が切れている場合はnullを返す
+      return null;
+    }
+  }
+  return null;
+};
+
+const addSeriesDataItem = async(uid: string, doc_id: string, newItem: Series | BookItem) => {
+  const db = await dbPromise;
+
+  // 既存のデータを取得する
+  const existingData = await getSeriesData(uid, doc_id);
+
+  let data;
+  if (existingData) {
+    // 既存のデータがある場合は、新しいアイテムを追加または上書きする
+    if (isSeries(newItem)) {
+      // 新しいアイテムが Series タイプの場合に限り、上書きを試行する
+      data = existingData.map((item: Series | BookItem) => 
+        'seriesId' in item && item.seriesId === newItem.seriesId ? newItem : item
+      );
+      if (!data.find((item: Series | BookItem) => 'seriesId' in item && item.seriesId === newItem.seriesId)) {
+        data.push(newItem);
+      }
+    } else {
+      // 新しいアイテムが BookItem タイプの場合、追加する
+      data = [...existingData, newItem];
+    }
+  } else {
+    // 既存のデータがない場合は、新しいデータ配列を作成する
+    data = [newItem];
+  }
+
+  // 更新されたデータをデータベースに保存する
+  const timestamp = Date.now();
+  await db.put('series', JSON.stringify({ data, timestamp }), `${uid}-${doc_id}`);
+}
+
+export { firebaseErrorMessage, incrementCounter, decrementCounter, sort, setBookshelvesData, getBookshelvesData,
+        getSeriesData, setSeriesData, addSeriesDataItem }

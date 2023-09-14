@@ -8,6 +8,7 @@ import { type Series, isSeries, isBookItem, Action } from '@/interface'
 import BookComp from '@/components/Bookshelf/BookComp.vue'
 import { onAuthStateChanged, type Unsubscribe } from 'firebase/auth'
 import { onUnmounted } from 'vue'
+import { getSeriesData, setSeriesData } from '@/function'
 
 interface Props {
   selectedBookshelf: BookShelf | undefined
@@ -89,38 +90,49 @@ const getSeries = async () => {
   // 本棚のシリーズコレクションへの参照を取得
   const doc_id = prop.selectedBookshelf?.doc_id
   if (doc_id) {
-    const seriesCollectionRef = collection(
-      firestore,
-      'users',
-      user.uid,
-      'bookshelves',
-      doc_id,
-      'series'
-    )
-    const noSeriesBookCollection = collection(
-      firestore,
-      'users',
-      user.uid,
-      'bookshelves',
-      doc_id,
-      'books'
-    )
-    await getDocs(seriesCollectionRef).then((snapshot) => {
-      snapshot.forEach((e) => {
-        items.value.push(e.data() as Series)
-      })
-    })
+    const localCache = await getSeriesData(user.uid, doc_id)
 
-    await getDocs(noSeriesBookCollection).then((snapshot) => {
-      snapshot.forEach((e) => {
-        const data = e.data() as BookItem; // ここでBookItemとしてデータを取得
-        // isbnをstringからnumberに変換します（isbnが存在する場合）
-        if (data.isbn) {
-          data.isbn = Number(data.isbn);
-        }
-        items.value.push(data); // 更新したデータを配列に追加
+    if(!localCache) { //キャッシュがないとき
+      const seriesCollectionRef = collection(
+        firestore,
+        'users',
+        user.uid,
+        'bookshelves',
+        doc_id,
+        'series'
+      )
+      const noSeriesBookCollection = collection(
+        firestore,
+        'users',
+        user.uid,
+        'bookshelves',
+        doc_id,
+        'books'
+      )
+      await getDocs(seriesCollectionRef).then((snapshot) => {
+        snapshot.forEach((e) => {
+          console.log("tt")
+          items.value.push(e.data() as Series)
+        })
       })
-    })
+  
+      await getDocs(noSeriesBookCollection).then((snapshot) => {
+        snapshot.forEach((e) => {
+          const data = e.data() as BookItem; // ここでBookItemとしてデータを取得
+          // isbnをstringからnumberに変換します（isbnが存在する場合）
+          if (data.isbn) {
+            data.isbn = Number(data.isbn);
+          }
+          items.value.push(data); // 更新したデータを配列に追加
+        })
+      })
+
+      await setSeriesData(user.uid, doc_id, items.value)
+    } else {
+      console.log(localCache)
+      items.value = localCache;
+    }
+
 
     emit("count", items.value.length);
     emit("update:propItems", items.value)

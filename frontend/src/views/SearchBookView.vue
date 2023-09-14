@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import GlobalHeader from '@/containers/GlobalHeader.vue'
 import Results from '@/components/SearchBook/Results.vue'
-import { type BookShelf, type BookItem } from '@/interface'
+import { type BookShelf, type BookItem, type Series } from '@/interface'
 import { ref, watch } from 'vue'
 import SearchBar from '@/basic/SearchBar.vue'
 import axios from 'axios'
@@ -14,7 +14,7 @@ import { onAuthStateChanged } from 'firebase/auth'
 import { implementBookShelf, type BookItemNoSeries } from '@/interface'
 import { onUnmounted, computed } from 'vue'
 import router from '@/router'
-import { incrementCounter, sort } from '@/function'
+import { incrementCounter, sort, addSeriesDataItem } from '@/function'
 import { Timestamp } from "firebase/firestore"
 import Pagination from '@/components/SearchBook/Pagination.vue'
 import SearchButton from '@/components/SearchButton.vue'
@@ -164,11 +164,15 @@ const registerBook = async (book: BookItem) => {
       )
       const noSeriesBook: BookItemNoSeries = convertToBookItemWithoutSeries(book)
       await addDoc(noSeriesBookCollection, noSeriesBook)
+      await addSeriesDataItem(user.uid, selectedBookshelfId, book)
     } else { //シリーズもの
       const seriesRef = doc(bookshelvesRef, selectedBookshelfId, 'series', seriesId)
       const seriesSnap = await getDoc(seriesRef)
+      let seriesTemp: Series | undefined;
+
       if (seriesSnap.exists()) {
         const seriesData = seriesSnap.data();
+
         const shouldUpdatePic = book && (
           (((book.orderNumber ?? 0)> (seriesData?.picOrder ?? 0)) && book.image_url !== "") ||
           (((book.orderNumber ?? 0)< (seriesData?.picOrder ?? 0)) && seriesData?.pic === "")
@@ -180,9 +184,25 @@ const registerBook = async (book: BookItem) => {
             picOrder: book?.orderNumber ?? 0
           });
         }
+
+        seriesTemp = {
+          seriesId: seriesData?.seriesId,
+          pic: seriesData?.pic,
+          counter: seriesData?.counter ?? 0, // シリーズのカウンタを設定
+          seriesTitle: seriesData?.seriesTitle,
+        }
+
+        console.log(seriesTemp)
       } else {
         // ドキュメントが存在しない場合、画像とカウンターを設定
         const seriesTitle = extractSeriesTitle(book.title);
+
+        seriesTemp = {
+          seriesId: seriesId,
+          pic: book?.image_url ?? "",
+          counter: 0,
+          seriesTitle: extractSeriesTitle(book.title),
+        };
 
         await setDoc(seriesRef, {
           seriesId: seriesId,
@@ -205,13 +225,18 @@ const registerBook = async (book: BookItem) => {
       )
       await addDoc(booksCollection, book)
       await incrementCounter(seriesRef)
-
-      
+      // 新しいシリーズアイテムをIndexedDBに追加
+      console.log(seriesTemp)
+      if(seriesTemp) {
+        seriesTemp.counter++;
+        await addSeriesDataItem(user.uid, selectedBookshelfId, seriesTemp);
+      }
     }
   } catch (error) {
     console.log(error)
   }
 }
+
 
 const buttons = ref<BookShelf[]>([])
 
