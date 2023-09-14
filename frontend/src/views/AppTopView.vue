@@ -8,6 +8,7 @@ import { ref } from 'vue'
 import { implementBookShelf, type BookShelf, type BookItem, type Series, Action } from '@/interface'
 import { firestore, getCurrentUser } from '@/config/firebase'
 import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore'
+import { deleteSeriesDataItem } from '@/function'
 
 const onNavigate = (name: string): void => {
   router.push({ name: name })
@@ -131,6 +132,8 @@ const deleteBook = async () => {
       if (!querySnapshot.empty) {
         const docFirst = querySnapshot.docs[0]
         await deleteDoc(docFirst.ref)
+
+        await deleteSeriesDataItem(uid, bookshelfId, item)
       }
     }
 
@@ -168,6 +171,8 @@ const deleteBook = async () => {
         if (!querySnapshot.empty) {
           const docFirst = querySnapshot.docs[0]
           await deleteDoc(docFirst.ref)
+          // Firestoreから削除した後にキャッシュを更新
+          await deleteSeriesDataItem(uid, bookshelfId, series);
         }
 
         await deleteDoc(docSnapshot.ref)

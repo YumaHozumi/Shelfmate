@@ -162,6 +162,32 @@ const addSeriesDataItem = async (uid: string, doc_id: string, newItem: Series | 
   await db.put('series', JSON.stringify({ data, timestamp }), `${uid}-${doc_id}`)
 }
 
+const deleteSeriesDataItem = async (uid: string, doc_id: string, itemToDelete: (Series | BookItem)) => {
+  const db = await dbPromise
+
+  // 既存のデータを取得する
+  const existingData = await getSeriesData(uid, doc_id)
+
+  let data;
+  if (existingData) {
+    if (isSeries(itemToDelete)) {
+      // アイテムが Series タイプの場合、seriesId が一致するアイテムを削除
+      data = existingData.filter((item: Series | BookItem) => 
+        !('seriesId' in item) || item.seriesId !== itemToDelete.seriesId
+      );
+    } else {
+      // アイテムが BookItem タイプの場合、bookId が一致するアイテムを削除
+      data = existingData.filter((item: Series | BookItem) => 
+        !('bookId' in item) || item.bookId !== itemToDelete.bookId
+      );
+    }
+
+    // 更新されたデータをデータベースに保存する
+    const timestamp = Date.now();
+    await db.put('series', JSON.stringify({ data, timestamp }), `${uid}-${doc_id}`);
+  }
+}
+
 export {
   firebaseErrorMessage,
   incrementCounter,
@@ -171,5 +197,6 @@ export {
   getBookshelvesData,
   getSeriesData,
   setSeriesData,
-  addSeriesDataItem
+  addSeriesDataItem,
+  deleteSeriesDataItem
 }

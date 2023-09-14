@@ -129,7 +129,6 @@ const getSeries = async () => {
 
       await setSeriesData(user.uid, doc_id, items.value)
     } else {
-      console.log(localCache)
       items.value = localCache
     }
 
