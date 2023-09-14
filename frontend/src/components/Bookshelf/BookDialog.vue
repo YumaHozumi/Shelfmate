@@ -13,7 +13,7 @@ const props = defineProps<Props>()
 const dialog = ref(false)
 
 const click = () => {
-  if(!props.isEdit) dialog.value = true
+  if (!props.isEdit) dialog.value = true
 }
 </script>
 

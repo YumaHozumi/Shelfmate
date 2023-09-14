@@ -39,8 +39,8 @@ defineProps<Props>()
     color: white;
     text-align: center;
     padding: 5px;
-    white-space: nowrap;  // 改行を防ぐ
-    overflow: hidden;     // オーバーフローしたテキストを隠す
+    white-space: nowrap; // 改行を防ぐ
+    overflow: hidden; // オーバーフローしたテキストを隠す
     text-overflow: ellipsis; // オーバーフローしたテキストを「...」で表示
   }
 

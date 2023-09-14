@@ -19,10 +19,10 @@ const clickLocalHeaderBtn = (bookshelf: BookShelf): void => {
   selectedBookshelf.value = bookshelf
 }
 
-const num = ref(0);
+const num = ref(0)
 
 const getCount = (count: number): void => {
-  num.value = count;
+  num.value = count
 }
 
 const selectedBookshelf = ref<BookShelf | undefined>()
@@ -46,125 +46,164 @@ const initializeSelectedBookshelf = async () => {
 }
 
 initializeSelectedBookshelf() // 関数を呼び出し、selectedBookshelfを初期化
-const isEdit = ref(false);
+const isEdit = ref(false)
 
 const clickBtn = (editMode: boolean) => {
-  isEdit.value = editMode;
+  isEdit.value = editMode
 }
 
 const listBookItem = ref<BookItem[]>([])
-const listSeries = ref<Series[]>([]);
+const listSeries = ref<Series[]>([])
 
 const clearList = () => {
-  listBookItem.value.length = 0;
-  listSeries.value.length = 0;
+  listBookItem.value.length = 0
+  listSeries.value.length = 0
 }
 
 const clickBookItem = (item: BookItem, action: Action) => {
   if (action === Action.UPDATE) {
     // アイテムがまだリストに存在しない場合にのみ、アイテムをリストに追加します
-    if (!listBookItem.value.some(existingItem => existingItem.bookId === item.bookId)) {
-      listBookItem.value.push(item);
+    if (!listBookItem.value.some((existingItem) => existingItem.bookId === item.bookId)) {
+      listBookItem.value.push(item)
     }
   } else if (action === Action.DELETE) {
     // 指定した bookId を持つアイテムをリストから削除します
-    listBookItem.value = listBookItem.value.filter(existingItem => existingItem.bookId !== item.bookId);
+    listBookItem.value = listBookItem.value.filter(
+      (existingItem) => existingItem.bookId !== item.bookId
+    )
   }
 }
 
 const clickSeries = (item: Series, action: Action) => {
   if (action === Action.UPDATE) {
     // アイテムがまだリストに存在しない場合にのみ、アイテムをリストに追加します
-    if (!listSeries.value.some(existingItem => existingItem.seriesId === item.seriesId)) {
-      listSeries.value.push(item);
+    if (!listSeries.value.some((existingItem) => existingItem.seriesId === item.seriesId)) {
+      listSeries.value.push(item)
     }
   } else if (action === Action.DELETE) {
     // 指定した seriesId を持つアイテムをリストから削除します
-    listSeries.value = listSeries.value.filter(existingItem => existingItem.seriesId !== item.seriesId);
+    listSeries.value = listSeries.value.filter(
+      (existingItem) => existingItem.seriesId !== item.seriesId
+    )
   }
 }
 
-
 const deleteBook = async () => {
   try {
-    const user = await getCurrentUser();
-    
+    const user = await getCurrentUser()
+
     if (!user) {
-      throw new Error('User not found');
+      throw new Error('User not found')
     }
 
-    const uid = user.uid;
+    const uid = user.uid
     const bookshelfId = selectedBookshelf.value?.doc_id || ''
-    
+
     // listBookItemの各アイテムを削除
     for (const item of listBookItem.value) {
-      const bookCollection = collection(firestore, "users", uid, "bookshelves", bookshelfId, "books");
-      const qBook = query(bookCollection, where('bookId', '==', item.bookId));
-      const querySnapshotBook = await getDocs(qBook);
+      const bookCollection = collection(
+        firestore,
+        'users',
+        uid,
+        'bookshelves',
+        bookshelfId,
+        'books'
+      )
+      const qBook = query(bookCollection, where('bookId', '==', item.bookId))
+      const querySnapshotBook = await getDocs(qBook)
 
-      if(!querySnapshotBook.empty) {
-        const docFirst = querySnapshotBook.docs[0];
-        await deleteDoc(docFirst.ref);
+      if (!querySnapshotBook.empty) {
+        const docFirst = querySnapshotBook.docs[0]
+        await deleteDoc(docFirst.ref)
       }
 
-      const allBooksCollection = collection(firestore, 'users', uid, 'bookshelves', bookshelfId, 'allBooks');
-      const q = query(allBooksCollection, where('bookId', '==', item.bookId));
-      const querySnapshot = await getDocs(q);
+      const allBooksCollection = collection(
+        firestore,
+        'users',
+        uid,
+        'bookshelves',
+        bookshelfId,
+        'allBooks'
+      )
+      const q = query(allBooksCollection, where('bookId', '==', item.bookId))
+      const querySnapshot = await getDocs(q)
 
-      if(!querySnapshot.empty) {
-        const docFirst = querySnapshot.docs[0];
-        await deleteDoc(docFirst.ref);
+      if (!querySnapshot.empty) {
+        const docFirst = querySnapshot.docs[0]
+        await deleteDoc(docFirst.ref)
       }
     }
-    
+
     // listSeriesの各シリーズ下の全てのbooksを削除
     for (const series of listSeries.value) {
-      if (!series.seriesId) continue;
+      if (!series.seriesId) continue
       const seriesBooksQuery = query(
-        collection(firestore, 'users', uid, 'bookshelves', bookshelfId, 'series', series.seriesId, 'books')
-      );
+        collection(
+          firestore,
+          'users',
+          uid,
+          'bookshelves',
+          bookshelfId,
+          'series',
+          series.seriesId,
+          'books'
+        )
+      )
 
-      const seriesBooksSnapshot = await getDocs(seriesBooksQuery);
+      const seriesBooksSnapshot = await getDocs(seriesBooksQuery)
       for (const docSnapshot of seriesBooksSnapshot.docs) {
-        const bookData = docSnapshot.data() as BookItem;
+        const bookData = docSnapshot.data() as BookItem
 
-        const allBooksCollection = collection(firestore, 'users', uid, 'bookshelves', bookshelfId, 'allBooks');
-        const q = query(allBooksCollection, where('bookId', '==', bookData.bookId));
-        const querySnapshot = await getDocs(q);
+        const allBooksCollection = collection(
+          firestore,
+          'users',
+          uid,
+          'bookshelves',
+          bookshelfId,
+          'allBooks'
+        )
+        const q = query(allBooksCollection, where('bookId', '==', bookData.bookId))
+        const querySnapshot = await getDocs(q)
 
-        if(!querySnapshot.empty) {
-          const docFirst = querySnapshot.docs[0];
-          await deleteDoc(docFirst.ref);
+        if (!querySnapshot.empty) {
+          const docFirst = querySnapshot.docs[0]
+          await deleteDoc(docFirst.ref)
         }
 
-        await deleteDoc(docSnapshot.ref);
+        await deleteDoc(docSnapshot.ref)
       }
 
       // After deleting all books in the series, delete the series itself
-      const seriesDocRef = doc(firestore, "users", uid, "bookshelves", bookshelfId, "series", series.seriesId);
-      await deleteDoc(seriesDocRef);
-
+      const seriesDocRef = doc(
+        firestore,
+        'users',
+        uid,
+        'bookshelves',
+        bookshelfId,
+        'series',
+        series.seriesId
+      )
+      await deleteDoc(seriesDocRef)
     }
-    listBookItem.value.length = 0;
-    listSeries.value.length = 0;
-
+    listBookItem.value.length = 0
+    listSeries.value.length = 0
   } catch (e) {
-    console.error('Error deleting books:', e);
+    console.error('Error deleting books:', e)
   }
 }
 
 const selectMenu = (selectedMenu: string): void => {
-  if(selectedMenu === "作品名順") {
+  if (selectedMenu === '作品名順') {
     items.value.sort((a, b) => {
-      const titleA = "title" in a ? a.title : a.seriesTitle;
-      const titleB = "title" in b ? b.title : b.seriesTitle;
-      return titleA.localeCompare(titleB);
+      const titleA = 'title' in a ? a.title : a.seriesTitle
+      const titleB = 'title' in b ? b.title : b.seriesTitle
+      return titleA.localeCompare(titleB)
     })
   }
 }
 
 const initComp = (): void => {
-  selectMenu("作品名順")
+  selectMenu('作品名順')
 }
 </script>
 
@@ -190,8 +229,8 @@ const initComp = (): void => {
   </v-footer>
 </template>
 
-
-<style scoped lang="scss">.footer {
+<style scoped lang="scss">
+.footer {
   position: fixed;
   bottom: 0;
   width: 100%;
@@ -202,5 +241,4 @@ const initComp = (): void => {
     font-weight: bolder;
   }
 }
-
 </style>

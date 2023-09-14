@@ -8,18 +8,30 @@ import axios from 'axios'
 import LoadingContainer from '@/containers/LoadingContainer.vue'
 import Menu from '@/components/Menu.vue'
 import { firebaseAuth, firestore, getCurrentUser } from '@/config/firebase'
-import { addDoc, collection, doc, getDoc, getDocs, onSnapshot, query, setDoc, updateDoc, where, type Unsubscribe } from 'firebase/firestore'
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  query,
+  setDoc,
+  updateDoc,
+  where,
+  type Unsubscribe
+} from 'firebase/firestore'
 import imageURL from '@/assets/no-image.png'
 import { onAuthStateChanged } from 'firebase/auth'
 import { implementBookShelf, type BookItemNoSeries } from '@/interface'
 import { onUnmounted, computed } from 'vue'
 import router from '@/router'
 import { incrementCounter, sort, addSeriesDataItem } from '@/function'
-import { Timestamp } from "firebase/firestore"
+import { Timestamp } from 'firebase/firestore'
 import Pagination from '@/components/SearchBook/Pagination.vue'
 import SearchButton from '@/components/SearchButton.vue'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
-import { setBookshelvesData, getBookshelvesData} from "@/function"
+import { setBookshelvesData, getBookshelvesData } from '@/function'
 
 const onNavigate = (name: string): void => {
   router.push({ name: name })
@@ -28,12 +40,12 @@ const onNavigate = (name: string): void => {
 const itemsInit: BookItem[] = []
 const items = ref(itemsInit)
 const isLoading = ref(false)
-const errorMsg = ref("")
+const errorMsg = ref('')
 
 //Google Books APIに検索クエリ投げる
 const search = async (searchText: string): Promise<BookItem[]> => {
-  const baseURL = 'https://www.googleapis.com/books/v1/volumes';
-  const replaceText = searchText.replace(/[\s\u3000]/g, '+');
+  const baseURL = 'https://www.googleapis.com/books/v1/volumes'
+  const replaceText = searchText.replace(/[\s\u3000]/g, '+')
 
   const params: Record<string, string> = {
     q: replaceText,
@@ -41,24 +53,27 @@ const search = async (searchText: string): Promise<BookItem[]> => {
     filter: 'ebooks',
     maxResults: '5',
     startIndex: page.value.toString()
-  };
+  }
 
   const queryString = Object.keys(params)
-  .map(key => `${encodeURIComponent(key)}=${key === 'q' ? params[key] : encodeURIComponent(params[key])}`)
-  .join('&');
+    .map(
+      (key) =>
+        `${encodeURIComponent(key)}=${key === 'q' ? params[key] : encodeURIComponent(params[key])}`
+    )
+    .join('&')
 
-  const completedURL = `${baseURL}?${queryString}`;
+  const completedURL = `${baseURL}?${queryString}`
 
-  let books: BookItem[] = [];
+  let books: BookItem[] = []
 
   try {
-    errorMsg.value = ""
-    const res = await axios.get(completedURL);
-    const apiItems = res.data.items;
+    errorMsg.value = ''
+    const res = await axios.get(completedURL)
+    const apiItems = res.data.items
 
     if (!apiItems || apiItems.length === 0) {
-      errorMsg.value = "本が見つかりませんでした"; // 404エラーメッセージを設定
-      return books; // 空の本の配列を返す
+      errorMsg.value = '本が見つかりませんでした' // 404エラーメッセージを設定
+      return books // 空の本の配列を返す
     }
 
     books = apiItems.map((item: any) => ({
@@ -71,75 +86,87 @@ const search = async (searchText: string): Promise<BookItem[]> => {
       public_date: Timestamp.fromDate(new Date(item.volumeInfo?.publishedDate || 0)),
       seriesId: item.volumeInfo?.seriesInfo?.volumeSeries?.[0]?.seriesId ?? '',
       orderNumber: item.volumeInfo?.seriesInfo?.volumeSeries?.[0]?.orderNumber ?? 0
-    }));
+    }))
 
     books.forEach((book) => {
       if (book.isbn !== undefined && book.image_url === undefined) {
-        book.image_url = 'https://iss.ndl.go.jp/thumbnail/' + book.isbn;
+        book.image_url = 'https://iss.ndl.go.jp/thumbnail/' + book.isbn
       }
-    });
+    })
   } catch (error) {
-    console.log(error);
-    errorMsg.value = "サーバーとの通信でエラーが発生しました。時間おいてお試しください。"; // その他のエラーメッセージを設定
+    console.log(error)
+    errorMsg.value = 'サーバーとの通信でエラーが発生しました。時間おいてお試しください。' // その他のエラーメッセージを設定
   }
 
-  return books;
+  return books
 }
 
-
-let tempSearchText = "";
+let tempSearchText = ''
 
 const searchClick = async (searchText: string) => {
   isLoading.value = true
-  resetPage();
-  tempSearchText = searchText;
+  resetPage()
+  tempSearchText = searchText
 
   const books = await search(searchText)
-  items.value = books;
-  
-  await setRegisteredBooks();
-  isLoading.value = false;
+  items.value = books
+
+  await setRegisteredBooks()
+  isLoading.value = false
 }
 
 const menu = ['発売日が新しい順', '発売日が古い順', '作品名順', '作者名順']
 
 const registerBookId = async (bookShelfId: string, book: BookItem): Promise<boolean> => {
   try {
-    const user = await getCurrentUser();
-    const bookshelvesRef = collection(firestore, "users", user.uid, "bookshelves", bookShelfId, "allBooks")
-    const q = query(bookshelvesRef, where("bookId", "==", book.bookId))
-    const querySnapshot = await getDocs(q);
-    
-    if(querySnapshot.docs.length > 0) {
-      return false;
+    const user = await getCurrentUser()
+    const bookshelvesRef = collection(
+      firestore,
+      'users',
+      user.uid,
+      'bookshelves',
+      bookShelfId,
+      'allBooks'
+    )
+    const q = query(bookshelvesRef, where('bookId', '==', book.bookId))
+    const querySnapshot = await getDocs(q)
+
+    if (querySnapshot.docs.length > 0) {
+      return false
     } else {
-      await addDoc(bookshelvesRef, book);
-      return true;
+      await addDoc(bookshelvesRef, book)
+      return true
     }
-    
-  }catch (error) {
-    console.log(error);
-    return false;
+  } catch (error) {
+    console.log(error)
+    return false
   }
 }
 
 const registeredBooks = ref<BookItem[]>([])
 
-const setRegisteredBooks = async() => {
-  const user = await getCurrentUser();
+const setRegisteredBooks = async () => {
+  const user = await getCurrentUser()
   const selectedBookshelfId = selectedBookshelf.value?.doc_id || ''
-  const bookshelvesRef = collection(firestore, "users", user.uid, "bookshelves", selectedBookshelfId, "allBooks")
-  const booksSnapshot = await getDocs(bookshelvesRef);
+  const bookshelvesRef = collection(
+    firestore,
+    'users',
+    user.uid,
+    'bookshelves',
+    selectedBookshelfId,
+    'allBooks'
+  )
+  const booksSnapshot = await getDocs(bookshelvesRef)
 
-  registeredBooks.value = booksSnapshot.docs.map(doc => doc.data() as BookItem)
+  registeredBooks.value = booksSnapshot.docs.map((doc) => doc.data() as BookItem)
 }
 
 //シリーズの部分のテキストだけを抽出する正規表現
 const extractSeriesTitle = (str: string): string => {
-  const regex = /^(.*?)(?:\s*\d+)?(?:\s*（[^）]+）)?(?:\s*【[^】]+】)?\s*$/;
-  const match = str.match(regex);
-  return match ? match[1].trim() : '';
-};
+  const regex = /^(.*?)(?:\s*\d+)?(?:\s*（[^）]+）)?(?:\s*【[^】]+】)?\s*$/
+  const match = str.match(regex)
+  return match ? match[1].trim() : ''
+}
 
 const registerBook = async (book: BookItem) => {
   try {
@@ -149,8 +176,8 @@ const registerBook = async (book: BookItem) => {
     const seriesId = book?.seriesId ?? ''
     const isAddBook = await registerBookId(selectedBookshelfId, book)
 
-    if(!isAddBook) return;
-    await setRegisteredBooks();
+    if (!isAddBook) return
+    await setRegisteredBooks()
 
     //シリーズものじゃないとき
     if (seriesId === '') {
@@ -165,52 +192,51 @@ const registerBook = async (book: BookItem) => {
       const noSeriesBook: BookItemNoSeries = convertToBookItemWithoutSeries(book)
       await addDoc(noSeriesBookCollection, noSeriesBook)
       await addSeriesDataItem(user.uid, selectedBookshelfId, book)
-    } else { //シリーズもの
+    } else {
+      //シリーズもの
       const seriesRef = doc(bookshelvesRef, selectedBookshelfId, 'series', seriesId)
       const seriesSnap = await getDoc(seriesRef)
-      let seriesTemp: Series | undefined;
+      let seriesTemp: Series | undefined
 
       if (seriesSnap.exists()) {
-        const seriesData = seriesSnap.data();
+        const seriesData = seriesSnap.data()
 
-        const shouldUpdatePic = book && (
-          (((book.orderNumber ?? 0)> (seriesData?.picOrder ?? 0)) && book.image_url !== "") ||
-          (((book.orderNumber ?? 0)< (seriesData?.picOrder ?? 0)) && seriesData?.pic === "")
-        );
+        const shouldUpdatePic =
+          book &&
+          (((book.orderNumber ?? 0) > (seriesData?.picOrder ?? 0) && book.image_url !== '') ||
+            ((book.orderNumber ?? 0) < (seriesData?.picOrder ?? 0) && seriesData?.pic === ''))
 
         if (shouldUpdatePic) {
           await updateDoc(seriesRef, {
             pic: book?.image_url,
             picOrder: book?.orderNumber ?? 0
-          });
+          })
         }
 
         seriesTemp = {
           seriesId: seriesData?.seriesId,
           pic: seriesData?.pic,
           counter: seriesData?.counter ?? 0, // シリーズのカウンタを設定
-          seriesTitle: seriesData?.seriesTitle,
+          seriesTitle: seriesData?.seriesTitle
         }
-
-        console.log(seriesTemp)
       } else {
         // ドキュメントが存在しない場合、画像とカウンターを設定
-        const seriesTitle = extractSeriesTitle(book.title);
+        const seriesTitle = extractSeriesTitle(book.title)
 
         seriesTemp = {
           seriesId: seriesId,
-          pic: book?.image_url ?? "",
+          pic: book?.image_url ?? '',
           counter: 0,
-          seriesTitle: extractSeriesTitle(book.title),
-        };
+          seriesTitle: extractSeriesTitle(book.title)
+        }
 
         await setDoc(seriesRef, {
           seriesId: seriesId,
-          pic: book?.image_url ?? "",
+          pic: book?.image_url ?? '',
           counter: 0,
           picOrder: book?.orderNumber ?? 0,
-          seriesTitle: seriesTitle,
-        });
+          seriesTitle: seriesTitle
+        })
       }
 
       const booksCollection = collection(
@@ -226,10 +252,10 @@ const registerBook = async (book: BookItem) => {
       await addDoc(booksCollection, book)
       await incrementCounter(seriesRef)
       // 新しいシリーズアイテムをIndexedDBに追加
-      console.log(seriesTemp)
-      if(seriesTemp) {
-        seriesTemp.counter++;
-        await addSeriesDataItem(user.uid, selectedBookshelfId, seriesTemp);
+
+      if (seriesTemp) {
+        seriesTemp.counter++
+        await addSeriesDataItem(user.uid, selectedBookshelfId, seriesTemp)
       }
     }
   } catch (error) {
@@ -237,10 +263,9 @@ const registerBook = async (book: BookItem) => {
   }
 }
 
-
 const buttons = ref<BookShelf[]>([])
 
-let isInitialLoad = true;
+let isInitialLoad = true
 
 let unsubscribe: Unsubscribe
 
@@ -249,44 +274,44 @@ onAuthStateChanged(firebaseAuth, (user) => {
     unsubscribe = onSnapshot(
       collection(firestore, 'users', user.uid, 'bookshelves'),
       async (snapshot) => {
-        if(isInitialLoad) {
-          isInitialLoad = false;
-          const localCache = await getBookshelvesData(user.uid);
-          if(!localCache) {
+        if (isInitialLoad) {
+          isInitialLoad = false
+          const localCache = await getBookshelvesData(user.uid)
+          if (!localCache) {
             //ローカルキャッシュがない場合、Firestoreからデータを取得
-            buttons.value = snapshot.docs.map(doc => {
-              const data = doc.data();
-              if(implementBookShelf(data)) {
-                const bookShelfData: BookShelf = { doc_id: doc.id, ...data }
-                return bookShelfData
-              }
-              return undefined;
-            }).filter((item): item is BookShelf => item !== undefined);
+            buttons.value = snapshot.docs
+              .map((doc) => {
+                const data = doc.data()
+                if (implementBookShelf(data)) {
+                  const bookShelfData: BookShelf = { doc_id: doc.id, ...data }
+                  return bookShelfData
+                }
+                return undefined
+              })
+              .filter((item): item is BookShelf => item !== undefined)
 
-            await setBookshelvesData(user.uid, buttons.value);
-          }else { //ある場合
+            await setBookshelvesData(user.uid, buttons.value)
+          } else {
+            //ある場合
             //ローカルキャッシュからデータを取得
-            buttons.value = localCache;
+            buttons.value = localCache
           }
-        }else {
+        } else {
           snapshot.docChanges().forEach(async (change) => {
             const data = change.doc.data()
             if (implementBookShelf(data)) {
               if (change.type === 'added') {
                 const bookShelfData: BookShelf = { doc_id: change.doc.id, ...data } // doc_idを設定し直します
                 buttons.value.push(bookShelfData)
-                await setBookshelvesData(user.uid, buttons.value);
+                await setBookshelvesData(user.uid, buttons.value)
               }
-
             }
           })
-          
         }
-        
+
         if (selectedBookshelf.value === undefined) {
           selectedBookshelf.value = buttons.value?.[0]
         }
-
       }
     )
   }
@@ -317,22 +342,22 @@ const convertToBookItemWithoutSeries = (bookItem: BookItem): BookItemNoSeries =>
 }
 
 //Paginationの処理
-const page = ref(0);
+const page = ref(0)
 
 const resetPage = () => {
-  page.value = 0;
+  page.value = 0
 }
 
 const moreBtnClick = async () => {
   if (page.value < 4) {
-    page.value++;
+    page.value++
     await searchMore()
   }
 }
 
 const searchMore = async () => {
   const books = await search(tempSearchText)
-  items.value.push(...books);
+  items.value.push(...books)
 }
 
 watch(selectedBookshelf, async () => {
@@ -358,8 +383,18 @@ watch(selectedBookshelf, async () => {
     <SearchButton></SearchButton>
     <Menu :items="menu" icon="mdi-sort" class="menu" @selectItem="selectMenu"></Menu>
   </div>
-  <Results :items="items" v-if="!isLoading" @registerBook="registerBook" :registeredBooks="registeredBooks"></Results>
-  <Pagination :page="page" @moreBtnClick="moreBtnClick" v-if="items.length > 0 && !isLoading" class="my-8"></Pagination>
+  <Results
+    :items="items"
+    v-if="!isLoading"
+    @registerBook="registerBook"
+    :registeredBooks="registeredBooks"
+  ></Results>
+  <Pagination
+    :page="page"
+    @moreBtnClick="moreBtnClick"
+    v-if="items.length > 0 && !isLoading"
+    class="my-8"
+  ></Pagination>
   <LoadingContainer :isLoading="isLoading"></LoadingContainer>
 </template>
 

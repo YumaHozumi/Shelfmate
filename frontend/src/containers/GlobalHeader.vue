@@ -28,7 +28,7 @@ const onClickRegisterButton = (): void => {
   emit('navigate', 'Register')
 }
 
-const isShow = ref(true);
+const isShow = ref(true)
 
 let unsubscribe: Unsubscribe
 
@@ -36,17 +36,17 @@ watchEffect(() => {
   // watchEffect内で非同期処理を監視
   unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
     if (user && user?.emailVerified) {
-      console.log('ログイン済み');
-      isShow.value = false;
+      console.log('ログイン済み')
+      isShow.value = false
     } else {
-      console.log('ログインしてない');
-      isShow.value = true;
+      console.log('ログインしてない')
+      isShow.value = true
     }
-  });
-});
+  })
+})
 
 onUnmounted(() => {
-  unsubscribe();
+  unsubscribe()
 })
 
 const onClickAddButton = (): void => {

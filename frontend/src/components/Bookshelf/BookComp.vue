@@ -15,42 +15,49 @@ interface Props {
 const props = defineProps<Props>()
 
 interface Emits {
-  (event: "clickBook", item: Series | BookItem, isSelected: boolean): void
+  (event: 'clickBook', item: Series | BookItem, isSelected: boolean): void
 }
 
-const emit = defineEmits<Emits>();
+const emit = defineEmits<Emits>()
 
 const clickBook = (): void => {
-  emit("clickBook", props.item, isSelected.value);
+  emit('clickBook', props.item, isSelected.value)
 }
 
 const isSeries = (input: Series | BookItem): input is Series => {
   return (input as Series).counter !== undefined
 }
 
-const isSelected = ref(false);
+const isSelected = ref(false)
 
 const handleClick = () => {
-  if(props.isEdit) {
-    isSelected.value = !isSelected.value;
-    clickBook();
+  if (props.isEdit) {
+    isSelected.value = !isSelected.value
+    clickBook()
   }
-};
+}
 
 //editモードがfalseになったらselectは外す
-watch(() => props.isEdit, (newVal) => {
-  if (!newVal) {
-    isSelected.value = false;
+watch(
+  () => props.isEdit,
+  (newVal) => {
+    if (!newVal) {
+      isSelected.value = false
+    }
   }
-});
-
+)
 </script>
 
 <template>
-  <FullDialog v-if="isSeries(item)" :series="item" :selectBookshelfId="selectBookshelfId" :isEdit="isEdit">
+  <FullDialog
+    v-if="isSeries(item)"
+    :series="item"
+    :selectBookshelfId="selectBookshelfId"
+    :isEdit="isEdit"
+  >
     <span class="books" :class="{ selected: isSelected }" @click="handleClick">
-      <Books :series="item" :class="{dark: isEdit}"></Books>
-      <v-badge color="blue" overlap class="book-badge" :class="{dark: isEdit}">
+      <Books :series="item" :class="{ dark: isEdit }"></Books>
+      <v-badge color="blue" overlap class="book-badge" :class="{ dark: isEdit }">
         <template v-slot:badge>
           <span class="count">{{ item.counter }}冊</span>
         </template>
@@ -61,7 +68,7 @@ watch(() => props.isEdit, (newVal) => {
 
   <BookDialog v-else :book="item" :isEdit="isEdit">
     <span :class="{ editable: isEdit, selected: isSelected }" @click="handleClick">
-      <Book :book="item" :class="{dark: isEdit}"></Book>
+      <Book :book="item" :class="{ dark: isEdit }"></Book>
       <v-icon class="check" v-show="isSelected">mdi-check</v-icon>
     </span>
   </BookDialog>
@@ -89,17 +96,16 @@ watch(() => props.isEdit, (newVal) => {
   border-radius: 50%;
   padding: 15px;
   border: 3px solid white;
-  
 }
 
 .book-badge {
-    position: absolute;
-    right: 25%;
-    top: -5%;
-  
-    .count {
-      font-size: larger;
-    }
+  position: absolute;
+  right: 25%;
+  top: -5%;
+
+  .count {
+    font-size: larger;
+  }
 }
 
 .book-container {
@@ -129,6 +135,5 @@ watch(() => props.isEdit, (newVal) => {
       transform: scale(1.05); //1.05倍に拡大
     }
   }
-
 }
 </style>

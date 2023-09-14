@@ -22,7 +22,7 @@ interface Emits {
 const emit = defineEmits<Emits>()
 
 const email = ref('')
-const emailError = ref('');
+const emailError = ref('')
 const password = ref('')
 const passwordError = ref('')
 const errorMessage = ref('')
@@ -50,22 +50,22 @@ const submitButton = async () => {
 }
 
 watch(email, (newVal) => {
-  const validationResult = rules.email(newVal);
+  const validationResult = rules.email(newVal)
   if (typeof validationResult === 'string') {
-    emailError.value = validationResult;
+    emailError.value = validationResult
   } else {
-    emailError.value = '';
+    emailError.value = ''
   }
-});
+})
 
 watch(password, (newVal) => {
-  const validationResult = rules.password(newVal);
+  const validationResult = rules.password(newVal)
   if (typeof validationResult === 'string') {
-    passwordError.value = validationResult;
+    passwordError.value = validationResult
   } else {
-    passwordError.value = '';
+    passwordError.value = ''
   }
-});
+})
 </script>
 
 <template>
@@ -111,9 +111,8 @@ watch(password, (newVal) => {
 }
 
 .error-message {
-    color: red;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-  }
-
+  color: red;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
 </style>

@@ -20,7 +20,7 @@ const bookList = ref<BookItem[]>([])
 
 const onClickBook = async () => {
   const user = await getCurrentUser()
-  if(prop.isEdit) return;
+  if (prop.isEdit) return
 
   if (prop.series.seriesId) {
     const booksCollection = collection(
@@ -34,25 +34,30 @@ const onClickBook = async () => {
       'books'
     )
     await getDocs(booksCollection).then((snapshot) => {
-      bookList.value.length = 0;
+      bookList.value.length = 0
       snapshot.forEach((book) => {
         bookList.value.push(book.data() as BookItem)
       })
-      bookList.value = sort(bookList.value, menu[0]);
+      bookList.value = sort(bookList.value, menu[0])
     })
   }
 }
 
-const menu = ['発売日が新しい順', '発売日が古い順', "巻数順(降順)", "巻数順(昇順)"]
+const menu = ['発売日が新しい順', '発売日が古い順', '巻数順(降順)', '巻数順(昇順)']
 
 const selectMenu = (index: number): void => {
   bookList.value = sort(bookList.value, menu[index])
 }
-
 </script>
 
 <template>
-  <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition" :disabled="isEdit">
+  <v-dialog
+    v-model="dialog"
+    fullscreen
+    hide-overlay
+    transition="dialog-bottom-transition"
+    :disabled="isEdit"
+  >
     <template v-slot:activator="{ props }">
       <div v-bind="props" @click="onClickBook">
         <slot></slot>

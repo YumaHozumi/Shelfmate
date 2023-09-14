@@ -1,4 +1,4 @@
-import type { Timestamp } from "firebase/firestore"
+import type { Timestamp } from 'firebase/firestore'
 
 interface BookItem {
   bookId: string
@@ -31,8 +31,8 @@ interface SelectSeriesItem {
 }
 
 enum Action {
-  DELETE = "DELETE",
-  UPDATE = "UPDATE"
+  DELETE = 'DELETE',
+  UPDATE = 'UPDATE'
 }
 
 type BookItemNoSeries = Omit<BookItem, 'seriesId' | 'orderNumber'>
@@ -42,7 +42,7 @@ const implementBookShelf = (arg: any): arg is BookShelf => {
   return arg !== null && typeof arg === 'object' && typeof arg.shelf_name === 'string'
 }
 
-const isBookItem = (obj: any): obj is BookItem =>  {
+const isBookItem = (obj: any): obj is BookItem => {
   return (
     typeof obj.bookId === 'string' &&
     (typeof obj.isbn === 'number' || obj.isbn === undefined) &&
@@ -52,7 +52,7 @@ const isBookItem = (obj: any): obj is BookItem =>  {
     typeof obj.detail === 'string' &&
     (typeof obj.seriesId === 'string' || obj.seriesId === undefined) &&
     (typeof obj.orderNumber === 'number' || obj.orderNumber === undefined)
-  );
+  )
 }
 
 // 新たな型ガードを定義
@@ -62,8 +62,8 @@ const isSeries = (obj: any): obj is Series => {
     typeof obj.pic === 'string' &&
     typeof obj.counter === 'number' &&
     typeof obj.seriesTitle === 'string'
-  );
-};
+  )
+}
 
-export type { BookItem, BookShelf, Series, BookItemNoSeries, SelectSeriesItem, }
+export type { BookItem, BookShelf, Series, BookItemNoSeries, SelectSeriesItem }
 export { implementBookShelf, isBookItem, isSeries, Action }

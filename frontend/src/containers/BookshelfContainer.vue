@@ -19,55 +19,55 @@ interface Props {
 const prop = defineProps<Props>()
 
 interface Emits {
-  (event: "count", count: number): void
-  (event: "clickBookItem", item: BookItem, action: Action): void
-  (event: "clickSeries", series: Series, action: Action): void
-  (event: "clearList"): void
-  (event: "update:propItems", items: (Series | BookItem)[]): void
-  (event: "initComp"): void
+  (event: 'count', count: number): void
+  (event: 'clickBookItem', item: BookItem, action: Action): void
+  (event: 'clickSeries', series: Series, action: Action): void
+  (event: 'clearList'): void
+  (event: 'update:propItems', items: (Series | BookItem)[]): void
+  (event: 'initComp'): void
 }
 
-const emit = defineEmits<Emits>();
+const emit = defineEmits<Emits>()
 
 const items = ref<(Series | BookItem)[]>([])
 
-let unsubBook: Unsubscribe;
+let unsubBook: Unsubscribe
 let unsubSeries: Unsubscribe
 
 onAuthStateChanged(firebaseAuth, (user) => {
-  const doc_id = prop.selectedBookshelf?.doc_id;
-  if(user && doc_id) {
+  const doc_id = prop.selectedBookshelf?.doc_id
+  if (user && doc_id) {
     unsubBook = onSnapshot(
-      collection(firestore,'users',user.uid,'bookshelves',doc_id,'books'), 
+      collection(firestore, 'users', user.uid, 'bookshelves', doc_id, 'books'),
       (snapshot) => {
         snapshot.docChanges().forEach((change) => {
-          if(change.type === "removed"){
-            const data = change.doc.data() as BookItem;
-            
-            items.value = items.value.filter(item => {
-              if(isBookItem(item)) return item.bookId !== data.bookId;
-              return true; // この行を追加
-            });
-            emit("count", items.value.length);
-            emit("update:propItems", items.value)
+          if (change.type === 'removed') {
+            const data = change.doc.data() as BookItem
+
+            items.value = items.value.filter((item) => {
+              if (isBookItem(item)) return item.bookId !== data.bookId
+              return true // この行を追加
+            })
+            emit('count', items.value.length)
+            emit('update:propItems', items.value)
           }
-       })
+        })
       }
     )
 
     unsubSeries = onSnapshot(
-      collection(firestore, "users", user.uid, "bookshelves", doc_id, "series"),
+      collection(firestore, 'users', user.uid, 'bookshelves', doc_id, 'series'),
       (snapshot) => {
         snapshot.docChanges().forEach((change) => {
-          if(change.type === "removed") {
-            const data = change.doc.data() as Series;
+          if (change.type === 'removed') {
+            const data = change.doc.data() as Series
 
-            items.value = items.value.filter(item => {
-              if(isSeries(item))  return item.seriesId !== data.seriesId;
-              return true;
+            items.value = items.value.filter((item) => {
+              if (isSeries(item)) return item.seriesId !== data.seriesId
+              return true
             })
-            emit("count", items.value.length);
-            emit("update:propItems", items.value)
+            emit('count', items.value.length)
+            emit('update:propItems', items.value)
           }
         })
       }
@@ -84,7 +84,6 @@ onUnmounted(() => {
   unsubSeries()
 })
 
-
 const getSeries = async () => {
   const user = await getCurrentUser()
   // 本棚のシリーズコレクションへの参照を取得
@@ -92,7 +91,8 @@ const getSeries = async () => {
   if (doc_id) {
     const localCache = await getSeriesData(user.uid, doc_id)
 
-    if(!localCache) { //キャッシュがないとき
+    if (!localCache) {
+      //キャッシュがないとき
       const seriesCollectionRef = collection(
         firestore,
         'users',
@@ -111,58 +111,60 @@ const getSeries = async () => {
       )
       await getDocs(seriesCollectionRef).then((snapshot) => {
         snapshot.forEach((e) => {
-          console.log("tt")
+          console.log('tt')
           items.value.push(e.data() as Series)
         })
       })
-  
+
       await getDocs(noSeriesBookCollection).then((snapshot) => {
         snapshot.forEach((e) => {
-          const data = e.data() as BookItem; // ここでBookItemとしてデータを取得
+          const data = e.data() as BookItem // ここでBookItemとしてデータを取得
           // isbnをstringからnumberに変換します（isbnが存在する場合）
           if (data.isbn) {
-            data.isbn = Number(data.isbn);
+            data.isbn = Number(data.isbn)
           }
-          items.value.push(data); // 更新したデータを配列に追加
+          items.value.push(data) // 更新したデータを配列に追加
         })
       })
 
       await setSeriesData(user.uid, doc_id, items.value)
     } else {
       console.log(localCache)
-      items.value = localCache;
+      items.value = localCache
     }
 
-
-    emit("count", items.value.length);
-    emit("update:propItems", items.value)
-    emit("initComp")
+    emit('count', items.value.length)
+    emit('update:propItems', items.value)
+    emit('initComp')
   }
 }
 const selectedBookshelf = toRef(prop, 'selectedBookshelf')
 
 watch(selectedBookshelf, async () => {
   items.value.length = 0
-  emit("update:propItems", items.value)
+  emit('update:propItems', items.value)
   await getSeries()
 })
 
 const clickBook = (item: Series | BookItem, isSelected: boolean): void => {
-  if(isSelected) {
-    if (isSeries(item)) emit("clickSeries", item as Series, Action.UPDATE);
-    else if(isBookItem(item)) emit("clickBookItem", item as BookItem, Action.UPDATE);
-  }else{
-    if(isSeries(item)) emit("clickSeries", item as Series, Action.DELETE);
-    else if(isBookItem(item)) emit("clickBookItem", item as BookItem, Action.DELETE);
+  if (isSelected) {
+    if (isSeries(item)) emit('clickSeries', item as Series, Action.UPDATE)
+    else if (isBookItem(item)) emit('clickBookItem', item as BookItem, Action.UPDATE)
+  } else {
+    if (isSeries(item)) emit('clickSeries', item as Series, Action.DELETE)
+    else if (isBookItem(item)) emit('clickBookItem', item as BookItem, Action.DELETE)
   }
 }
 
-watch(() => prop.isEdit, (newVal) => {
-  if (!newVal) {
-    //editがfalseになったら初期化
-    emit("clearList");
+watch(
+  () => prop.isEdit,
+  (newVal) => {
+    if (!newVal) {
+      //editがfalseになったら初期化
+      emit('clearList')
+    }
   }
-});
+)
 </script>
 
 <template>

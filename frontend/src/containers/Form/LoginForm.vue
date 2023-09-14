@@ -2,17 +2,13 @@
 import SubmitButton from '@/basic//Login/SubmitButton.vue'
 import GoogleButton from '@/basic/Login/GoogleButton.vue'
 import Link from '@/basic/Login/Link.vue'
-import {
-  signInWithEmailAndPassword,
-  GoogleAuthProvider,
-  signInWithRedirect,
-} from 'firebase/auth'
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect } from 'firebase/auth'
 import { ref, watch } from 'vue'
 import { FirebaseError } from 'firebase/app'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
 import { firebaseErrorMessage } from '@/function'
 import { firebaseAuth } from '@/config/firebase'
-import { rules } from "@/validation"
+import { rules } from '@/validation'
 
 interface Emits {
   (event: 'navigate', name: string): void
@@ -21,7 +17,7 @@ interface Emits {
 const emit = defineEmits<Emits>()
 
 const email = ref('')
-const emailError = ref('');
+const emailError = ref('')
 const password = ref('')
 const passwordError = ref('')
 const errorMessage = ref('')
@@ -55,22 +51,22 @@ const clickGoogleButton = async () => {
 }
 
 watch(email, (newVal) => {
-  const validationResult = rules.email(newVal);
+  const validationResult = rules.email(newVal)
   if (typeof validationResult === 'string') {
-    emailError.value = validationResult;
+    emailError.value = validationResult
   } else {
-    emailError.value = '';
+    emailError.value = ''
   }
-});
+})
 
 watch(password, (newVal) => {
-  const validationResult = rules.required(newVal);
+  const validationResult = rules.required(newVal)
   if (typeof validationResult === 'string') {
-    passwordError.value = validationResult;
+    passwordError.value = validationResult
   } else {
-    passwordError.value = '';
+    passwordError.value = ''
   }
-});
+})
 </script>
 
 <template>
@@ -143,6 +139,5 @@ watch(password, (newVal) => {
     font-size: 0.875rem;
     margin-top: 0.25rem;
   }
-
 }
 </style>

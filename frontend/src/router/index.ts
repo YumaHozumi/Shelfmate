@@ -38,28 +38,27 @@ const routeSettings: RouteRecordRaw[] = [
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: routeSettings,
+  routes: routeSettings
 })
 
 router.beforeEach((to, from, next) => {
-  const requireAuth = to.matched.some((record) => record.meta.requireAuth);
+  const requireAuth = to.matched.some((record) => record.meta.requireAuth)
   if (requireAuth) {
     // Promiseを使って認証状態の確認を非同期に行う
     new Promise((resolve) => {
       onAuthStateChanged(firebaseAuth, (user) => {
-        resolve(user); // ユーザー情報またはnullを解決
-      });
+        resolve(user) // ユーザー情報またはnullを解決
+      })
     }).then((user) => {
       if (user) {
-        next(); // 認証済みの場合は次へ進む
+        next() // 認証済みの場合は次へ進む
       } else {
-        next({ name: 'Login' }); // 未認証の場合はログインページへ
+        next({ name: 'Login' }) // 未認証の場合はログインページへ
       }
-    });
+    })
   } else {
-    next();
+    next()
   }
-});
-
+})
 
 export default router
