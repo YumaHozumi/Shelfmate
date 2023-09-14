@@ -196,7 +196,6 @@ const registerBook = async (book: BookItem) => {
       //シリーズもの
       const seriesRef = doc(bookshelvesRef, selectedBookshelfId, 'series', seriesId)
       const seriesSnap = await getDoc(seriesRef)
-      let seriesTemp: Series | undefined
 
       if (seriesSnap.exists()) {
         const seriesData = seriesSnap.data()
@@ -212,23 +211,9 @@ const registerBook = async (book: BookItem) => {
             picOrder: book?.orderNumber ?? 0
           })
         }
-
-        seriesTemp = {
-          seriesId: seriesData?.seriesId,
-          pic: seriesData?.pic,
-          counter: seriesData?.counter ?? 0, // シリーズのカウンタを設定
-          seriesTitle: seriesData?.seriesTitle
-        }
       } else {
         // ドキュメントが存在しない場合、画像とカウンターを設定
         const seriesTitle = extractSeriesTitle(book.title)
-
-        seriesTemp = {
-          seriesId: seriesId,
-          pic: book?.image_url ?? '',
-          counter: 0,
-          seriesTitle: extractSeriesTitle(book.title)
-        }
 
         await setDoc(seriesRef, {
           seriesId: seriesId,
@@ -252,11 +237,6 @@ const registerBook = async (book: BookItem) => {
       await addDoc(booksCollection, book)
       await incrementCounter(seriesRef)
       // 新しいシリーズアイテムをIndexedDBに追加
-
-      if (seriesTemp) {
-        seriesTemp.counter++
-        await addSeriesDataItem(user.uid, selectedBookshelfId, seriesTemp)
-      }
     }
   } catch (error) {
     console.log(error)

@@ -51,14 +51,14 @@ const decrementCounter = async (docRef: DocumentReference) => {
 }
 
 const sort = (books: BookItem[], order: string): BookItem[] => {
-  if (order === '発売日が新しい順') {
+  if (order === '発売日が新しい順' || order === '発売日が古い順') {
     return books
       .slice()
-      .sort((a, b) => b.public_date.toDate().getTime() - a.public_date.toDate().getTime())
-  } else if (order === '発売日が古い順') {
-    return books
-      .slice()
-      .sort((a, b) => a.public_date.toDate().getTime() - b.public_date.toDate().getTime())
+      .sort((a, b) => {
+        const dateA = a.public_date?.toDate?.() ?? new Date(a.public_date.seconds);
+        const dateB = b.public_date?.toDate?.() ?? new Date(b.public_date.seconds);
+        return (order === '発売日が新しい順' ? dateB.getTime() - dateA.getTime() : dateA.getTime() - dateB.getTime());
+      });
   } else if (order === '作品名順') {
     return books.slice().sort((a, b) => a.title.localeCompare(b.title, 'ja-u-co-natural'))
   } else if (order === '作者名順') {
@@ -76,6 +76,7 @@ const dbPromise = openDB('my-database', 1, {
   upgrade(db) {
     db.createObjectStore('bookshelves')
     db.createObjectStore('series')
+    db.createObjectStore("series-books")
   }
 })
 
@@ -188,6 +189,52 @@ const deleteSeriesDataItem = async (uid: string, doc_id: string, itemToDelete: (
   }
 }
 
+const setSeriesBooksData = async (uid: string, doc_id: string, seriesId: string, data: BookItem[]) => {
+  const db = await dbPromise;
+  const timestamp = Date.now();
+  await db.put('series-books', JSON.stringify({ data, timestamp }), `${uid}-${doc_id}-${seriesId}`);
+};
+
+const getSeriesBooksData = async (uid: string, doc_id: string, seriesId: string) => {
+  const db = await dbPromise;
+  const result = await db.get('series-books', `${uid}-${doc_id}-${seriesId}`);
+  if (result) {
+    const { data, timestamp } = JSON.parse(result);
+
+    // 有効期限を12時間と設定（43200000ミリ秒 = 12時間）
+    const expiryTime = 43200000;
+    if (Date.now() - timestamp < expiryTime) {
+      return data;
+    } else {
+      // 有効期限が切れている場合はnullを返す
+      return null;
+    }
+  }
+  return null;
+};
+
+const deleteSeriesBooksData = async (uid: string, doc_id: string, seriesId: string) => {
+  const db = await dbPromise;
+  await db.delete('series-books', `${uid}-${doc_id}-${seriesId}`);
+};
+
+const deleteSpecificBookData = async (uid: string, doc_id: string, seriesId: string, bookId: string) => {
+  const db = await dbPromise;
+
+  // 既存のシリーズのbooksデータを取得
+  const existingDataResult = await db.get('series-books', `${uid}-${doc_id}-${seriesId}`);
+
+  if (existingDataResult) {
+    const { data, timestamp } = JSON.parse(existingDataResult);
+
+    // 削除したいbookを除外
+    const updatedData = data.filter((book: BookItem) => book.bookId !== bookId);
+
+    // 更新されたデータを保存
+    await db.put('series-books', JSON.stringify({ data: updatedData, timestamp }), `${uid}-${doc_id}-${seriesId}`);
+  }
+};
+
 export {
   firebaseErrorMessage,
   incrementCounter,
@@ -198,5 +245,9 @@ export {
   getSeriesData,
   setSeriesData,
   addSeriesDataItem,
-  deleteSeriesDataItem
+  deleteSeriesDataItem,
+  getSeriesBooksData,
+  setSeriesBooksData,
+  deleteSeriesBooksData,
+  deleteSpecificBookData
 }

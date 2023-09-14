@@ -68,6 +68,17 @@ onAuthStateChanged(firebaseAuth, (user) => {
             })
             emit('count', items.value.length)
             emit('update:propItems', items.value)
+          } else if(change.type === "modified") {
+            const newData = change.doc.data() as Series;  // 新しいデータを取得します
+
+            const index = items.value.findIndex((item) => isSeries(item) && item.seriesId === newData.seriesId);  // 該当のシリーズを見つけます
+
+            if (index !== -1) {
+              items.value[index] = newData;  // シリーズを新しいデータで更新します
+            }
+
+            emit('count', items.value.length);
+            emit('update:propItems', items.value);
           }
         })
       }
@@ -93,14 +104,6 @@ const getSeries = async () => {
 
     if (!localCache) {
       //キャッシュがないとき
-      const seriesCollectionRef = collection(
-        firestore,
-        'users',
-        user.uid,
-        'bookshelves',
-        doc_id,
-        'series'
-      )
       const noSeriesBookCollection = collection(
         firestore,
         'users',
@@ -109,13 +112,7 @@ const getSeries = async () => {
         doc_id,
         'books'
       )
-      await getDocs(seriesCollectionRef).then((snapshot) => {
-        snapshot.forEach((e) => {
-          console.log('tt')
-          items.value.push(e.data() as Series)
-        })
-      })
-
+      
       await getDocs(noSeriesBookCollection).then((snapshot) => {
         snapshot.forEach((e) => {
           const data = e.data() as BookItem // ここでBookItemとしてデータを取得
@@ -126,12 +123,26 @@ const getSeries = async () => {
           items.value.push(data) // 更新したデータを配列に追加
         })
       })
-
+      
       await setSeriesData(user.uid, doc_id, items.value)
     } else {
       items.value = localCache
     }
-
+    
+    const seriesCollectionRef = collection(
+      firestore,
+      'users',
+      user.uid,
+      'bookshelves',
+      doc_id,
+      'series'
+    )
+    await getDocs(seriesCollectionRef).then((snapshot) => {
+      snapshot.forEach((e) => {
+        items.value.push(e.data() as Series)
+      })
+    })
+    
     emit('count', items.value.length)
     emit('update:propItems', items.value)
     emit('initComp')
