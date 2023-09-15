@@ -238,7 +238,7 @@ const submit = async () => {
 
   if(book) {
     const isAddBook = await registerBookId(selectedBookshelfId, book)
-    console.log(isAddBook)
+
     if(!isAddBook) return;
   }
 

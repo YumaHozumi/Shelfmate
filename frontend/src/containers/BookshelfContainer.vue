@@ -6,7 +6,7 @@ import { collection, getDocs, onSnapshot } from 'firebase/firestore'
 import { firebaseAuth, firestore, getCurrentUser } from '@/config/firebase'
 import { type Series, isSeries, isBookItem, Action } from '@/interface'
 import BookComp from '@/components/Bookshelf/BookComp.vue'
-import { onAuthStateChanged, type Unsubscribe } from 'firebase/auth'
+import { onAuthStateChanged, type Unsubscribe, type User } from 'firebase/auth'
 import { onUnmounted } from 'vue'
 import { getSeriesData, setSeriesData } from '@/function'
 
@@ -34,10 +34,8 @@ const items = ref<(Series | BookItem)[]>([])
 let unsubBook: Unsubscribe
 let unsubSeries: Unsubscribe
 
-onAuthStateChanged(firebaseAuth, (user) => {
-  const doc_id = prop.selectedBookshelf?.doc_id
-  if (user && doc_id) {
-    unsubBook = onSnapshot(
+const setUnsubs = (user: User, doc_id: string) => {
+  unsubBook = onSnapshot(
       collection(firestore, 'users', user.uid, 'bookshelves', doc_id, 'books'),
       (snapshot) => {
         snapshot.docChanges().forEach((change) => {
@@ -83,6 +81,12 @@ onAuthStateChanged(firebaseAuth, (user) => {
         })
       }
     )
+}
+
+onAuthStateChanged(firebaseAuth, (user) => {
+  const doc_id = prop.selectedBookshelf?.doc_id
+  if (user && doc_id) {
+    setUnsubs(user, doc_id)
   }
 })
 
@@ -94,6 +98,7 @@ onUnmounted(() => {
   unsubBook()
   unsubSeries()
 })
+
 
 const getSeries = async () => {
   const user = await getCurrentUser()
@@ -157,11 +162,27 @@ const getSeries = async () => {
 }
 const selectedBookshelf = toRef(prop, 'selectedBookshelf')
 
-watch(selectedBookshelf, async () => {
+watch(selectedBookshelf, async (newVal, oldVal) => {
+  if (oldVal) {
+    // 古いリスナーを解除
+    unsubBook();
+    unsubSeries();
+  }
+
   items.value.length = 0
   emit('update:propItems', items.value)
   await getSeries()
+
+  if (newVal && newVal.doc_id) {
+    // 新しいリスナーを設定
+    await setupRealtimeUpdates(newVal.doc_id);
+  }
 })
+
+const setupRealtimeUpdates = async (doc_id: string) => {
+  const user = await getCurrentUser();
+  setUnsubs(user, doc_id);
+}
 
 const clickBook = (item: Series | BookItem, isSelected: boolean): void => {
   if (isSelected) {
