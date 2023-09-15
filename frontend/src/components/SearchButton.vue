@@ -204,11 +204,43 @@ const registerBook = async (book: BookItem) => {
   nowBook.value = book
 }
 
+const registerBookId = async (bookShelfId: string, book: BookItem): Promise<boolean> => {
+  try {
+    const user = await getCurrentUser()
+    const bookshelvesRef = collection(
+      firestore,
+      'users',
+      user.uid,
+      'bookshelves',
+      bookShelfId,
+      'allBooks'
+    )
+    const q = query(bookshelvesRef, where('bookId', '==', book.bookId))
+    const querySnapshot = await getDocs(q)
+
+    if (querySnapshot.docs.length > 0) {
+      return false
+    } else {
+      await addDoc(bookshelvesRef, book)
+      return true
+    }
+  } catch (error) {
+    console.log(error)
+    return false
+  }
+}
+
 const submit = async () => {
   nestDialog.value = false
   const user = await getCurrentUser()
   const selectedBookshelfId = selectedBookshelf.value?.doc_id || ''
   const book = nowBook.value
+
+  if(book) {
+    const isAddBook = await registerBookId(selectedBookshelfId, book)
+    if(!isAddBook) return;
+  }
+
   // シリーズものじゃないとき
   if (selectedRadio.value === 'one' && book !== undefined) {
     const noSeriesBookCollection = collection(
@@ -283,6 +315,9 @@ const submit = async () => {
         selectItem.value.seriesId,
         'books'
       )
+      //API経由で取得したやつにはシリーズIDないためここで設定
+      book.seriesId = selectItem.value.seriesId; 
+
       await addDoc(booksCollection, book)
       await incrementCounter(seriesRef)
       await addSeriesBooksData(user.uid, selectedBookshelfId, selectItem.value.seriesId, book)

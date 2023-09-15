@@ -58,7 +58,7 @@ const getBooks = async () => {
         await setSeriesBooksData(user.uid, prop.selectBookshelfId, prop.series.seriesId ?? "", bookList.value)
       })
     } else { //あるとき
-      bookList.value = localCache;
+      bookList.value = sort(localCache, menu[0]);
     }
   }
 
@@ -129,7 +129,7 @@ const deleteBooks = async() => {
         await deleteDoc(allBookDocFirst.ref);
         //特定の本を削除
         await deleteSpecificBookData(user.uid, prop.selectBookshelfId, prop.series.seriesId, book.bookId)
-
+        
         if(prop.series.counter <= 0) { // 本が0冊になったら
           const seriesDocRef = doc(
             firestore,
