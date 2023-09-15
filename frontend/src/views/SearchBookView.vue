@@ -26,7 +26,7 @@ import { onAuthStateChanged } from 'firebase/auth'
 import { implementBookShelf, type BookItemNoSeries } from '@/interface'
 import { onUnmounted, computed } from 'vue'
 import router from '@/router'
-import { incrementCounter, sort, addSeriesDataItem } from '@/function'
+import { incrementCounter, sort, addSeriesDataItem, addSeriesBooksData } from '@/function'
 import { Timestamp } from 'firebase/firestore'
 import Pagination from '@/components/SearchBook/Pagination.vue'
 import SearchButton from '@/components/SearchButton.vue'
@@ -237,6 +237,7 @@ const registerBook = async (book: BookItem) => {
       await addDoc(booksCollection, book)
       await incrementCounter(seriesRef)
       // 新しいシリーズアイテムをIndexedDBに追加
+      await addSeriesBooksData(user.uid, selectedBookshelfId, seriesId, book);
     }
   } catch (error) {
     console.log(error)

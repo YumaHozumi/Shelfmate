@@ -24,7 +24,7 @@ const debouncedSearch = debounce((searthText: string) => {
 
 //検索ボタン押したら
 const searchClick = (): void => {
-  if (inputText.value === '') return
+  if (inputText.value === '' || !valid.value) return
   debouncedSearch(inputText.value)
 }
 

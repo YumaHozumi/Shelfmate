@@ -31,7 +31,7 @@ import { firebaseAuth, firestore, getCurrentUser } from '@/config/firebase'
 import { onUnmounted } from 'vue'
 import SearchResult from '@/components/SearchBook/SearchResult.vue'
 import DropdownMenu from './DropdownMenu.vue'
-import { addSeriesDataItem, incrementCounter } from '@/function'
+import { addSeriesDataItem, incrementCounter, addSeriesBooksData } from '@/function'
 import { rules } from '@/validation'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
 import { setBookshelvesData, getBookshelvesData } from '@/function'
@@ -285,6 +285,7 @@ const submit = async () => {
       )
       await addDoc(booksCollection, book)
       await incrementCounter(seriesRef)
+      await addSeriesBooksData(user.uid, selectedBookshelfId, selectItem.value.seriesId, book)
     }
   }
 }

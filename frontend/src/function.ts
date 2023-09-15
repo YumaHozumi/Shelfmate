@@ -195,6 +195,19 @@ const setSeriesBooksData = async (uid: string, doc_id: string, seriesId: string,
   await db.put('series-books', JSON.stringify({ data, timestamp }), `${uid}-${doc_id}-${seriesId}`);
 };
 
+const addSeriesBooksData = async (uid: string, doc_id: string, seriesId: string, book: BookItem) => {
+  const db = await dbPromise;
+  const existingData = await getSeriesBooksData(uid, doc_id, seriesId);
+  
+  let data: BookItem[];
+
+  if(existingData) data = [...existingData, book];
+  else data = [book]
+
+  const timestamp = Date.now()
+  await db.put('series-books', JSON.stringify({ data, timestamp }), `${uid}-${doc_id}-${seriesId}`);
+}
+
 const getSeriesBooksData = async (uid: string, doc_id: string, seriesId: string) => {
   const db = await dbPromise;
   const result = await db.get('series-books', `${uid}-${doc_id}-${seriesId}`);
@@ -249,5 +262,6 @@ export {
   getSeriesBooksData,
   setSeriesBooksData,
   deleteSeriesBooksData,
-  deleteSpecificBookData
+  deleteSpecificBookData,
+  addSeriesBooksData
 }
