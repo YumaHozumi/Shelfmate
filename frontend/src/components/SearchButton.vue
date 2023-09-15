@@ -238,6 +238,7 @@ const submit = async () => {
 
   if(book) {
     const isAddBook = await registerBookId(selectedBookshelfId, book)
+    console.log(isAddBook)
     if(!isAddBook) return;
   }
 
@@ -321,6 +322,9 @@ const submit = async () => {
       await addDoc(booksCollection, book)
       await incrementCounter(seriesRef)
       await addSeriesBooksData(user.uid, selectedBookshelfId, selectItem.value.seriesId, book)
+
+      // selectItem.value = undefined;
+      // selectedRadio.value = "one";
     }
   }
 }
@@ -347,6 +351,8 @@ const localRules = ref([rules.hyphen, rules.zenkaku, rules.isbn])
 const closeDialog = () => {
   dialog.value = false
   book.value = undefined
+  // selectItem.value = undefined
+  // selectedRadio.value = "one"
 }
 </script>
 
@@ -411,7 +417,7 @@ const closeDialog = () => {
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn class="registerBtn" @click="submit">登録</v-btn>
+        <v-btn class="registerBtn" @click="submit" :disabled="selectedRadio === 'series' && !selectItem">登録</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

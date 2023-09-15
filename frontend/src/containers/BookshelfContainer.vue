@@ -126,7 +126,14 @@ const getSeries = async () => {
       
       await setSeriesData(user.uid, doc_id, items.value)
     } else {
-      items.value = localCache
+  // キャッシュがあるときはキャッシュからデータを取得
+      items.value = localCache.map((data: any) => {
+        // isbnをstringからnumberに変換します（isbnが存在する場合）
+        if (data.isbn) {
+          data.isbn = Number(data.isbn);
+        }
+        return data;
+      });
     }
     
     const seriesCollectionRef = collection(
