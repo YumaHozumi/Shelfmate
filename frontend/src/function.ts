@@ -52,13 +52,13 @@ const decrementCounter = async (docRef: DocumentReference) => {
 
 const sort = (books: BookItem[], order: string): BookItem[] => {
   if (order === '発売日が新しい順' || order === '発売日が古い順') {
-    return books
-      .slice()
-      .sort((a, b) => {
-        const dateA = a.public_date?.toDate?.() ?? new Date(a.public_date.seconds);
-        const dateB = b.public_date?.toDate?.() ?? new Date(b.public_date.seconds);
-        return (order === '発売日が新しい順' ? dateB.getTime() - dateA.getTime() : dateA.getTime() - dateB.getTime());
-      });
+    return books.slice().sort((a, b) => {
+      const dateA = a.public_date?.toDate?.() ?? new Date(a.public_date.seconds)
+      const dateB = b.public_date?.toDate?.() ?? new Date(b.public_date.seconds)
+      return order === '発売日が新しい順'
+        ? dateB.getTime() - dateA.getTime()
+        : dateA.getTime() - dateB.getTime()
+    })
   } else if (order === '作品名順') {
     return books.slice().sort((a, b) => a.title.localeCompare(b.title, 'ja-u-co-natural'))
   } else if (order === '作者名順') {
@@ -76,7 +76,7 @@ const dbPromise = openDB('my-database', 1, {
   upgrade(db) {
     db.createObjectStore('bookshelves')
     db.createObjectStore('series')
-    db.createObjectStore("series-books")
+    db.createObjectStore('series-books')
   }
 })
 
@@ -163,90 +163,114 @@ const addSeriesDataItem = async (uid: string, doc_id: string, newItem: Series | 
   await db.put('series', JSON.stringify({ data, timestamp }), `${uid}-${doc_id}`)
 }
 
-const deleteSeriesDataItem = async (uid: string, doc_id: string, itemToDelete: (Series | BookItem)) => {
+const deleteSeriesDataItem = async (
+  uid: string,
+  doc_id: string,
+  itemToDelete: Series | BookItem
+) => {
   const db = await dbPromise
 
   // 既存のデータを取得する
   const existingData = await getSeriesData(uid, doc_id)
 
-  let data;
+  let data
   if (existingData) {
     if (isSeries(itemToDelete)) {
       // アイテムが Series タイプの場合、seriesId が一致するアイテムを削除
-      data = existingData.filter((item: Series | BookItem) => 
-        !('seriesId' in item) || item.seriesId !== itemToDelete.seriesId
-      );
+      data = existingData.filter(
+        (item: Series | BookItem) =>
+          !('seriesId' in item) || item.seriesId !== itemToDelete.seriesId
+      )
     } else {
       // アイテムが BookItem タイプの場合、bookId が一致するアイテムを削除
-      data = existingData.filter((item: Series | BookItem) => 
-        !('bookId' in item) || item.bookId !== itemToDelete.bookId
-      );
+      data = existingData.filter(
+        (item: Series | BookItem) => !('bookId' in item) || item.bookId !== itemToDelete.bookId
+      )
     }
 
     // 更新されたデータをデータベースに保存する
-    const timestamp = Date.now();
-    await db.put('series', JSON.stringify({ data, timestamp }), `${uid}-${doc_id}`);
+    const timestamp = Date.now()
+    await db.put('series', JSON.stringify({ data, timestamp }), `${uid}-${doc_id}`)
   }
 }
 
-const setSeriesBooksData = async (uid: string, doc_id: string, seriesId: string, data: BookItem[]) => {
-  const db = await dbPromise;
-  const timestamp = Date.now();
-  await db.put('series-books', JSON.stringify({ data, timestamp }), `${uid}-${doc_id}-${seriesId}`);
-};
+const setSeriesBooksData = async (
+  uid: string,
+  doc_id: string,
+  seriesId: string,
+  data: BookItem[]
+) => {
+  const db = await dbPromise
+  const timestamp = Date.now()
+  await db.put('series-books', JSON.stringify({ data, timestamp }), `${uid}-${doc_id}-${seriesId}`)
+}
 
-const addSeriesBooksData = async (uid: string, doc_id: string, seriesId: string, book: BookItem) => {
-  const db = await dbPromise;
-  const existingData = await getSeriesBooksData(uid, doc_id, seriesId);
-  
-  let data: BookItem[];
+const addSeriesBooksData = async (
+  uid: string,
+  doc_id: string,
+  seriesId: string,
+  book: BookItem
+) => {
+  const db = await dbPromise
+  const existingData = await getSeriesBooksData(uid, doc_id, seriesId)
 
-  if(existingData) data = [...existingData, book];
+  let data: BookItem[]
+
+  if (existingData) data = [...existingData, book]
   else data = [book]
 
   const timestamp = Date.now()
-  await db.put('series-books', JSON.stringify({ data, timestamp }), `${uid}-${doc_id}-${seriesId}`);
+  await db.put('series-books', JSON.stringify({ data, timestamp }), `${uid}-${doc_id}-${seriesId}`)
 }
 
 const getSeriesBooksData = async (uid: string, doc_id: string, seriesId: string) => {
-  const db = await dbPromise;
-  const result = await db.get('series-books', `${uid}-${doc_id}-${seriesId}`);
+  const db = await dbPromise
+  const result = await db.get('series-books', `${uid}-${doc_id}-${seriesId}`)
   if (result) {
-    const { data, timestamp } = JSON.parse(result);
+    const { data, timestamp } = JSON.parse(result)
 
     // 有効期限を12時間と設定（43200000ミリ秒 = 12時間）
-    const expiryTime = 43200000;
+    const expiryTime = 43200000
     if (Date.now() - timestamp < expiryTime) {
-      return data;
+      return data
     } else {
       // 有効期限が切れている場合はnullを返す
-      return null;
+      return null
     }
   }
-  return null;
-};
+  return null
+}
 
 const deleteSeriesBooksData = async (uid: string, doc_id: string, seriesId: string) => {
-  const db = await dbPromise;
-  await db.delete('series-books', `${uid}-${doc_id}-${seriesId}`);
-};
+  const db = await dbPromise
+  await db.delete('series-books', `${uid}-${doc_id}-${seriesId}`)
+}
 
-const deleteSpecificBookData = async (uid: string, doc_id: string, seriesId: string, bookId: string) => {
-  const db = await dbPromise;
+const deleteSpecificBookData = async (
+  uid: string,
+  doc_id: string,
+  seriesId: string,
+  bookId: string
+) => {
+  const db = await dbPromise
 
   // 既存のシリーズのbooksデータを取得
-  const existingDataResult = await db.get('series-books', `${uid}-${doc_id}-${seriesId}`);
+  const existingDataResult = await db.get('series-books', `${uid}-${doc_id}-${seriesId}`)
 
   if (existingDataResult) {
-    const { data, timestamp } = JSON.parse(existingDataResult);
+    const { data, timestamp } = JSON.parse(existingDataResult)
 
     // 削除したいbookを除外
-    const updatedData = data.filter((book: BookItem) => book.bookId !== bookId);
+    const updatedData = data.filter((book: BookItem) => book.bookId !== bookId)
 
     // 更新されたデータを保存
-    await db.put('series-books', JSON.stringify({ data: updatedData, timestamp }), `${uid}-${doc_id}-${seriesId}`);
+    await db.put(
+      'series-books',
+      JSON.stringify({ data: updatedData, timestamp }),
+      `${uid}-${doc_id}-${seriesId}`
+    )
   }
-};
+}
 
 export {
   firebaseErrorMessage,

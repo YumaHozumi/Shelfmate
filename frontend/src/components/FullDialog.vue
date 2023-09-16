@@ -4,7 +4,14 @@ import { type BookItem, type Series } from '@/interface'
 import { collection, deleteDoc, doc, getDoc, getDocs, query, where } from 'firebase/firestore'
 import { ref } from 'vue'
 import BookListItem from '@/components/BookListItem.vue'
-import { getSeriesBooksData, setSeriesBooksData, sort, deleteSpecificBookData, decrementCounter, deleteSeriesBooksData } from '@/function'
+import {
+  getSeriesBooksData,
+  setSeriesBooksData,
+  sort,
+  deleteSpecificBookData,
+  decrementCounter,
+  deleteSeriesBooksData
+} from '@/function'
 import Menu from '@/components/Menu.vue'
 import { watch } from 'vue'
 
@@ -22,23 +29,27 @@ const bookList = ref<BookItem[]>([])
 
 const clickEdit = () => {
   editMode.value = true
-  selectedBooks.value.length = 0;//初期化
+  selectedBooks.value.length = 0 //初期化
 }
 
 const clickCancel = () => {
   editMode.value = false
-  selectedBooks.value.length = 0;//初期化
+  selectedBooks.value.length = 0 //初期化
 }
 
 const getBooks = async () => {
   const user = await getCurrentUser()
   if (prop.isEdit) return
 
-  
-  if(prop.series.seriesId) {
-    const localCache = await getSeriesBooksData(user.uid, prop.selectBookshelfId, prop.series.seriesId);
+  if (prop.series.seriesId) {
+    const localCache = await getSeriesBooksData(
+      user.uid,
+      prop.selectBookshelfId,
+      prop.series.seriesId
+    )
 
-    if(!localCache) { //キャッシュがないとき
+    if (!localCache) {
+      //キャッシュがないとき
       const booksCollection = collection(
         firestore,
         'users',
@@ -55,13 +66,18 @@ const getBooks = async () => {
           bookList.value.push(book.data() as BookItem)
         })
         bookList.value = sort(bookList.value, menu[0])
-        await setSeriesBooksData(user.uid, prop.selectBookshelfId, prop.series.seriesId ?? "", bookList.value)
+        await setSeriesBooksData(
+          user.uid,
+          prop.selectBookshelfId,
+          prop.series.seriesId ?? '',
+          bookList.value
+        )
       })
-    } else { //あるとき
-      bookList.value = sort(localCache, menu[0]);
+    } else {
+      //あるとき
+      bookList.value = sort(localCache, menu[0])
     }
   }
-
 }
 
 const menu = ['発売日が新しい順', '発売日が古い順', '巻数順(降順)', '巻数順(昇順)']
@@ -71,15 +87,15 @@ const selectMenu = (index: number): void => {
 }
 
 // 選択された本を追跡するための ref 変数を作成
-const selectedBooks = ref<BookItem[]>([]);
+const selectedBooks = ref<BookItem[]>([])
 
 watch(dialog, (newVal) => {
-  if(!newVal) selectedBooks.value.length = 0;
+  if (!newVal) selectedBooks.value.length = 0
 })
 
-const deleteBooks = async() => {
+const deleteBooks = async () => {
   try {
-    const user = await getCurrentUser();
+    const user = await getCurrentUser()
 
     if (!user) {
       throw new Error('User not found')
@@ -89,48 +105,54 @@ const deleteBooks = async() => {
       //選択した本を削除
       const seriesBooksQuery = query(
         collection(
-            firestore,
-            'users',
-            user.uid,
-            'bookshelves',
-            prop.selectBookshelfId,
-            'series',
-            prop.series.seriesId || "",
-            'books'
-          ), where("bookId", "==", book.bookId)
+          firestore,
+          'users',
+          user.uid,
+          'bookshelves',
+          prop.selectBookshelfId,
+          'series',
+          prop.series.seriesId || '',
+          'books'
+        ),
+        where('bookId', '==', book.bookId)
       )
-      const querySnapshot = await getDocs(seriesBooksQuery);
+      const querySnapshot = await getDocs(seriesBooksQuery)
 
-      if(!querySnapshot.empty) {
-        const docFirst = querySnapshot.docs[0];
-        await deleteDoc(docFirst.ref);
-        
+      if (!querySnapshot.empty) {
+        const docFirst = querySnapshot.docs[0]
+        await deleteDoc(docFirst.ref)
+
         const bookshelvesRef = collection(firestore, 'users', user.uid, 'bookshelves')
-        const seriesRef = doc(bookshelvesRef, prop.selectBookshelfId, 'series', prop.series.seriesId ?? "")
+        const seriesRef = doc(
+          bookshelvesRef,
+          prop.selectBookshelfId,
+          'series',
+          prop.series.seriesId ?? ''
+        )
 
         await decrementCounter(seriesRef)
       }
 
       //allBooksのDBの変更処理
       const seriesAllBooksQuery = query(
-        collection(
-            firestore,
-            'users',
-            user.uid,
-            'bookshelves',
-            prop.selectBookshelfId,
-            'allBooks'
-          ), where("bookId", "==", book.bookId)
+        collection(firestore, 'users', user.uid, 'bookshelves', prop.selectBookshelfId, 'allBooks'),
+        where('bookId', '==', book.bookId)
       )
-      const querySnapShot2 = await getDocs(seriesAllBooksQuery);
+      const querySnapShot2 = await getDocs(seriesAllBooksQuery)
 
       if (!querySnapShot2.empty && prop.series.seriesId) {
-        const allBookDocFirst = querySnapShot2.docs[0];
-        await deleteDoc(allBookDocFirst.ref);
+        const allBookDocFirst = querySnapShot2.docs[0]
+        await deleteDoc(allBookDocFirst.ref)
         //特定の本を削除
-        await deleteSpecificBookData(user.uid, prop.selectBookshelfId, prop.series.seriesId, book.bookId)
-        
-        if(prop.series.counter <= 0) { // 本が0冊になったら
+        await deleteSpecificBookData(
+          user.uid,
+          prop.selectBookshelfId,
+          prop.series.seriesId,
+          book.bookId
+        )
+
+        if (prop.series.counter <= 0) {
+          // 本が0冊になったら
           const seriesDocRef = doc(
             firestore,
             'users',
@@ -145,8 +167,8 @@ const deleteBooks = async() => {
         }
       }
     }
-    selectedBooks.value.length = 0;
-    await getBooks();
+    selectedBooks.value.length = 0
+    await getBooks()
   } catch (e) {
     console.error('Error deleting books:', e)
   }
@@ -177,36 +199,34 @@ const deleteBooks = async() => {
 
       <div class="actions-bar">
         <p class="text-count">件数: {{ series.counter }}件</p>
-        
+
         <div class="right-group">
           <div class="edit-btn-group">
             <button @click="clickCancel" v-if="editMode" class="edit-btn">キャンセル</button>
             <button color="blue" @click="clickEdit" v-else class="edit-btn">編集</button>
           </div>
-          
+
           <div class="menu-container">
             <Menu :items="menu" icon="mdi-sort" class="menu" @selectItem="selectMenu"></Menu>
           </div>
         </div>
       </div>
       <v-list>
-        <v-list-item v-for="(book) in bookList" :key="book.bookId">
-        <v-row>
-          <v-col :cols="editMode ? 1 : 0" class="checkbox-column">
-            <v-checkbox 
-              v-model="selectedBooks"
-              :value="book"
-              class="checkbox"
-              v-show="editMode"
-            ></v-checkbox>
-          </v-col>
-          <v-col :cols="editMode ? 11 : 12">
-            <BookListItem :book="book"></BookListItem>
-          </v-col>
-        </v-row>
-      </v-list-item>
-
-
+        <v-list-item v-for="book in bookList" :key="book.bookId">
+          <v-row>
+            <v-col :cols="editMode ? 1 : 0" class="checkbox-column">
+              <v-checkbox
+                v-model="selectedBooks"
+                :value="book"
+                class="checkbox"
+                v-show="editMode"
+              ></v-checkbox>
+            </v-col>
+            <v-col :cols="editMode ? 11 : 12">
+              <BookListItem :book="book"></BookListItem>
+            </v-col>
+          </v-row>
+        </v-list-item>
       </v-list>
     </v-card>
     <v-footer fixed dark class="footer" v-show="editMode">
@@ -237,7 +257,6 @@ const deleteBooks = async() => {
   align-items: center;
 }
 
-
 .actions-bar {
   display: flex;
   justify-content: space-between;
@@ -261,7 +280,7 @@ const deleteBooks = async() => {
         min-width: 60px; // 適切な最小幅を設定して、文字が折り返さないようにする
         margin-left: 16px; // 余白を調整
         white-space: nowrap; // 文字の折り返しを防ぐ
-        color: #2196F3;
+        color: #2196f3;
       }
     }
 
@@ -286,7 +305,6 @@ const deleteBooks = async() => {
     background-color: white;
   }
 }
-
 
 .footer {
   position: fixed;

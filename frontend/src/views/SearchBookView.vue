@@ -237,7 +237,7 @@ const registerBook = async (book: BookItem) => {
       await addDoc(booksCollection, book)
       await incrementCounter(seriesRef)
       // 新しいシリーズアイテムをIndexedDBに追加
-      await addSeriesBooksData(user.uid, selectedBookshelfId, seriesId, book);
+      await addSeriesBooksData(user.uid, selectedBookshelfId, seriesId, book)
     }
   } catch (error) {
     console.log(error)

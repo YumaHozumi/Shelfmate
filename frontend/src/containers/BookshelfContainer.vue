@@ -36,51 +36,53 @@ let unsubSeries: Unsubscribe
 
 const setUnsubs = (user: User, doc_id: string) => {
   unsubBook = onSnapshot(
-      collection(firestore, 'users', user.uid, 'bookshelves', doc_id, 'books'),
-      (snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-          if (change.type === 'removed') {
-            const data = change.doc.data() as BookItem
+    collection(firestore, 'users', user.uid, 'bookshelves', doc_id, 'books'),
+    (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === 'removed') {
+          const data = change.doc.data() as BookItem
 
-            items.value = items.value.filter((item) => {
-              if (isBookItem(item)) return item.bookId !== data.bookId
-              return true // この行を追加
-            })
-            emit('count', items.value.length)
-            emit('update:propItems', items.value)
+          items.value = items.value.filter((item) => {
+            if (isBookItem(item)) return item.bookId !== data.bookId
+            return true // この行を追加
+          })
+          emit('count', items.value.length)
+          emit('update:propItems', items.value)
+        }
+      })
+    }
+  )
+
+  unsubSeries = onSnapshot(
+    collection(firestore, 'users', user.uid, 'bookshelves', doc_id, 'series'),
+    (snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === 'removed') {
+          const data = change.doc.data() as Series
+
+          items.value = items.value.filter((item) => {
+            if (isSeries(item)) return item.seriesId !== data.seriesId
+            return true
+          })
+          emit('count', items.value.length)
+          emit('update:propItems', items.value)
+        } else if (change.type === 'modified') {
+          const newData = change.doc.data() as Series // 新しいデータを取得します
+
+          const index = items.value.findIndex(
+            (item) => isSeries(item) && item.seriesId === newData.seriesId
+          ) // 該当のシリーズを見つけます
+
+          if (index !== -1) {
+            items.value[index] = newData // シリーズを新しいデータで更新します
           }
-        })
-      }
-    )
 
-    unsubSeries = onSnapshot(
-      collection(firestore, 'users', user.uid, 'bookshelves', doc_id, 'series'),
-      (snapshot) => {
-        snapshot.docChanges().forEach((change) => {
-          if (change.type === 'removed') {
-            const data = change.doc.data() as Series
-
-            items.value = items.value.filter((item) => {
-              if (isSeries(item)) return item.seriesId !== data.seriesId
-              return true
-            })
-            emit('count', items.value.length)
-            emit('update:propItems', items.value)
-          } else if(change.type === "modified") {
-            const newData = change.doc.data() as Series;  // 新しいデータを取得します
-
-            const index = items.value.findIndex((item) => isSeries(item) && item.seriesId === newData.seriesId);  // 該当のシリーズを見つけます
-
-            if (index !== -1) {
-              items.value[index] = newData;  // シリーズを新しいデータで更新します
-            }
-
-            emit('count', items.value.length);
-            emit('update:propItems', items.value);
-          }
-        })
-      }
-    )
+          emit('count', items.value.length)
+          emit('update:propItems', items.value)
+        }
+      })
+    }
+  )
 }
 
 onAuthStateChanged(firebaseAuth, (user) => {
@@ -99,7 +101,6 @@ onUnmounted(() => {
   unsubSeries()
 })
 
-
 const getSeries = async () => {
   const user = await getCurrentUser()
   // 本棚のシリーズコレクションへの参照を取得
@@ -117,7 +118,7 @@ const getSeries = async () => {
         doc_id,
         'books'
       )
-      
+
       await getDocs(noSeriesBookCollection).then((snapshot) => {
         snapshot.forEach((e) => {
           const data = e.data() as BookItem // ここでBookItemとしてデータを取得
@@ -128,19 +129,19 @@ const getSeries = async () => {
           items.value.push(data) // 更新したデータを配列に追加
         })
       })
-      
+
       await setSeriesData(user.uid, doc_id, items.value)
     } else {
-  // キャッシュがあるときはキャッシュからデータを取得
+      // キャッシュがあるときはキャッシュからデータを取得
       items.value = localCache.map((data: any) => {
         // isbnをstringからnumberに変換します（isbnが存在する場合）
         if (data.isbn) {
-          data.isbn = Number(data.isbn);
+          data.isbn = Number(data.isbn)
         }
-        return data;
-      });
+        return data
+      })
     }
-    
+
     const seriesCollectionRef = collection(
       firestore,
       'users',
@@ -154,7 +155,7 @@ const getSeries = async () => {
         items.value.push(e.data() as Series)
       })
     })
-    
+
     emit('count', items.value.length)
     emit('update:propItems', items.value)
     emit('initComp')
@@ -165,8 +166,8 @@ const selectedBookshelf = toRef(prop, 'selectedBookshelf')
 watch(selectedBookshelf, async (newVal, oldVal) => {
   if (oldVal) {
     // 古いリスナーを解除
-    unsubBook();
-    unsubSeries();
+    unsubBook()
+    unsubSeries()
   }
 
   items.value.length = 0
@@ -175,13 +176,13 @@ watch(selectedBookshelf, async (newVal, oldVal) => {
 
   if (newVal && newVal.doc_id) {
     // 新しいリスナーを設定
-    await setupRealtimeUpdates(newVal.doc_id);
+    await setupRealtimeUpdates(newVal.doc_id)
   }
 })
 
 const setupRealtimeUpdates = async (doc_id: string) => {
-  const user = await getCurrentUser();
-  setUnsubs(user, doc_id);
+  const user = await getCurrentUser()
+  setUnsubs(user, doc_id)
 }
 
 const clickBook = (item: Series | BookItem, isSelected: boolean): void => {

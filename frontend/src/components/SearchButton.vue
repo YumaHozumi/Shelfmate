@@ -24,7 +24,7 @@ import {
   setDoc,
   query,
   where,
-CollectionReference
+  CollectionReference
 } from 'firebase/firestore'
 import imageURL from '@/assets/no-image.png'
 import { onAuthStateChanged } from 'firebase/auth'
@@ -207,10 +207,10 @@ const registerBook = async (book: BookItem) => {
 
 const duplicateCheck = async (colref: CollectionReference, bookId: string) => {
   //重複判定
-  const q = query(colref, where("bookId", "==", bookId))
-  const querySnapshot = await getDocs(q);
-  if(querySnapshot.docs.length > 0) console.log("重複してる")
-  else console.log("not 重複")
+  const q = query(colref, where('bookId', '==', bookId))
+  const querySnapshot = await getDocs(q)
+  if (querySnapshot.docs.length > 0) console.log('重複してる')
+  else console.log('not 重複')
   return querySnapshot.docs.length > 0
 }
 
@@ -226,19 +226,19 @@ const submit = async () => {
     'bookshelves',
     selectedBookshelfId,
     'allBooks'
-    )
-    const noSeriesBookCollection = collection(
-      firestore,
-      'users',
-      user.uid,
-      'bookshelves',
-      selectedBookshelfId,
-      'books'
-    )
-  if(book !== undefined) {
+  )
+  const noSeriesBookCollection = collection(
+    firestore,
+    'users',
+    user.uid,
+    'bookshelves',
+    selectedBookshelfId,
+    'books'
+  )
+  if (book !== undefined) {
     //所持している本一覧に追加
     console.log(2)
-    if(!(await duplicateCheck(allBookCollection, book.bookId))) {
+    if (!(await duplicateCheck(allBookCollection, book.bookId))) {
       console.log(3)
       await addDoc(allBookCollection, book)
     } else return //重複していたらだめ
@@ -247,29 +247,27 @@ const submit = async () => {
   // シリーズものじゃないとき
   if (selectedRadio.value === 'one' && book !== undefined) {
     const noSeriesBook: BookItemNoSeries = convertToBookItemWithoutSeries(book)
-    if(!(await duplicateCheck(noSeriesBookCollection, book.bookId))){
+    if (!(await duplicateCheck(noSeriesBookCollection, book.bookId))) {
       //重複していないとき
       console.log(1)
       await addDoc(noSeriesBookCollection, noSeriesBook)
       await addSeriesDataItem(user.uid, selectedBookshelfId, book)
     }
-
   } else {
     // シリーズもの
-    
-    
+
     if (selectItem.value !== undefined && book !== undefined) {
       const booksCollection = collection(
-          firestore,
-          'users',
-          user.uid,
-          'bookshelves',
-          selectedBookshelfId,
-          'series',
-          selectItem.value.seriesId,
-          'books'
-        )
-      if(await duplicateCheck(booksCollection, book.bookId)) return;
+        firestore,
+        'users',
+        user.uid,
+        'bookshelves',
+        selectedBookshelfId,
+        'series',
+        selectItem.value.seriesId,
+        'books'
+      )
+      if (await duplicateCheck(booksCollection, book.bookId)) return
 
       const bookshelvesRef = collection(firestore, 'users', user.uid, 'bookshelves')
       const seriesRef = doc(
@@ -306,16 +304,15 @@ const submit = async () => {
         })
       }
 
-      
       //API経由で取得したやつにはシリーズIDないためここで設定
-      book.seriesId = selectItem.value.seriesId; 
-      
+      book.seriesId = selectItem.value.seriesId
+
       await addDoc(booksCollection, book)
       await incrementCounter(seriesRef)
       await addSeriesBooksData(user.uid, selectedBookshelfId, selectItem.value.seriesId, book)
 
-      selectItem.value = undefined;
-      selectedRadio.value = "one";
+      selectItem.value = undefined
+      selectedRadio.value = 'one'
     }
   }
 }
@@ -408,7 +405,12 @@ const closeDialog = () => {
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn class="registerBtn" @click="submit" :disabled="selectedRadio === 'series' && !selectItem">登録</v-btn>
+        <v-btn
+          class="registerBtn"
+          @click="submit"
+          :disabled="selectedRadio === 'series' && !selectItem"
+          >登録</v-btn
+        >
       </v-card-actions>
     </v-card>
   </v-dialog>

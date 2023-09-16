@@ -172,8 +172,8 @@ const deleteBook = async () => {
           const docFirst = querySnapshot.docs[0]
           await deleteDoc(docFirst.ref)
           // Firestoreから削除した後にキャッシュを更新
-          await deleteSeriesDataItem(uid, bookshelfId, series);
-          await deleteSeriesBooksData(uid, bookshelfId, series.seriesId);
+          await deleteSeriesDataItem(uid, bookshelfId, series)
+          await deleteSeriesBooksData(uid, bookshelfId, series.seriesId)
         }
 
         await deleteDoc(docSnapshot.ref)
