@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import GlobalHeader from '@/containers/GlobalHeader.vue'
 import Results from '@/components/SearchBook/Results.vue'
-import { type BookShelf, type BookItem, type Series } from '@/interface'
+import { type BookShelf, type BookItem } from '@/interface'
 import { ref, watch } from 'vue'
 import SearchBar from '@/basic/SearchBar.vue'
 import axios from 'axios'
