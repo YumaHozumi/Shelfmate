@@ -23,7 +23,8 @@ import {
   updateDoc,
   setDoc,
   query,
-  where
+  where,
+CollectionReference
 } from 'firebase/firestore'
 import imageURL from '@/assets/no-image.png'
 import { onAuthStateChanged } from 'firebase/auth'
@@ -204,30 +205,13 @@ const registerBook = async (book: BookItem) => {
   nowBook.value = book
 }
 
-const registerBookId = async (bookShelfId: string, book: BookItem): Promise<boolean> => {
-  try {
-    const user = await getCurrentUser()
-    const bookshelvesRef = collection(
-      firestore,
-      'users',
-      user.uid,
-      'bookshelves',
-      bookShelfId,
-      'allBooks'
-    )
-    const q = query(bookshelvesRef, where('bookId', '==', book.bookId))
-    const querySnapshot = await getDocs(q)
-
-    if (querySnapshot.docs.length > 0) {
-      return false
-    } else {
-      await addDoc(bookshelvesRef, book)
-      return true
-    }
-  } catch (error) {
-    console.log(error)
-    return false
-  }
+const duplicateCheck = async (colref: CollectionReference, bookId: string) => {
+  //重複判定
+  const q = query(colref, where("bookId", "==", bookId))
+  const querySnapshot = await getDocs(q);
+  if(querySnapshot.docs.length > 0) console.log("重複してる")
+  else console.log("not 重複")
+  return querySnapshot.docs.length > 0
 }
 
 const submit = async () => {
@@ -235,15 +219,14 @@ const submit = async () => {
   const user = await getCurrentUser()
   const selectedBookshelfId = selectedBookshelf.value?.doc_id || ''
   const book = nowBook.value
-
-  if(book) {
-    const isAddBook = await registerBookId(selectedBookshelfId, book)
-
-    if(!isAddBook) return;
-  }
-
-  // シリーズものじゃないとき
-  if (selectedRadio.value === 'one' && book !== undefined) {
+  const allBookCollection = collection(
+    firestore,
+    'users',
+    user.uid,
+    'bookshelves',
+    selectedBookshelfId,
+    'allBooks'
+    )
     const noSeriesBookCollection = collection(
       firestore,
       'users',
@@ -252,25 +235,42 @@ const submit = async () => {
       selectedBookshelfId,
       'books'
     )
+  if(book !== undefined) {
+    //所持している本一覧に追加
+    console.log(2)
+    if(!(await duplicateCheck(allBookCollection, book.bookId))) {
+      console.log(3)
+      await addDoc(allBookCollection, book)
+    } else return //重複していたらだめ
+  }
+
+  // シリーズものじゃないとき
+  if (selectedRadio.value === 'one' && book !== undefined) {
     const noSeriesBook: BookItemNoSeries = convertToBookItemWithoutSeries(book)
-    await addDoc(noSeriesBookCollection, noSeriesBook)
-    await addSeriesDataItem(user.uid, selectedBookshelfId, book)
+    if(!(await duplicateCheck(noSeriesBookCollection, book.bookId))){
+      //重複していないとき
+      console.log(1)
+      await addDoc(noSeriesBookCollection, noSeriesBook)
+      await addSeriesDataItem(user.uid, selectedBookshelfId, book)
+    }
 
-    const allBookCollection = collection(
-      firestore,
-      'users',
-      user.uid,
-      'bookshelves',
-      selectedBookshelfId,
-      'allBooks'
-    )
-    const q = query(allBookCollection, where('bookId', '==', book.bookId))
-    const querySnapshot = await getDocs(q)
-
-    if (querySnapshot.docs.length === 0) await addDoc(allBookCollection, book)
   } else {
     // シリーズもの
+    
+    
     if (selectItem.value !== undefined && book !== undefined) {
+      const booksCollection = collection(
+          firestore,
+          'users',
+          user.uid,
+          'bookshelves',
+          selectedBookshelfId,
+          'series',
+          selectItem.value.seriesId,
+          'books'
+        )
+      if(await duplicateCheck(booksCollection, book.bookId)) return;
+
       const bookshelvesRef = collection(firestore, 'users', user.uid, 'bookshelves')
       const seriesRef = doc(
         bookshelvesRef,
@@ -306,25 +306,16 @@ const submit = async () => {
         })
       }
 
-      const booksCollection = collection(
-        firestore,
-        'users',
-        user.uid,
-        'bookshelves',
-        selectedBookshelfId,
-        'series',
-        selectItem.value.seriesId,
-        'books'
-      )
+      
       //API経由で取得したやつにはシリーズIDないためここで設定
       book.seriesId = selectItem.value.seriesId; 
-
+      
       await addDoc(booksCollection, book)
       await incrementCounter(seriesRef)
       await addSeriesBooksData(user.uid, selectedBookshelfId, selectItem.value.seriesId, book)
 
-      // selectItem.value = undefined;
-      // selectedRadio.value = "one";
+      selectItem.value = undefined;
+      selectedRadio.value = "one";
     }
   }
 }
