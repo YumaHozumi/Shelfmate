@@ -36,10 +36,8 @@ watchEffect(() => {
   // watchEffect内で非同期処理を監視
   unsubscribe = onAuthStateChanged(firebaseAuth, (user) => {
     if (user && user?.emailVerified) {
-      console.log('ログイン済み')
       isShow.value = false
     } else {
-      console.log('ログインしてない')
       isShow.value = true
     }
   })

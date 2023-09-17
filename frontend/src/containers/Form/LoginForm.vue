@@ -39,7 +39,6 @@ const submitButton = async () => {
 }
 
 const clickGoogleButton = async () => {
-  console.log('google')
   const provider = new GoogleAuthProvider()
   try {
     await signInWithRedirect(firebaseAuth, provider)

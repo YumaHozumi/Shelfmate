@@ -1,6 +1,6 @@
 <template>
   <v-toolbar-title class="title no-copy">
-    <span class="clickable"> BookShelf </span>
+    <span class="clickable"> ShelfMate </span>
   </v-toolbar-title>
 </template>
 
