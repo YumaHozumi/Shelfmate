@@ -105,11 +105,9 @@ const searchClick = async (searchText: string) => {
   const baseURL = '/api/books/search'
   const params = '?isbn=' + searchText
   const completedURL = baseURL + params
-  console.log("now")
   await axios
     .get(completedURL)
     .then((res) => {
-      console.log(res)
       errorMsg.value = ''
       const item = res.data?.result?.items?.[0]
       if (item) {
@@ -209,8 +207,6 @@ const duplicateCheck = async (colref: CollectionReference, bookId: string) => {
   //重複判定
   const q = query(colref, where('bookId', '==', bookId))
   const querySnapshot = await getDocs(q)
-  if (querySnapshot.docs.length > 0) console.log('重複してる')
-  else console.log('not 重複')
   return querySnapshot.docs.length > 0
 }
 
@@ -237,9 +233,7 @@ const submit = async () => {
   )
   if (book !== undefined) {
     //所持している本一覧に追加
-    console.log(2)
     if (!(await duplicateCheck(allBookCollection, book.bookId))) {
-      console.log(3)
       await addDoc(allBookCollection, book)
     } else return //重複していたらだめ
   }
@@ -249,7 +243,6 @@ const submit = async () => {
     const noSeriesBook: BookItemNoSeries = convertToBookItemWithoutSeries(book)
     if (!(await duplicateCheck(noSeriesBookCollection, book.bookId))) {
       //重複していないとき
-      console.log(1)
       await addDoc(noSeriesBookCollection, noSeriesBook)
       await addSeriesDataItem(user.uid, selectedBookshelfId, book)
     }

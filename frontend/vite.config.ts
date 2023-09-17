@@ -15,10 +15,9 @@ export default defineConfig({
   },
   server: {
     port: 10400,
-    host: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'http://shelfmate-back:8080',
         changeOrigin: true,
       }
     }
