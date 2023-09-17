@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  shelfmate-front:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    ports:
+      - "80:80"
+
+  shelfmate-back:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile

@@ -1,0 +1,52 @@
+definitions:
+  object.Channel:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/object.Item'
+        type: array
+    type: object
+  object.Item:
+    properties:
+      author:
+        type: string
+      detail:
+        type: string
+      isbn:
+        type: string
+      public_date:
+        type: string
+      title:
+        type: string
+    type: object
+  object.RSS:
+    properties:
+      result:
+        $ref: '#/definitions/object.Channel'
+    type: object
+info:
+  contact: {}
+paths:
+  /api/books/search:
+    get:
+      consumes:
+      - application/json
+      description: Search books by keyword
+      operationId: search-books
+      parameters:
+      - description: Search keyword
+        in: query
+        name: isbn
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/object.RSS'
+            type: array
+      summary: Search books
+swagger: "2.0"

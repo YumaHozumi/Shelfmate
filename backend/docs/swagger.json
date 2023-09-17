@@ -1,0 +1,82 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "contact": {}
+    },
+    "paths": {
+        "/api/books/search": {
+            "get": {
+                "description": "Search books by keyword",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Search books",
+                "operationId": "search-books",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Search keyword",
+                        "name": "isbn",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/object.RSS"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "object.Channel": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/object.Item"
+                    }
+                }
+            }
+        },
+        "object.Item": {
+            "type": "object",
+            "properties": {
+                "author": {
+                    "type": "string"
+                },
+                "detail": {
+                    "type": "string"
+                },
+                "isbn": {
+                    "type": "string"
+                },
+                "public_date": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "object.RSS": {
+            "type": "object",
+            "properties": {
+                "result": {
+                    "$ref": "#/definitions/object.Channel"
+                }
+            }
+        }
+    }
+}

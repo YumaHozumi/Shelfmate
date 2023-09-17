@@ -1,45 +1,118 @@
 <script setup lang="ts">
-import SubmitButton from "@/basic//Login/SubmitButton.vue";
-import Label from "@/basic/Label.vue";
+import SubmitButton from '@/basic//Login/SubmitButton.vue'
+import Label from '@/basic/Label.vue'
+import { ref } from 'vue'
+import {
+  createUserWithEmailAndPassword,
+  sendEmailVerification,
+  fetchSignInMethodsForEmail,
+  EmailAuthProvider
+} from 'firebase/auth'
+import { FirebaseError } from 'firebase/app'
+import ErrorMessage from '@/basic/ErrorMessage.vue'
+import { firebaseErrorMessage } from '@/function'
+import { firebaseAuth } from '@/config/firebase'
+import { watch } from 'vue'
+import { rules } from '@/validation'
 
 interface Emits {
-    (event: "submitButton"): void;
+  (event: 'submitButton'): void
 }
 
-const emit = defineEmits<Emits>();
+const emit = defineEmits<Emits>()
 
-const submitButton = (): void => {
-    emit("submitButton");
-};
+const email = ref('')
+const emailError = ref('')
+const password = ref('')
+const passwordError = ref('')
+const errorMessage = ref('')
+
+const submitButton = async () => {
+  try {
+    const providers = await fetchSignInMethodsForEmail(firebaseAuth, email.value)
+
+    if (providers.findIndex((p) => p === EmailAuthProvider.EMAIL_PASSWORD_SIGN_IN_METHOD) !== -1) {
+      errorMessage.value = 'すでに登録されています'
+      return
+    }
+    const cred = await createUserWithEmailAndPassword(firebaseAuth, email.value, password.value)
+    const actionCodeSettings = {
+      url: 'http://localhost/login', // replace this with the URL of your top page
+      handleCodeInApp: true
+    }
+    await sendEmailVerification(cred.user, actionCodeSettings)
+    emit('submitButton')
+  } catch (e) {
+    if (e instanceof FirebaseError) {
+      errorMessage.value = firebaseErrorMessage(e)
+    }
+  }
+}
+
+watch(email, (newVal) => {
+  const validationResult = rules.email(newVal)
+  if (typeof validationResult === 'string') {
+    emailError.value = validationResult
+  } else {
+    emailError.value = ''
+  }
+})
+
+watch(password, (newVal) => {
+  const validationResult = rules.password(newVal)
+  if (typeof validationResult === 'string') {
+    passwordError.value = validationResult
+  } else {
+    passwordError.value = ''
+  }
+})
 </script>
 
 <template>
-    <v-form>
-        <v-row class="mx-1">
-            <v-col cols="12" class="pb-2">
-                <p>ユーザIDとして登録するメールアドレスを入力してください。</p>
-            </v-col>
-            <v-col cols="12" class="pt-0">
-                <p>入力したメールアドレスに確認コードを送信します。</p>
-            </v-col>
-        </v-row>
-        <v-row class="mx-1">
-            <v-col cols="12">
-                <Label text="メールアドレス" class="mb-3"></Label>
-                <input type="text" class="input-form ps-2">
-            </v-col>
-            <v-col cols="12" class="mb-3">
-                <SubmitButton @submitButton="submitButton" text="確認コードを送信する"
-                color="red"></SubmitButton>
-            </v-col>
-        </v-row>
-    </v-form>
+  <v-form>
+    <v-row class="mx-1">
+      <v-col cols="12">
+        <ErrorMessage :errorMessage="errorMessage"></ErrorMessage>
+      </v-col>
+      <v-col cols="12" class="pb-2">
+        <p>ユーザIDとして登録するメールアドレスを入力してください。</p>
+      </v-col>
+      <v-col cols="12" class="pt-0">
+        <p>入力したメールアドレスに確認メールを送信します。</p>
+      </v-col>
+    </v-row>
+    <v-row class="mx-1">
+      <v-col cols="12">
+        <Label text="メールアドレス" class="mb-3"></Label>
+        <input type="text" class="input-form ps-2 py-1" v-model="email" />
+        <div v-if="emailError" class="error-message">{{ emailError }}</div>
+      </v-col>
+      <v-col cols="12" class="mt-3">
+        <Label text="パスワード" class="mb-3"></Label>
+        <input type="password" class="input-form ps-2 py-1" v-model="password" />
+        <div v-if="passwordError" class="error-message">{{ passwordError }}</div>
+      </v-col>
+      <v-col cols="12" class="mb-3">
+        <SubmitButton
+          @submitButton="submitButton"
+          text="アカウントを作成する"
+          color="red"
+        ></SubmitButton>
+      </v-col>
+    </v-row>
+  </v-form>
 </template>
 
 <style scoped lang="scss">
 .input-form {
-    background-color: white;
-    border: 1px solid rgb(206, 205, 205);
-    width: 100%;
+  background-color: white;
+  border: 1px solid rgb(206, 205, 205);
+  width: 100%;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
 }
 </style>

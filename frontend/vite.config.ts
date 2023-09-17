@@ -12,5 +12,14 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     }
+  },
+  server: {
+    port: 10400,
+    proxy: {
+      '/api': {
+        target: 'http://shelfmate-back:8080',
+        changeOrigin: true,
+      }
+    }
   }
 })

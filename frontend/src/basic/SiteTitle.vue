@@ -1,19 +1,7 @@
-<script setup lang="ts">
-
-
-interface Emits {
-    (event: "clickSiteTitle"): void;
-}
-
-const emit = defineEmits<Emits>();
-
-const clickSiteTitle = (): void => {
-    emit("clickSiteTitle");
-}
-</script>
-
 <template>
-  <v-toolbar-title class="title no-copy" @click="clickSiteTitle">BookShelf</v-toolbar-title>
+  <v-toolbar-title class="title no-copy">
+    <span class="clickable"> ShelfMate </span>
+  </v-toolbar-title>
 </template>
 
 <style scoped lang="scss">
@@ -23,13 +11,16 @@ const clickSiteTitle = (): void => {
   font-size: 24px;
   font-family: 'Lato', sans-serif;
   font-family: 'Tektur', cursive;
-  cursor: pointer;
 
   &.no-copy {
     user-select: none; /* standard syntax */
     -webkit-user-select: none; /* Chrome and Safari */
     -moz-user-select: none; /* Firefox */
     -ms-user-select: none; /* Internet Explorer/Edge */
+  }
+
+  .clickable {
+    cursor: pointer;
   }
 }
 </style>
