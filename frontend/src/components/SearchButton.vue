@@ -105,10 +105,11 @@ const searchClick = async (searchText: string) => {
   const baseURL = '/api/books/search'
   const params = '?isbn=' + searchText
   const completedURL = baseURL + params
-
+  console.log("now")
   await axios
     .get(completedURL)
     .then((res) => {
+      console.log(res)
       errorMsg.value = ''
       const item = res.data?.result?.items?.[0]
       if (item) {

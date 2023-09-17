@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { BookItem } from '@/interface.ts'
+import type { BookItem } from '@/interface'
 import { ref } from 'vue'
 
 interface Props {

@@ -31,3 +31,4 @@ config
 
 **/__pycache/__
 *.pyc
+*.conf

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { firestore, getCurrentUser } from '@/config/firebase'
 import { type BookItem, type Series } from '@/interface'
-import { collection, deleteDoc, doc, getDoc, getDocs, query, where } from 'firebase/firestore'
+import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore'
 import { ref } from 'vue'
 import BookListItem from '@/components/BookListItem.vue'
 import {

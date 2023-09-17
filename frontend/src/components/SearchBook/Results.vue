@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import SearchResult from '@/components/SearchBook/SearchResult.vue'
-import type { BookItem } from '@/interface.ts'
+import type { BookItem } from '@/interface'
 
 interface Props {
   items: BookItem[]
