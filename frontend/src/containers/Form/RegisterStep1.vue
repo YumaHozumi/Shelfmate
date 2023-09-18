@@ -6,14 +6,17 @@ import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
   fetchSignInMethodsForEmail,
-  EmailAuthProvider
+  EmailAuthProvider,
+  getAdditionalUserInfo,
+  type User
 } from 'firebase/auth'
 import { FirebaseError } from 'firebase/app'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
 import { firebaseErrorMessage } from '@/function'
-import { firebaseAuth } from '@/config/firebase'
+import { firebaseAuth, firestore } from '@/config/firebase'
 import { watch } from 'vue'
 import { rules } from '@/validation'
+import { addDoc, collection, getDocs } from 'firebase/firestore'
 
 interface Emits {
   (event: 'submitButton'): void
@@ -27,6 +30,16 @@ const password = ref('')
 const passwordError = ref('')
 const errorMessage = ref('')
 
+const initBookshelf = async (user: User) => {
+  const bookShelfCollection = collection(firestore, 'users', user.uid, 'bookshelves')
+   // コレクションからドキュメントをクエリ
+   const querySnapshot = await getDocs(bookShelfCollection)
+  // クエリが空の場合、ドキュメントを追加
+  if (querySnapshot.empty) {
+    await addDoc(bookShelfCollection, { shelf_name: '始まりの本棚' })
+  }
+}
+
 const submitButton = async () => {
   try {
     const providers = await fetchSignInMethodsForEmail(firebaseAuth, email.value)
@@ -37,9 +50,15 @@ const submitButton = async () => {
     }
     const cred = await createUserWithEmailAndPassword(firebaseAuth, email.value, password.value)
     const actionCodeSettings = {
-      url: 'http://localhost/login', // replace this with the URL of your top page
+      //url: 'http://shelfmate.hzmintech.com/login', // replace this with the URL of your top page
+      url: "http://localhost/login",
       handleCodeInApp: true
     }
+
+    const isNewUser = getAdditionalUserInfo(cred)?.isNewUser; //新しく登録された？
+    
+    if(isNewUser) await initBookshelf(cred.user) //始まりの本棚を作成
+
     await sendEmailVerification(cred.user, actionCodeSettings)
     emit('submitButton')
   } catch (e) {

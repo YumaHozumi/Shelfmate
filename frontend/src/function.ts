@@ -1,7 +1,8 @@
 import { FirebaseError } from 'firebase/app'
-import { DocumentReference, getDoc, increment, updateDoc } from 'firebase/firestore'
+import { DocumentReference, addDoc, collection, getDoc, getDocs, increment, updateDoc } from 'firebase/firestore'
 import { isSeries, type BookItem, type BookShelf, type Series } from './interface'
 import { openDB } from 'idb'
+import { firestore, getCurrentUser } from './config/firebase'
 
 const firebaseErrorMessage = (e: FirebaseError): string => {
   switch (e.code) {
@@ -272,6 +273,17 @@ const deleteSpecificBookData = async (
   }
 }
 
+const onInitBookshelf = async () => {
+  const user = await getCurrentUser()
+  const bookShelfCollection = collection(firestore, 'users', user.uid, 'bookshelves')
+  // コレクションからドキュメントをクエリ
+  const querySnapshot = await getDocs(bookShelfCollection)
+  // クエリが空の場合、ドキュメントを追加
+  if (querySnapshot.empty) {
+    await addDoc(bookShelfCollection, { shelf_name: '始まりの本棚' })
+  }
+}
+
 export {
   firebaseErrorMessage,
   incrementCounter,
@@ -287,5 +299,6 @@ export {
   setSeriesBooksData,
   deleteSeriesBooksData,
   deleteSpecificBookData,
-  addSeriesBooksData
+  addSeriesBooksData,
+  onInitBookshelf
 }
