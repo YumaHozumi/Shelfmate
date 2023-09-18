@@ -14,12 +14,13 @@ import { FirebaseError } from 'firebase/app'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
 import { firebaseErrorMessage } from '@/function'
 import { firebaseAuth, firestore } from '@/config/firebase'
-import { watch } from 'vue'
+import { watch, computed } from 'vue'
 import { rules } from '@/validation'
 import { addDoc, collection, getDocs } from 'firebase/firestore'
 
 interface Emits {
   (event: 'submitButton'): void
+  (event: "updateLoading", flag: boolean): void
 }
 
 const emit = defineEmits<Emits>()
@@ -41,6 +42,8 @@ const initBookshelf = async (user: User) => {
 }
 
 const submitButton = async () => {
+  emit("updateLoading", true);
+
   try {
     const providers = await fetchSignInMethodsForEmail(firebaseAuth, email.value)
 
@@ -50,8 +53,8 @@ const submitButton = async () => {
     }
     const cred = await createUserWithEmailAndPassword(firebaseAuth, email.value, password.value)
     const actionCodeSettings = {
-      //url: 'http://shelfmate.hzmintech.com/login', // replace this with the URL of your top page
-      url: "http://localhost/login",
+      url: 'http://shelfmate.hzmintech.com/login', // replace this with the URL of your top page
+      //url: "http://localhost/login",
       handleCodeInApp: true
     }
 
@@ -60,11 +63,13 @@ const submitButton = async () => {
     if(isNewUser) await initBookshelf(cred.user) //始まりの本棚を作成
 
     await sendEmailVerification(cred.user, actionCodeSettings)
+    emit("updateLoading", false);
     emit('submitButton')
   } catch (e) {
     if (e instanceof FirebaseError) {
       errorMessage.value = firebaseErrorMessage(e)
     }
+    emit("updateLoading", false);
   }
 }
 
@@ -85,6 +90,11 @@ watch(password, (newVal) => {
     passwordError.value = ''
   }
 })
+
+
+const isButtonDisabled = computed(() => {
+  return emailError.value !== '' || passwordError.value !== '' || !email.value || !password.value;
+});
 </script>
 
 <template>
@@ -116,6 +126,7 @@ watch(password, (newVal) => {
           @submitButton="submitButton"
           text="アカウントを作成する"
           color="red"
+          :disabled="isButtonDisabled"
         ></SubmitButton>
       </v-col>
     </v-row>

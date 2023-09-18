@@ -24,6 +24,7 @@ const errorMessage = ref('')
 const currentCompIndex = ref(0)
 
 const switchComp = (): void => {
+
   errorMessage.value = ''
   currentCompIndex.value++
 }
@@ -66,16 +67,21 @@ onMounted(async () => {
   // リダイレクト処理が終わったらレンダリングを許可
   isLoading.value = false
 })
+
+const updateLoading = (flag: boolean) => {
+  console.log(flag)
+  isLoading.value = flag;
+}
 </script>
 
 <template>
   <LoadingContainer :isLoading="isLoading"></LoadingContainer>
-  <div v-if="!isLoading">
+  <div v-show="!isLoading">
     <Header @navigate="onNavigate"></Header>
     <v-sheet width="500" class="mx-auto form px-10 py-3 mt-5 no-radius-bottom">
       <ProgressBar :currentStep="currentCompIndex"></ProgressBar>
       <ErrorMessage :errorMessage="errorMessage" class="mx-4"></ErrorMessage>
-      <RegisterStep1 v-if="currentCompIndex == 0" @submitButton="switchComp"></RegisterStep1>
+      <RegisterStep1 v-if="currentCompIndex == 0" @submitButton="switchComp" @updateLoading="updateLoading"></RegisterStep1>
       <RegisterStep2
         v-if="currentCompIndex == 1"
         @back="back"
