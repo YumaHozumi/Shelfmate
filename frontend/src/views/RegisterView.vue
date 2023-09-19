@@ -69,7 +69,6 @@ onMounted(async () => {
 })
 
 const updateLoading = (flag: boolean) => {
-  console.log(flag)
   isLoading.value = flag;
 }
 </script>
