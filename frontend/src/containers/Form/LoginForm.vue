@@ -3,7 +3,7 @@ import SubmitButton from '@/basic//Login/SubmitButton.vue'
 import GoogleButton from '@/basic/Login/GoogleButton.vue'
 import Link from '@/basic/Login/Link.vue'
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect } from 'firebase/auth'
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { FirebaseError } from 'firebase/app'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
 import { firebaseErrorMessage } from '@/function'
@@ -66,6 +66,10 @@ watch(password, (newVal) => {
     passwordError.value = ''
   }
 })
+
+const isButtonDisabled = computed(() => {
+  return emailError.value !== '' || passwordError.value !== '' || !email.value || !password.value;
+});
 </script>
 
 <template>
@@ -93,6 +97,7 @@ watch(password, (newVal) => {
                 @submitButton="submitButton"
                 text="ログイン"
                 color="blue"
+                :disabled="isButtonDisabled"
               ></SubmitButton>
             </v-col>
           </v-row>

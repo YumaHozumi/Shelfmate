@@ -10,9 +10,9 @@ import { getRedirectResult, GoogleAuthProvider, signInWithRedirect } from 'fireb
 import { FirebaseError } from 'firebase/app'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
 import { firebaseErrorMessage } from '@/function'
-import { firebaseAuth, getCurrentUser, firestore } from '@/config/firebase'
+import { firebaseAuth } from '@/config/firebase'
 import LoadingContainer from '@/containers/LoadingContainer.vue'
-import { collection, addDoc, getDocs } from 'firebase/firestore'
+import { onInitBookshelf } from '@/function'
 
 const onNavigate = (name: string): void => {
   router.push({ name: name })
@@ -24,6 +24,7 @@ const errorMessage = ref('')
 const currentCompIndex = ref(0)
 
 const switchComp = (): void => {
+
   errorMessage.value = ''
   currentCompIndex.value++
 }
@@ -49,18 +50,6 @@ const clickGoogleButton = async () => {
 // レンダリングフラグを追加
 const isLoading = ref(true)
 
-const onInitBookshelf = async () => {
-  const user = await getCurrentUser()
-  const bookShelfCollection = collection(firestore, 'users', user.uid, 'bookshelves')
-
-  // コレクションからドキュメントをクエリ
-  const querySnapshot = await getDocs(bookShelfCollection)
-
-  // クエリが空の場合、ドキュメントを追加
-  if (querySnapshot.empty) {
-    await addDoc(bookShelfCollection, { shelf_name: '始まりの本棚' })
-  }
-}
 onMounted(async () => {
   try {
     isLoading.value = true
@@ -78,16 +67,20 @@ onMounted(async () => {
   // リダイレクト処理が終わったらレンダリングを許可
   isLoading.value = false
 })
+
+const updateLoading = (flag: boolean) => {
+  isLoading.value = flag;
+}
 </script>
 
 <template>
   <LoadingContainer :isLoading="isLoading"></LoadingContainer>
-  <div v-if="!isLoading">
+  <div v-show="!isLoading">
     <Header @navigate="onNavigate"></Header>
     <v-sheet width="500" class="mx-auto form px-10 py-3 mt-5 no-radius-bottom">
       <ProgressBar :currentStep="currentCompIndex"></ProgressBar>
       <ErrorMessage :errorMessage="errorMessage" class="mx-4"></ErrorMessage>
-      <RegisterStep1 v-if="currentCompIndex == 0" @submitButton="switchComp"></RegisterStep1>
+      <RegisterStep1 v-if="currentCompIndex == 0" @submitButton="switchComp" @updateLoading="updateLoading"></RegisterStep1>
       <RegisterStep2
         v-if="currentCompIndex == 1"
         @back="back"
