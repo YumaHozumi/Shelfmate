@@ -53,8 +53,8 @@ const submitButton = async () => {
     }
     const cred = await createUserWithEmailAndPassword(firebaseAuth, email.value, password.value)
     const actionCodeSettings = {
-      url: 'http://shelfmate.hzmintech.com/login', // replace this with the URL of your top page
-      //url: "http://localhost/login",
+      //url: 'http://shelfmate.hzmintech.com/login', // replace this with the URL of your top page
+      url: "http://localhost/login",
       handleCodeInApp: true
     }
 
