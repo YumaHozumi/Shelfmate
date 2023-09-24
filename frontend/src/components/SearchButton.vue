@@ -8,7 +8,7 @@ import {
   type BookItem,
   type BookShelf,
   type SelectSeriesItem,
-  type BookItemNoSeries,
+  type BookItemNoSeries
 } from '@/interface'
 import {
   Timestamp,

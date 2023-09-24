@@ -51,8 +51,8 @@ router.beforeEach((to, from, next) => {
       })
     }).then((user) => {
       if (user) {
-        if(user.emailVerified) next() // 認証済みの場合は次へ進む
-        else next({name: 'Login'})
+        if (user.emailVerified) next() // 認証済みの場合は次へ進む
+        else next({ name: 'Login' })
       } else {
         next({ name: 'Login' }) // 未認証の場合はログインページへ
       }

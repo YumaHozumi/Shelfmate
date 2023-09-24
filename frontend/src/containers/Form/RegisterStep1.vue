@@ -20,7 +20,7 @@ import { addDoc, collection, getDocs } from 'firebase/firestore'
 
 interface Emits {
   (event: 'submitButton'): void
-  (event: "updateLoading", flag: boolean): void
+  (event: 'updateLoading', flag: boolean): void
 }
 
 const emit = defineEmits<Emits>()
@@ -33,8 +33,8 @@ const errorMessage = ref('')
 
 const initBookshelf = async (user: User) => {
   const bookShelfCollection = collection(firestore, 'users', user.uid, 'bookshelves')
-   // コレクションからドキュメントをクエリ
-   const querySnapshot = await getDocs(bookShelfCollection)
+  // コレクションからドキュメントをクエリ
+  const querySnapshot = await getDocs(bookShelfCollection)
   // クエリが空の場合、ドキュメントを追加
   if (querySnapshot.empty) {
     await addDoc(bookShelfCollection, { shelf_name: '始まりの本棚' })
@@ -42,7 +42,7 @@ const initBookshelf = async (user: User) => {
 }
 
 const submitButton = async () => {
-  emit("updateLoading", true);
+  emit('updateLoading', true)
 
   try {
     const providers = await fetchSignInMethodsForEmail(firebaseAuth, email.value)
@@ -54,22 +54,22 @@ const submitButton = async () => {
     const cred = await createUserWithEmailAndPassword(firebaseAuth, email.value, password.value)
     const actionCodeSettings = {
       //url: 'http://shelfmate.hzmintech.com/login', // replace this with the URL of your top page
-      url: "http://localhost/login",
+      url: 'http://localhost/login',
       handleCodeInApp: true
     }
 
-    const isNewUser = getAdditionalUserInfo(cred)?.isNewUser; //新しく登録された？
-    
-    if(isNewUser) await initBookshelf(cred.user) //始まりの本棚を作成
+    const isNewUser = getAdditionalUserInfo(cred)?.isNewUser //新しく登録された？
+
+    if (isNewUser) await initBookshelf(cred.user) //始まりの本棚を作成
 
     await sendEmailVerification(cred.user, actionCodeSettings)
-    emit("updateLoading", false);
+    emit('updateLoading', false)
     emit('submitButton')
   } catch (e) {
     if (e instanceof FirebaseError) {
       errorMessage.value = firebaseErrorMessage(e)
     }
-    emit("updateLoading", false);
+    emit('updateLoading', false)
   }
 }
 
@@ -91,10 +91,9 @@ watch(password, (newVal) => {
   }
 })
 
-
 const isButtonDisabled = computed(() => {
-  return emailError.value !== '' || passwordError.value !== '' || !email.value || !password.value;
-});
+  return emailError.value !== '' || passwordError.value !== '' || !email.value || !password.value
+})
 </script>
 
 <template>
