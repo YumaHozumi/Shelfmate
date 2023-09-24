@@ -68,8 +68,8 @@ watch(password, (newVal) => {
 })
 
 const isButtonDisabled = computed(() => {
-  return emailError.value !== '' || passwordError.value !== '' || !email.value || !password.value;
-});
+  return emailError.value !== '' || passwordError.value !== '' || !email.value || !password.value
+})
 </script>
 
 <template>

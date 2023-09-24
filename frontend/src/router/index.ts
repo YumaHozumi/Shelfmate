@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 import AppTop from '@/views/AppTopView.vue'
-import { onAuthStateChanged } from 'firebase/auth'
+import { onAuthStateChanged, type User } from 'firebase/auth'
 import { firebaseAuth } from '@/config/firebase'
 
 const routeSettings: RouteRecordRaw[] = [
@@ -45,13 +45,14 @@ router.beforeEach((to, from, next) => {
   const requireAuth = to.matched.some((record) => record.meta.requireAuth)
   if (requireAuth) {
     // Promiseを使って認証状態の確認を非同期に行う
-    new Promise((resolve) => {
+    new Promise<User | null>((resolve) => {
       onAuthStateChanged(firebaseAuth, (user) => {
         resolve(user) // ユーザー情報またはnullを解決
       })
     }).then((user) => {
       if (user) {
-        next() // 認証済みの場合は次へ進む
+        if (user.emailVerified) next() // 認証済みの場合は次へ進む
+        else next({ name: 'Login' })
       } else {
         next({ name: 'Login' }) // 未認証の場合はログインページへ
       }

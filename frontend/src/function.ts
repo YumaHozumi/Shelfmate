@@ -1,5 +1,13 @@
 import { FirebaseError } from 'firebase/app'
-import { DocumentReference, addDoc, collection, getDoc, getDocs, increment, updateDoc } from 'firebase/firestore'
+import {
+  DocumentReference,
+  addDoc,
+  collection,
+  getDoc,
+  getDocs,
+  increment,
+  updateDoc
+} from 'firebase/firestore'
 import { isSeries, type BookItem, type BookShelf, type Series } from './interface'
 import { openDB } from 'idb'
 import { firestore, getCurrentUser } from './config/firebase'

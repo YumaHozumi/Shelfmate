@@ -2,11 +2,12 @@
 import SiteTitle from '@/basic/SiteTitle.vue'
 import LoginButton from '@/basic/LoginButton.vue'
 import { ref, watchEffect } from 'vue'
-import { onAuthStateChanged, type Unsubscribe } from 'firebase/auth'
+import { onAuthStateChanged, type Unsubscribe, signOut } from 'firebase/auth'
 import MyDialog from '@/components/MyDialog.vue'
 import { getCurrentUser, firebaseAuth, firestore } from '@/config/firebase'
 import { collection, addDoc } from 'firebase/firestore'
 import { onUnmounted } from 'vue'
+import UserIcon from "@/components/UserIcon.vue"
 
 interface Emits {
   (event: 'navigate', name: string): void
@@ -56,6 +57,15 @@ const onCreateButton = async (shelf_name: string) => {
   const bookShelfCollection = collection(firestore, 'users', user.uid, 'bookshelves')
   await addDoc(bookShelfCollection, { shelf_name: shelf_name })
 }
+
+const logout = async () => {
+  try {
+    await signOut(firebaseAuth);
+    emit('navigate', 'Login');
+  } catch(error) {
+    console.log("ログアウトに失敗しました", error);
+  }
+}
 </script>
 
 <template>
@@ -66,6 +76,9 @@ const onCreateButton = async (shelf_name: string) => {
       <v-icon>mdi-account-plus-outline</v-icon>
       新規登録
     </v-btn>
+    
+    <UserIcon class="icon" @clickUserIcon="logout" v-if="!isShow"></UserIcon>
+
     <MyDialog
       color="green"
       btnText="本棚を作成"
@@ -100,5 +113,9 @@ const onCreateButton = async (shelf_name: string) => {
 
 .header-border {
   border-bottom: 1px solid rgb(209, 209, 209);
+}
+
+.icon {
+  margin-right: 1%;
 }
 </style>
