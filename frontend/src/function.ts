@@ -86,6 +86,7 @@ const dbPromise = openDB('my-database', 1, {
     db.createObjectStore('bookshelves')
     db.createObjectStore('series')
     db.createObjectStore('series-books')
+    db.createObjectStore("allBooks")
   }
 })
 
@@ -112,6 +113,8 @@ const getBookshelvesData = async (uid: string) => {
   }
   return null
 }
+
+
 
 const setSeriesData = async (uid: string, doc_id: string, data: (Series | BookItem)[]) => {
   const db = await dbPromise
@@ -292,6 +295,29 @@ const onInitBookshelf = async () => {
   }
 }
 
+const setRegisteredBooksData = async (uid: string, selectedBookshelfId: string, data: BookItem[]) => {
+  const db = await dbPromise;
+  const timestamp = Date.now();
+  await db.put('allBooks', JSON.stringify({ data, timestamp }), `${uid}-${selectedBookshelfId}`);
+}
+
+const getRegisteredBooksData = async (uid: string, selectedBookshelfId: string) => {
+  const db = await dbPromise;
+  const result = await db.get('allBooks', `${uid}-${selectedBookshelfId}`);
+  if (result) {
+    const { data, timestamp } = JSON.parse(result);
+
+    // 有効期限を12時間と設定（43200000ミリ秒 = 12時間）
+    const expiryTime = 43200000;
+    if (Date.now() - timestamp < expiryTime) {
+      return data;
+    } else {
+      return null;
+    }
+  }
+  return null;
+}
+
 export {
   firebaseErrorMessage,
   incrementCounter,
@@ -308,5 +334,7 @@ export {
   deleteSeriesBooksData,
   deleteSpecificBookData,
   addSeriesBooksData,
-  onInitBookshelf
+  onInitBookshelf,
+  setRegisteredBooksData,
+  getRegisteredBooksData
 }

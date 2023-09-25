@@ -26,7 +26,7 @@ import { onAuthStateChanged } from 'firebase/auth'
 import { implementBookShelf, type BookItemNoSeries } from '@/interface'
 import { onUnmounted, computed } from 'vue'
 import router from '@/router'
-import { incrementCounter, sort, addSeriesDataItem, addSeriesBooksData } from '@/function'
+import { incrementCounter, sort, addSeriesDataItem, addSeriesBooksData, getRegisteredBooksData, setRegisteredBooksData } from '@/function'
 import { Timestamp } from 'firebase/firestore'
 import Pagination from '@/components/SearchBook/Pagination.vue'
 import SearchButton from '@/components/SearchButton.vue'
@@ -117,9 +117,19 @@ const searchClick = async (searchText: string) => {
 
 const menu = ['発売日が新しい順', '発売日が古い順', '作品名順', '作者名順']
 
+// 既存の関数に追加
+const updateRegisteredBooksCache = async (uid: string, bookShelfId: string, newBook: BookItem) => {
+  const cachedData = await getRegisteredBooksData(uid, bookShelfId);
+  if (cachedData) {
+    cachedData.push(newBook);
+    await setRegisteredBooksData(uid, bookShelfId, cachedData);
+  }
+}
+
+// 既存の関数を改善
 const registerBookId = async (bookShelfId: string, book: BookItem): Promise<boolean> => {
   try {
-    const user = await getCurrentUser()
+    const user = await getCurrentUser();
     const bookshelvesRef = collection(
       firestore,
       'users',
@@ -127,27 +137,39 @@ const registerBookId = async (bookShelfId: string, book: BookItem): Promise<bool
       'bookshelves',
       bookShelfId,
       'allBooks'
-    )
-    const q = query(bookshelvesRef, where('bookId', '==', book.bookId))
-    const querySnapshot = await getDocs(q)
+    );
+    const q = query(bookshelvesRef, where('bookId', '==', book.bookId));
+    const querySnapshot = await getDocs(q);
 
     if (querySnapshot.docs.length > 0) {
-      return false
+      return false;
     } else {
-      await addDoc(bookshelvesRef, book)
-      return true
+      await addDoc(bookshelvesRef, book);
+
+      // キャッシュを更新
+      await updateRegisteredBooksCache(user.uid, bookShelfId, book);
+
+      return true;
     }
   } catch (error) {
-    console.log(error)
-    return false
+    console.log(error);
+    return false;
   }
 }
 
 const registeredBooks = ref<BookItem[]>([])
 
 const setRegisteredBooks = async () => {
-  const user = await getCurrentUser()
-  const selectedBookshelfId = selectedBookshelf.value?.doc_id || ''
+  const user = await getCurrentUser();
+  const selectedBookshelfId = selectedBookshelf.value?.doc_id || '';
+  
+  // キャッシュからデータを取得
+  const cachedData = await getRegisteredBooksData(user.uid, selectedBookshelfId);
+  if (cachedData) {
+    registeredBooks.value = cachedData;
+    return;
+  }
+
   const bookshelvesRef = collection(
     firestore,
     'users',
@@ -155,10 +177,13 @@ const setRegisteredBooks = async () => {
     'bookshelves',
     selectedBookshelfId,
     'allBooks'
-  )
-  const booksSnapshot = await getDocs(bookshelvesRef)
+  );
+  const booksSnapshot = await getDocs(bookshelvesRef);
 
-  registeredBooks.value = booksSnapshot.docs.map((doc) => doc.data() as BookItem)
+  registeredBooks.value = booksSnapshot.docs.map((doc) => doc.data() as BookItem);
+
+  // データをキャッシュに保存
+  await setRegisteredBooksData(user.uid, selectedBookshelfId, registeredBooks.value);
 }
 
 //シリーズの部分のテキストだけを抽出する正規表現
