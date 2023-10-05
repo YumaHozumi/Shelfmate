@@ -9,30 +9,25 @@ const routeSettings: RouteRecordRaw[] = [
     path: '/',
     name: 'AppTop',
     component: AppTop,
-    meta: { requireAuth: true }
+    meta: { requireAuth: true, title: "本棚画面" }
   },
   {
     path: '/login',
     name: 'Login',
-    component: () => import('@/views/LoginView.vue')
+    component: () => import('@/views/LoginView.vue'),
+    meta: { title: "ログイン"}
   },
   {
     path: '/register',
     name: 'Register',
-    component: () => import('@/views/RegisterView.vue')
-  },
-  {
-    path: '/series/:id',
-    name: 'Series',
-    props: true,
-    component: () => import('@/views/SeriesView.vue'),
-    meta: { requireAuth: true }
+    component: () => import('@/views/RegisterView.vue'),
+    meta: { title: "新規登録"}
   },
   {
     path: '/search',
     name: 'Search',
     component: () => import('@/views/SearchBookView.vue'),
-    meta: { requireAuth: true }
+    meta: { requireAuth: true, title: "検索画面" }
   }
 ]
 
@@ -60,6 +55,13 @@ router.beforeEach((to, from, next) => {
   } else {
     next()
   }
+})
+
+//const DEFAULT_TITLE = "Shelfmate"
+
+router.afterEach((to) => {
+  const title = to.meta.title
+  document.title = title
 })
 
 export default router
