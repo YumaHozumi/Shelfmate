@@ -318,6 +318,23 @@ const getRegisteredBooksData = async (uid: string, selectedBookshelfId: string) 
   return null;
 }
 
+const deleteRegisteredBook = async (uid: string, selectedBookshelfId: string, targetBookId: string) => {
+  const db = await dbPromise;
+  
+  // 既存のデータを取得
+  const result = await db.get('allBooks', `${uid}-${selectedBookshelfId}`);
+  if (result) {
+    const { data, _ } = JSON.parse(result);
+
+    // 対象のBookItemを除外した新しいデータ配列を作成
+    const newData = data.filter((bookItem: BookItem) => bookItem.bookId !== targetBookId);
+
+    // データベースを更新
+    await db.put('allBooks', JSON.stringify({ data: newData, timestamp: Date.now() }), `${uid}-${selectedBookshelfId}`);
+  }
+}
+
+
 export {
   firebaseErrorMessage,
   incrementCounter,
@@ -336,5 +353,6 @@ export {
   addSeriesBooksData,
   onInitBookshelf,
   setRegisteredBooksData,
-  getRegisteredBooksData
+  getRegisteredBooksData,
+  deleteRegisteredBook
 }

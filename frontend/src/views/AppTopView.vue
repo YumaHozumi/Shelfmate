@@ -8,7 +8,7 @@ import { ref } from 'vue'
 import { implementBookShelf, type BookShelf, type BookItem, type Series, Action } from '@/interface'
 import { firestore, getCurrentUser } from '@/config/firebase'
 import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore'
-import { deleteSeriesBooksData, deleteSeriesDataItem } from '@/function'
+import { deleteRegisteredBook, deleteSeriesBooksData, deleteSeriesDataItem } from '@/function'
 
 const onNavigate = (name: string): void => {
   router.push({ name: name })
@@ -134,6 +134,7 @@ const deleteBook = async () => {
         await deleteDoc(docFirst.ref)
 
         await deleteSeriesDataItem(uid, bookshelfId, item)
+        await deleteRegisteredBook(uid, bookshelfId, item.bookId);
       }
     }
 
@@ -175,8 +176,9 @@ const deleteBook = async () => {
           await deleteSeriesDataItem(uid, bookshelfId, series)
           await deleteSeriesBooksData(uid, bookshelfId, series.seriesId)
         }
-
+        
         await deleteDoc(docSnapshot.ref)
+        await deleteRegisteredBook(uid, bookshelfId, bookData.bookId);
       }
 
       // After deleting all books in the series, delete the series itself

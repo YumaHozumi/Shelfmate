@@ -10,7 +10,8 @@ import {
   sort,
   deleteSpecificBookData,
   decrementCounter,
-  deleteSeriesBooksData
+  deleteSeriesBooksData,
+  deleteRegisteredBook
 } from '@/function'
 import Menu from '@/components/Menu.vue'
 import { watch } from 'vue'
@@ -165,6 +166,8 @@ const deleteBooks = async () => {
           await deleteDoc(seriesDocRef)
           await deleteSeriesBooksData(user.uid, prop.selectBookshelfId, prop.series.seriesId)
         }
+
+        await deleteRegisteredBook(user.uid, prop.selectBookshelfId, book.bookId);
       }
     }
     selectedBooks.value.length = 0
