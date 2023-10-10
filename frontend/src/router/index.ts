@@ -61,7 +61,7 @@ router.beforeEach((to, from, next) => {
 
 router.afterEach((to) => {
   const title = to.meta.title
-  document.title = title
+  if(typeof title === "string") document.title = title
 })
 
 export default router
