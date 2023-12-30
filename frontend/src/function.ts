@@ -11,6 +11,8 @@ import {
 import { isSeries, type BookItem, type BookShelf, type Series } from './interface'
 import { openDB } from 'idb'
 import { firestore, getCurrentUser } from './config/firebase'
+import { Timestamp } from 'firebase/firestore'
+import NO_IMAGE from '@/assets/no-image.png'
 
 const firebaseErrorMessage = (e: FirebaseError): string => {
   switch (e.code) {
@@ -334,6 +336,27 @@ const deleteRegisteredBook = async (uid: string, selectedBookshelfId: string, ta
   }
 }
 
+const transformApiResponseToBookItems = (apiResponse: any): BookItem[] => {
+  const books: BookItem[] = apiResponse.map((item: any) => {
+    const volumeInfo = item.volumeInfo;
+    const isbnInfo = volumeInfo.industryIdentifiers?.find((identifier: any) => identifier.type === 'ISBN_13') || volumeInfo.industryIdentifiers?.[0];
+    const isbn = isbnInfo ? parseInt(isbnInfo.identifier, 10) : undefined;
+    
+    return {
+      bookId: item.id,
+      isbn: isbn ?? 0,
+      title: volumeInfo.title ?? '',
+      image_url: volumeInfo.imageLinks?.thumbnail ?? NO_IMAGE,
+      author: volumeInfo.authors?.[0] ?? '',
+      detail: item.searchInfo?.textSnippet ?? '',
+      public_date: Timestamp.fromDate(new Date(volumeInfo.publishedDate || 0)),
+      seriesId: item.volumeInfo?.seriesInfo?.volumeSeries?.[0]?.seriesId ?? '',
+      orderNumber: item.volumeInfo?.seriesInfo?.volumeSeries?.[0]?.orderNumber ?? 0
+    } as BookItem;
+  })
+  return books;
+}
+
 
 export {
   firebaseErrorMessage,
@@ -354,5 +377,6 @@ export {
   onInitBookshelf,
   setRegisteredBooksData,
   getRegisteredBooksData,
-  deleteRegisteredBook
+  deleteRegisteredBook,
+  transformApiResponseToBookItems,
 }

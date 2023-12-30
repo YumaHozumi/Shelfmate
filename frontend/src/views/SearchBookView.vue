@@ -21,34 +21,31 @@ import {
   where,
   type Unsubscribe
 } from 'firebase/firestore'
-import imageURL from '@/assets/no-image.png'
+
 import { onAuthStateChanged } from 'firebase/auth'
 import { implementBookShelf, type BookItemNoSeries } from '@/interface'
 import { onUnmounted, computed } from 'vue'
 import router from '@/router'
 import { incrementCounter, sort, addSeriesDataItem, addSeriesBooksData, getRegisteredBooksData, setRegisteredBooksData } from '@/function'
-import { Timestamp } from 'firebase/firestore'
 import Pagination from '@/components/SearchBook/Pagination.vue'
 import SearchButton from '@/components/SearchButton.vue'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
-import { setBookshelvesData, getBookshelvesData } from '@/function'
+import { setBookshelvesData, getBookshelvesData, transformApiResponseToBookItems } from '@/function'
 
+//ナビゲーション処理
 const onNavigate = (name: string): void => {
   router.push({ name: name })
 }
 
-const itemsInit: BookItem[] = []
-const items = ref(itemsInit)
-const isLoading = ref(false)
-const errorMsg = ref('')
-
-//Google Books APIに検索クエリ投げる
-const search = async (searchText: string): Promise<BookItem[]> => {
+//エンコード済みのクエリ付きURLを組み立てる 
+//ex) https://www.googleapis.com/books/v1/volumes?q=hogehoge+helloworld
+const assembleURL = (searchText: string): string =>  {
   const baseURL = 'https://www.googleapis.com/books/v1/volumes'
-  const replaceText = searchText.replace(/[\s\u3000]/g, '+')
+  //半角 or 全角 → 「+」 に変換
+  const blankReplaceText = searchText.replace(/[\s\u3000]/g, '+')
 
   const params: Record<string, string> = {
-    q: replaceText,
+    q: blankReplaceText,
     printType: 'books',
     filter: 'ebooks',
     maxResults: '5',
@@ -63,35 +60,32 @@ const search = async (searchText: string): Promise<BookItem[]> => {
     .join('&')
 
   const completedURL = `${baseURL}?${queryString}`
+  return completedURL
+}
 
+const itemsInit: BookItem[] = []
+const items    =  ref(itemsInit)
+const isLoading = ref(false)
+const errorMsg  = ref('')
+
+//Google Books APIに検索クエリ投げる
+const search = async (searchText: string): Promise<BookItem[]> => {
+  const API_URL = assembleURL(searchText);
   let books: BookItem[] = []
 
   try {
     errorMsg.value = ''
-    const res = await axios.get(completedURL)
-    const apiItems = res.data.items
+    const res = await axios.get(API_URL)
+    books = transformApiResponseToBookItems(res.data.items)
 
-    if (!apiItems || apiItems.length === 0) {
+    if (!books || books.length === 0) {
       errorMsg.value = '本が見つかりませんでした' // 404エラーメッセージを設定
-      return books // 空の本の配列を返す
+      return [] // 空の本の配列を返す
     }
 
-    books = apiItems.map((item: any) => ({
-      bookId: item.id,
-      isbn: item.volumeInfo?.industryIdentifiers?.[1]?.identifier ?? 0,
-      title: item.volumeInfo?.title ?? '',
-      image_url: item.volumeInfo?.imageLinks?.thumbnail ?? imageURL,
-      author: item.volumeInfo?.authors?.[0] ?? '',
-      detail: item.searchInfo?.textSnippet ?? '',
-      public_date: Timestamp.fromDate(new Date(item.volumeInfo?.publishedDate || 0)),
-      seriesId: item.volumeInfo?.seriesInfo?.volumeSeries?.[0]?.seriesId ?? '',
-      orderNumber: item.volumeInfo?.seriesInfo?.volumeSeries?.[0]?.orderNumber ?? 0
-    }))
-
     books.forEach((book) => {
-      if (book.isbn !== undefined && book.image_url === undefined) {
-        book.image_url = 'https://iss.ndl.go.jp/thumbnail/' + book.isbn
-      }
+      if (book.isbn === undefined || book.image_url !== undefined) return;
+      book.image_url = 'https://iss.ndl.go.jp/thumbnail/' + book.isbn
     })
   } catch (error) {
     console.log(error)
