@@ -54,6 +54,7 @@ onAuthStateChanged(firebaseAuth, (user) => {
   if (user) {
     unsubscribe = onSnapshot(
       collection(firestore, 'users', user.uid, 'bookshelves'),
+      {includeMetadataChanges: true},
       async (snapshot) => {
         if (isInitialLoad) {
           isInitialLoad = false
