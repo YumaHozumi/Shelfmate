@@ -19,7 +19,8 @@ import {
   setDoc,
   updateDoc,
   where,
-  type Unsubscribe
+  type Unsubscribe,
+  CollectionReference
 } from 'firebase/firestore'
 
 import { onAuthStateChanged, type User } from 'firebase/auth'
@@ -30,7 +31,8 @@ import { incrementCounter, sort } from '@/function'
 import Pagination from '@/components/SearchBook/Pagination.vue'
 import SearchButton from '@/components/SearchButton.vue'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
-import { setBookshelvesData, getBookshelvesData, transformApiResponseToBookItems } from '@/function'
+import { setBookshelvesData, transformApiResponseToBookItems } from '@/function'
+import type OptionContainerVue from '@/containers/OptionContainer.vue'
 
 //ナビゲーション処理
 const onNavigate = (name: string): void => {
@@ -246,39 +248,14 @@ const registerBook = async (book: BookItem) => {
 
 const buttons = ref<BookShelf[]>([])
 
-let isInitialLoad = true
-
 let unsubscribe: Unsubscribe
 
 onAuthStateChanged(firebaseAuth, (user) => {
   if (user) {
     unsubscribe = onSnapshot(
-      collection(firestore, 'users', user.uid, 'bookshelves'),
+      collection(firestore, 'users', user.uid, 'bookshelves') as CollectionReference<BookShelf>,
       {includeMetadataChanges: true},
       async (snapshot) => {
-        if (isInitialLoad) {
-          isInitialLoad = false
-          const localCache = await getBookshelvesData(user.uid)
-          if (!localCache) {
-            //ローカルキャッシュがない場合、Firestoreからデータを取得
-            buttons.value = snapshot.docs
-              .map((doc) => {
-                const data = doc.data()
-                if (implementBookShelf(data)) {
-                  const bookShelfData: BookShelf = { doc_id: doc.id, ...data }
-                  return bookShelfData
-                }
-                return undefined
-              })
-              .filter((item): item is BookShelf => item !== undefined)
-
-            await setBookshelvesData(user.uid, buttons.value)
-          } else {
-            //ある場合
-            //ローカルキャッシュからデータを取得
-            buttons.value = localCache
-          }
-        } else {
           snapshot.docChanges().forEach(async (change) => {
             const data = change.doc.data()
             if (implementBookShelf(data)) {
@@ -289,13 +266,11 @@ onAuthStateChanged(firebaseAuth, (user) => {
               }
             }
           })
-        }
 
-        if (selectedBookshelf.value === undefined) {
-          selectedBookshelf.value = buttons.value?.[0]
-        }
-      }
-    )
+          if(selectedBookshelf.value !== undefined) return
+
+          selectedBookshelf.value = buttons.value?.[0];
+        })
   }
 })
 
