@@ -361,7 +361,7 @@ const transformApiResponseToBookItems = (apiResponse: any): BookItem[] => {
   return books;
 }
 
-const fetchBookShelfNoSeries = async (user: User, doc_id: string): QuerySnapshot<BookItem> => {
+const fetchBookShelfNoSeries = async (user: User, doc_id: string): Promise<QuerySnapshot<BookItem>> => {
   const noSeriesBookCollection = collection(
       firestore,
       'users',
@@ -383,7 +383,7 @@ const fetchBookShelfNoSeries = async (user: User, doc_id: string): QuerySnapshot
 };
 
 
-const fetchBookShelfSeries = async (user: User, doc_id: string): QuerySnapshot<Series> => {
+const fetchBookShelfSeries = async (user: User, doc_id: string): Promise<QuerySnapshot<Series>> => {
   const seriesCollection = collection(
     firestore,
     'users',
@@ -400,7 +400,7 @@ const fetchBookShelfSeries = async (user: User, doc_id: string): QuerySnapshot<S
   }
 };
 
-const fetchSeries = async (user: User, selectedBookshelfId: string, seriesId: string): QuerySnapshot<BookItem> => {
+const fetchSeries = async (user: User, selectedBookshelfId: string, seriesId: string): Promise<QuerySnapshot<BookItem>> => {
   const booksCollection = collection(
     firestore,
     'users',
@@ -423,6 +423,20 @@ const fetchSeries = async (user: User, selectedBookshelfId: string, seriesId: st
   }
 }
 
+const fetchBookshelves = async (user: User): Promise<QuerySnapshot<BookShelf>> => {
+  const bookshelvesCollction =  collection(
+    firestore, 
+    'users', 
+    user.uid, 
+    'bookshelves'
+  ) as CollectionReference<BookShelf>
+
+  try {
+    return await getDocsFromCache(bookshelvesCollction);
+  } catch (error) {
+    return await getDocs(bookshelvesCollction);
+  }
+}
 
 export {
   firebaseErrorMessage,
@@ -447,5 +461,6 @@ export {
   transformApiResponseToBookItems,
   fetchBookShelfNoSeries,
   fetchBookShelfSeries,
-  fetchSeries
+  fetchSeries,
+  fetchBookshelves
 }
