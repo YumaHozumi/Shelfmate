@@ -8,7 +8,8 @@ import {
   increment,
   updateDoc,
   getDocsFromCache,
-  CollectionReference
+  CollectionReference,
+  QuerySnapshot,
 } from 'firebase/firestore'
 import {type User} from 'firebase/auth';
 import { isSeries, type BookItem, type BookShelf, type Series } from './interface'
@@ -360,7 +361,7 @@ const transformApiResponseToBookItems = (apiResponse: any): BookItem[] => {
   return books;
 }
 
-const fetchBookShelfNoSeries = async (user: User, doc_id: string) => {
+const fetchBookShelfNoSeries = async (user: User, doc_id: string): QuerySnapshot<BookItem> => {
   const noSeriesBookCollection = collection(
       firestore,
       'users',
@@ -370,12 +371,57 @@ const fetchBookShelfNoSeries = async (user: User, doc_id: string) => {
       'books'
   ) as CollectionReference<BookItem>
     
-  try {//キャッシュあったら使う
-    return await getDocsFromCache(noSeriesBookCollection);
+  try {
+    const docs = await getDocsFromCache(noSeriesBookCollection);
+    console.log('キャッシュからデータを取得しました。'); // キャッシュからの取得をログに記録
+    return docs;
   } catch (error) {
-    return await getDocs(noSeriesBookCollection);
+    const docs = await getDocs(noSeriesBookCollection);
+    console.log('キャッシュが使用できないため、サーバーからデータを取得しました。'); // サーバーからの取得をログに記録
+    return docs;
   }
 };
+
+
+const fetchBookShelfSeries = async (user: User, doc_id: string): QuerySnapshot<Series> => {
+  const seriesCollection = collection(
+    firestore,
+    'users',
+    user.uid,
+    'bookshelves',
+    doc_id,
+    'series'
+  ) as CollectionReference<Series>
+
+  try{
+    return await getDocsFromCache(seriesCollection);
+  }catch (error) {
+    return await getDocs(seriesCollection)
+  }
+};
+
+const fetchSeries = async (user: User, selectedBookshelfId: string, seriesId: string): QuerySnapshot<BookItem> => {
+  const booksCollection = collection(
+    firestore,
+    'users',
+    user.uid,
+    'bookshelves',
+    selectedBookshelfId,
+    'series',
+    seriesId,
+    'books'
+  ) as CollectionReference<BookItem>
+
+  try {
+    const docs = await getDocsFromCache(booksCollection);
+    console.log('キャッシュからデータを取得しました。'); // キャッシュからの取得をログに記録
+    return docs;
+  } catch (error) {
+    const docs = await getDocs(booksCollection);
+    console.log('キャッシュが使用できないため、サーバーからデータを取得しました。'); // サーバーからの取得をログに記録
+    return docs;
+  }
+}
 
 
 export {
@@ -399,5 +445,7 @@ export {
   getRegisteredBooksData,
   deleteRegisteredBook,
   transformApiResponseToBookItems,
-  fetchBookShelfNoSeries
+  fetchBookShelfNoSeries,
+  fetchBookShelfSeries,
+  fetchSeries
 }

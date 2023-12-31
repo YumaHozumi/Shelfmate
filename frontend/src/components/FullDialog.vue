@@ -1,17 +1,16 @@
 <script setup lang="ts">
 import { firestore, getCurrentUser } from '@/config/firebase'
 import { type BookItem, type Series } from '@/interface'
-import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore'
+import { QuerySnapshot, collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore'
 import { ref } from 'vue'
 import BookListItem from '@/components/BookListItem.vue'
 import {
-  getSeriesBooksData,
-  setSeriesBooksData,
   sort,
   deleteSpecificBookData,
   decrementCounter,
   deleteSeriesBooksData,
-  deleteRegisteredBook
+  deleteRegisteredBook,
+  fetchSeries
 } from '@/function'
 import Menu from '@/components/Menu.vue'
 import { watch } from 'vue'
@@ -41,44 +40,20 @@ const clickCancel = () => {
 const getBooks = async () => {
   const user = await getCurrentUser()
   if (prop.isEdit) return
+  if (!prop.series.seriesId) return;
 
-  if (prop.series.seriesId) {
-    const localCache = await getSeriesBooksData(
-      user.uid,
-      prop.selectBookshelfId,
-      prop.series.seriesId
-    )
+  let books: QuerySnapshot<BookItem> = await fetchSeries(user, prop.selectBookshelfId, prop.series.seriesId);
+  pushBooks(books);
+  bookList.value = sort(bookList.value, menu[0]);
+}
 
-    if (!localCache) {
-      //キャッシュがないとき
-      const booksCollection = collection(
-        firestore,
-        'users',
-        user.uid,
-        'bookshelves',
-        prop.selectBookshelfId,
-        'series',
-        prop.series.seriesId,
-        'books'
-      )
-      await getDocs(booksCollection).then(async (snapshot) => {
-        bookList.value.length = 0
-        snapshot.forEach((book) => {
-          bookList.value.push(book.data() as BookItem)
-        })
-        bookList.value = sort(bookList.value, menu[0])
-        await setSeriesBooksData(
-          user.uid,
-          prop.selectBookshelfId,
-          prop.series.seriesId ?? '',
-          bookList.value
-        )
-      })
-    } else {
-      //あるとき
-      bookList.value = sort(localCache, menu[0])
-    }
-  }
+const pushBooks = (books: QuerySnapshot<BookItem>) => {
+  bookList.value.length = 0;
+  books.docs.forEach((docSnapshot) => {
+    const data = docSnapshot.data() as BookItem;
+
+    bookList.value.push(data);
+  })
 }
 
 const menu = ['発売日が新しい順', '発売日が古い順', '巻数順(降順)', '巻数順(昇順)']

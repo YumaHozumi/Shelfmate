@@ -22,11 +22,11 @@ import {
   type Unsubscribe
 } from 'firebase/firestore'
 
-import { onAuthStateChanged } from 'firebase/auth'
+import { onAuthStateChanged, type User } from 'firebase/auth'
 import { implementBookShelf, type BookItemNoSeries } from '@/interface'
 import { onUnmounted, computed } from 'vue'
 import router from '@/router'
-import { incrementCounter, sort, addSeriesDataItem, addSeriesBooksData, getRegisteredBooksData, setRegisteredBooksData } from '@/function'
+import { incrementCounter, sort } from '@/function'
 import Pagination from '@/components/SearchBook/Pagination.vue'
 import SearchButton from '@/components/SearchButton.vue'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
@@ -111,15 +111,6 @@ const searchClick = async (searchText: string) => {
 
 const menu = ['発売日が新しい順', '発売日が古い順', '作品名順', '作者名順']
 
-// 既存の関数に追加
-const updateRegisteredBooksCache = async (uid: string, bookShelfId: string, newBook: BookItem) => {
-  const cachedData = await getRegisteredBooksData(uid, bookShelfId);
-  if (cachedData) {
-    cachedData.push(newBook);
-    await setRegisteredBooksData(uid, bookShelfId, cachedData);
-  }
-}
-
 // 本を登録
 const registerBookId = async (bookShelfId: string, book: BookItem): Promise<boolean> => {
   try {
@@ -150,6 +141,7 @@ const registerBookId = async (bookShelfId: string, book: BookItem): Promise<bool
 
 const registeredBooks = ref<BookItem[]>([])
 
+//検索結果表示時にボタンで登録済みかそうでないかを表示するのに必要
 const setRegisteredBooks = async () => {
   const user = await getCurrentUser();
   const selectedBookshelfId = selectedBookshelf.value?.doc_id || '';
@@ -175,19 +167,8 @@ const extractSeriesTitle = (str: string): string => {
   return match ? match[1].trim() : ''
 }
 
-const registerBook = async (book: BookItem) => {
-  try {
-    const user = await getCurrentUser()
-    const bookshelvesRef = collection(firestore, 'users', user.uid, 'bookshelves')
-    const selectedBookshelfId = selectedBookshelf.value?.doc_id || ''
-    const seriesId = book?.seriesId ?? ''
-    const isAddBook = await registerBookId(selectedBookshelfId, book)
-
-    if (!isAddBook) return
-
-    //シリーズものじゃないとき
-    if (seriesId === '') {
-      const noSeriesBookCollection = collection(
+const addNoSeries = async (book: BookItem, user: User, selectedBookshelfId: string ) => {
+  const noSeriesBookCollection = collection(
         firestore,
         'users',
         user.uid,
@@ -197,6 +178,22 @@ const registerBook = async (book: BookItem) => {
       )
       const noSeriesBook: BookItemNoSeries = convertToBookItemWithoutSeries(book)
       await addDoc(noSeriesBookCollection, noSeriesBook)
+}
+
+const registerBook = async (book: BookItem) => {
+  try {
+    const user = await getCurrentUser()
+    const bookshelvesRef = collection(firestore, 'users', user.uid, 'bookshelves')
+    const selectedBookshelfId = selectedBookshelf.value?.doc_id || ''
+    const seriesId = book?.seriesId ?? ''
+    const isAddBook = await registerBookId(selectedBookshelfId, book)
+
+    if (!isAddBook) return
+    await setRegisteredBooks();
+
+    //シリーズものじゃないとき
+    if (seriesId === '') {
+      await addNoSeries(book, user, selectedBookshelfId);
     } else {
       //シリーズもの
       const seriesRef = doc(bookshelvesRef, selectedBookshelfId, 'series', seriesId)

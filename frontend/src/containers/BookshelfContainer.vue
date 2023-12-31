@@ -8,7 +8,8 @@ import { type Series, isSeries, isBookItem, Action } from '@/interface'
 import BookComp from '@/components/Bookshelf/BookComp.vue'
 import { onAuthStateChanged, type Unsubscribe, type User } from 'firebase/auth'
 import { onUnmounted } from 'vue'
-import {fetchBookShelfNoSeries} from '@/function';
+import {fetchBookShelfNoSeries, fetchBookShelfSeries} from '@/function';
+import type { registerRuntimeCompiler } from 'vue'
 
 interface Props {
   selectedBookshelf: BookShelf | undefined
@@ -70,7 +71,6 @@ const setUnsubs = (user: User, doc_id: string) => {
           emit('update:propItems', items.value)
         } else if (change.type === 'modified') {
           const newData = change.doc.data() as Series // 新しいデータを取得します
-
           const index = items.value.findIndex(
             (item) => isSeries(item) && item.seriesId === newData.seriesId
           ) // 該当のシリーズを見つけます
@@ -103,10 +103,9 @@ onUnmounted(() => {
   unsubSeries()
 })
 
-
-
-const pushBookShelfNoSeries = async (seriesSnapshot: QuerySnapshot<BookItem>) => {
-  seriesSnapshot.docs.forEach((docSnapshot) => {
+//シリーズものじゃない本を本棚に追加
+const pushBookShelfNoSeries = async (noSeriesSnapshot: QuerySnapshot<BookItem>) => {
+  noSeriesSnapshot.docs.forEach((docSnapshot) => {
     const data = docSnapshot.data() as BookItem; // BookItemとしてデータを取得
 
     // isbnをstringからnumberに変換（isbnが存在する場合）
@@ -118,28 +117,26 @@ const pushBookShelfNoSeries = async (seriesSnapshot: QuerySnapshot<BookItem>) =>
   });
 }
 
+//シリーズものの本を本棚に追加
+const pushBookShelfSeries = async (seriesSnapshot: QuerySnapshot<Series>) => {
+  seriesSnapshot.docs.forEach((docSnapshot) => {
+    const data = docSnapshot.data() as Series;
+
+    items.value.push(data);
+  })
+}
+
 const getSeries = async () => {
   const user = await getCurrentUser()
   // 本棚のシリーズコレクションへの参照を取得
   const doc_id = prop.selectedBookshelf?.doc_id
   if(!doc_id) return;
 
-  let seriesSnapshot: QuerySnapshot<BookItem> = await fetchBookShelfNoSeries(user, doc_id);
-  pushBookShelfNoSeries(seriesSnapshot);
+  let noSeriesSnapshot: QuerySnapshot<BookItem> = await fetchBookShelfNoSeries(user, doc_id);
+  pushBookShelfNoSeries(noSeriesSnapshot);
 
-  const seriesCollectionRef = collection(
-    firestore,
-    'users',
-    user.uid,
-    'bookshelves',
-    doc_id,
-    'series'
-  )
-  await getDocs(seriesCollectionRef).then((snapshot) => {
-    snapshot.forEach((e) => {
-      items.value.push(e.data() as Series)
-    })
-  })
+  let seriesSnapshot: QuerySnapshot<Series> = await fetchBookShelfSeries(user, doc_id);
+  pushBookShelfSeries(seriesSnapshot);
 
   emit('count', items.value.length)
   emit('update:propItems', items.value)
