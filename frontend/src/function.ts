@@ -6,8 +6,11 @@ import {
   getDoc,
   getDocs,
   increment,
-  updateDoc
+  updateDoc,
+  getDocsFromCache,
+  CollectionReference
 } from 'firebase/firestore'
+import {type User} from 'firebase/auth';
 import { isSeries, type BookItem, type BookShelf, type Series } from './interface'
 import { openDB } from 'idb'
 import { firestore, getCurrentUser } from './config/firebase'
@@ -357,6 +360,23 @@ const transformApiResponseToBookItems = (apiResponse: any): BookItem[] => {
   return books;
 }
 
+const fetchBookShelfNoSeries = async (user: User, doc_id: string) => {
+  const noSeriesBookCollection = collection(
+      firestore,
+      'users',
+      user.uid,
+      'bookshelves',
+      doc_id,
+      'books'
+  ) as CollectionReference<BookItem>
+    
+  try {//キャッシュあったら使う
+    return await getDocsFromCache(noSeriesBookCollection);
+  } catch (error) {
+    return await getDocs(noSeriesBookCollection);
+  }
+};
+
 
 export {
   firebaseErrorMessage,
@@ -379,4 +399,5 @@ export {
   getRegisteredBooksData,
   deleteRegisteredBook,
   transformApiResponseToBookItems,
+  fetchBookShelfNoSeries
 }

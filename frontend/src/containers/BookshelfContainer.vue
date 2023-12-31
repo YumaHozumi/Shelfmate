@@ -2,13 +2,13 @@
 import type { BookItem, BookShelf } from '@/interface'
 import { ref, watch, toRef } from 'vue'
 import { onMounted } from 'vue'
-import { collection, getDocs, onSnapshot } from 'firebase/firestore'
+import { collection, getDocs, onSnapshot, QuerySnapshot} from 'firebase/firestore'
 import { firebaseAuth, firestore, getCurrentUser } from '@/config/firebase'
 import { type Series, isSeries, isBookItem, Action } from '@/interface'
 import BookComp from '@/components/Bookshelf/BookComp.vue'
 import { onAuthStateChanged, type Unsubscribe, type User } from 'firebase/auth'
 import { onUnmounted } from 'vue'
-import { getSeriesData, setSeriesData } from '@/function'
+import {fetchBookShelfNoSeries} from '@/function';
 
 interface Props {
   selectedBookshelf: BookShelf | undefined
@@ -37,6 +37,7 @@ let unsubSeries: Unsubscribe
 const setUnsubs = (user: User, doc_id: string) => {
   unsubBook = onSnapshot(
     collection(firestore, 'users', user.uid, 'bookshelves', doc_id, 'books'),
+    {includeMetadataChanges: true},
     (snapshot) => {
       snapshot.docChanges().forEach((change) => {
         if (change.type === 'removed') {
@@ -55,6 +56,7 @@ const setUnsubs = (user: User, doc_id: string) => {
 
   unsubSeries = onSnapshot(
     collection(firestore, 'users', user.uid, 'bookshelves', doc_id, 'series'),
+    {includeMetadataChanges: true},
     (snapshot) => {
       snapshot.docChanges().forEach((change) => {
         if (change.type === 'removed') {
@@ -101,65 +103,48 @@ onUnmounted(() => {
   unsubSeries()
 })
 
+
+
+const pushBookShelfNoSeries = async (seriesSnapshot: QuerySnapshot<BookItem>) => {
+  seriesSnapshot.docs.forEach((docSnapshot) => {
+    const data = docSnapshot.data() as BookItem; // BookItemとしてデータを取得
+
+    // isbnをstringからnumberに変換（isbnが存在する場合）
+    if (data.isbn) {
+      data.isbn = Number(data.isbn);
+    }
+
+    items.value.push(data); // 更新したデータを配列に追加
+  });
+}
+
 const getSeries = async () => {
   const user = await getCurrentUser()
   // 本棚のシリーズコレクションへの参照を取得
   const doc_id = prop.selectedBookshelf?.doc_id
-  if (doc_id) {
-    const localCache = await getSeriesData(user.uid, doc_id)
+  if(!doc_id) return;
 
-    if (!localCache) {
-      //キャッシュがないとき
-      const noSeriesBookCollection = collection(
-        firestore,
-        'users',
-        user.uid,
-        'bookshelves',
-        doc_id,
-        'books'
-      )
+  let seriesSnapshot: QuerySnapshot<BookItem> = await fetchBookShelfNoSeries(user, doc_id);
+  pushBookShelfNoSeries(seriesSnapshot);
 
-      await getDocs(noSeriesBookCollection).then((snapshot) => {
-        snapshot.forEach((e) => {
-          const data = e.data() as BookItem // ここでBookItemとしてデータを取得
-          // isbnをstringからnumberに変換します（isbnが存在する場合）
-          if (data.isbn) {
-            data.isbn = Number(data.isbn)
-          }
-          items.value.push(data) // 更新したデータを配列に追加
-        })
-      })
-
-      await setSeriesData(user.uid, doc_id, items.value)
-    } else {
-      // キャッシュがあるときはキャッシュからデータを取得
-      items.value = localCache.map((data: any) => {
-        // isbnをstringからnumberに変換します（isbnが存在する場合）
-        if (data.isbn) {
-          data.isbn = Number(data.isbn)
-        }
-        return data
-      })
-    }
-
-    const seriesCollectionRef = collection(
-      firestore,
-      'users',
-      user.uid,
-      'bookshelves',
-      doc_id,
-      'series'
-    )
-    await getDocs(seriesCollectionRef).then((snapshot) => {
-      snapshot.forEach((e) => {
-        items.value.push(e.data() as Series)
-      })
+  const seriesCollectionRef = collection(
+    firestore,
+    'users',
+    user.uid,
+    'bookshelves',
+    doc_id,
+    'series'
+  )
+  await getDocs(seriesCollectionRef).then((snapshot) => {
+    snapshot.forEach((e) => {
+      items.value.push(e.data() as Series)
     })
+  })
 
-    emit('count', items.value.length)
-    emit('update:propItems', items.value)
-    emit('initComp')
-  }
+  emit('count', items.value.length)
+  emit('update:propItems', items.value)
+  emit('initComp')
+  
 }
 const selectedBookshelf = toRef(prop, 'selectedBookshelf')
 

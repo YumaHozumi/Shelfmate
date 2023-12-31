@@ -120,7 +120,7 @@ const updateRegisteredBooksCache = async (uid: string, bookShelfId: string, newB
   }
 }
 
-// 既存の関数を改善
+// 本を登録
 const registerBookId = async (bookShelfId: string, book: BookItem): Promise<boolean> => {
   try {
     const user = await getCurrentUser();
@@ -140,9 +140,6 @@ const registerBookId = async (bookShelfId: string, book: BookItem): Promise<bool
     } else {
       await addDoc(bookshelvesRef, book);
 
-      // キャッシュを更新
-      await updateRegisteredBooksCache(user.uid, bookShelfId, book);
-
       return true;
     }
   } catch (error) {
@@ -156,13 +153,6 @@ const registeredBooks = ref<BookItem[]>([])
 const setRegisteredBooks = async () => {
   const user = await getCurrentUser();
   const selectedBookshelfId = selectedBookshelf.value?.doc_id || '';
-  
-  // キャッシュからデータを取得
-  const cachedData = await getRegisteredBooksData(user.uid, selectedBookshelfId);
-  if (cachedData) {
-    registeredBooks.value = cachedData;
-    return;
-  }
 
   const bookshelvesRef = collection(
     firestore,
@@ -176,8 +166,6 @@ const setRegisteredBooks = async () => {
 
   registeredBooks.value = booksSnapshot.docs.map((doc) => doc.data() as BookItem);
 
-  // データをキャッシュに保存
-  await setRegisteredBooksData(user.uid, selectedBookshelfId, registeredBooks.value);
 }
 
 //シリーズの部分のテキストだけを抽出する正規表現
@@ -196,7 +184,6 @@ const registerBook = async (book: BookItem) => {
     const isAddBook = await registerBookId(selectedBookshelfId, book)
 
     if (!isAddBook) return
-    await setRegisteredBooks()
 
     //シリーズものじゃないとき
     if (seriesId === '') {
@@ -210,7 +197,6 @@ const registerBook = async (book: BookItem) => {
       )
       const noSeriesBook: BookItemNoSeries = convertToBookItemWithoutSeries(book)
       await addDoc(noSeriesBookCollection, noSeriesBook)
-      await addSeriesDataItem(user.uid, selectedBookshelfId, book)
     } else {
       //シリーズもの
       const seriesRef = doc(bookshelvesRef, selectedBookshelfId, 'series', seriesId)
@@ -255,8 +241,6 @@ const registerBook = async (book: BookItem) => {
       )
       await addDoc(booksCollection, book)
       await incrementCounter(seriesRef)
-      // 新しいシリーズアイテムをIndexedDBに追加
-      await addSeriesBooksData(user.uid, selectedBookshelfId, seriesId, book)
     }
   } catch (error) {
     console.log(error)
