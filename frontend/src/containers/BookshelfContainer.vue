@@ -9,7 +9,6 @@ import BookComp from '@/components/Bookshelf/BookComp.vue'
 import { onAuthStateChanged, type Unsubscribe, type User } from 'firebase/auth'
 import { onUnmounted } from 'vue'
 import {fetchBookShelfNoSeries, fetchBookShelfSeries} from '@/function';
-import type { registerRuntimeCompiler } from 'vue'
 
 interface Props {
   selectedBookshelf: BookShelf | undefined

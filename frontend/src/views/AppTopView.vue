@@ -8,8 +8,8 @@ import { ref } from 'vue'
 import { implementBookShelf, type BookShelf, type BookItem, type Series, Action } from '@/interface'
 import { firestore, getCurrentUser } from '@/config/firebase'
 import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore'
-import { deleteRegisteredBook, deleteSeriesBooksData, deleteSeriesDataItem } from '@/function'
 import { type User } from 'firebase/auth';
+import { fetchBookShelfNoSeries, fetchBookShelfSeries } from '@/function'
 
 const onNavigate = (name: string): void => {
   router.push({ name: name })
@@ -42,6 +42,18 @@ const initializeSelectedBookshelf = async () => {
         selectedBookshelf.value = bookShelfData
       }
     }
+
+    const seriesSnap = await fetchBookShelfSeries(user, firstDoc.id )
+    seriesSnap.docs.forEach((docSnap) => {
+      const data = docSnap.data() as Series;
+      items.value.push(data);
+    })
+
+    const noseriesSnap = await fetchBookShelfNoSeries(user, firstDoc.id )
+    noseriesSnap.docs.forEach((docSnap) => {
+      const data = docSnap.data() as BookItem;
+      items.value.push(data);
+    })
   } catch (e) {
     console.log(e)
   }

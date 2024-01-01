@@ -32,7 +32,6 @@ import Pagination from '@/components/SearchBook/Pagination.vue'
 import SearchButton from '@/components/SearchButton.vue'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
 import { setBookshelvesData, transformApiResponseToBookItems } from '@/function'
-import type OptionContainerVue from '@/containers/OptionContainer.vue'
 
 //ナビゲーション処理
 const onNavigate = (name: string): void => {

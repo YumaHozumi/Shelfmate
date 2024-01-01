@@ -1,19 +1,18 @@
 <script setup lang="ts">
 import { firestore, getCurrentUser } from '@/config/firebase'
 import { type BookItem, type Series } from '@/interface'
-import { QuerySnapshot, collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore'
+import { CollectionReference, QuerySnapshot, collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore'
 import { ref } from 'vue'
 import BookListItem from '@/components/BookListItem.vue'
 import {
   sort,
   deleteSpecificBookData,
   decrementCounter,
-  deleteSeriesBooksData,
-  deleteRegisteredBook,
   fetchSeries
 } from '@/function'
 import Menu from '@/components/Menu.vue'
 import { watch } from 'vue'
+import type { User } from 'firebase/auth'
 
 interface Props {
   series: Series
@@ -79,71 +78,10 @@ const deleteBooks = async () => {
 
     for (const book of selectedBooks.value) {
       //選択した本を削除
-      const seriesBooksQuery = query(
-        collection(
-          firestore,
-          'users',
-          user.uid,
-          'bookshelves',
-          prop.selectBookshelfId,
-          'series',
-          prop.series.seriesId || '',
-          'books'
-        ),
-        where('bookId', '==', book.bookId)
-      )
-      const querySnapshot = await getDocs(seriesBooksQuery)
+      const seriesId: string = prop.series.seriesId ?? '';
+      await deleteBookItemFromBooksDB(book, user, prop.selectBookshelfId, seriesId);
 
-      if (!querySnapshot.empty) {
-        const docFirst = querySnapshot.docs[0]
-        await deleteDoc(docFirst.ref)
-
-        const bookshelvesRef = collection(firestore, 'users', user.uid, 'bookshelves')
-        const seriesRef = doc(
-          bookshelvesRef,
-          prop.selectBookshelfId,
-          'series',
-          prop.series.seriesId ?? ''
-        )
-
-        await decrementCounter(seriesRef)
-      }
-
-      //allBooksのDBの変更処理
-      const seriesAllBooksQuery = query(
-        collection(firestore, 'users', user.uid, 'bookshelves', prop.selectBookshelfId, 'allBooks'),
-        where('bookId', '==', book.bookId)
-      )
-      const querySnapShot2 = await getDocs(seriesAllBooksQuery)
-
-      if (!querySnapShot2.empty && prop.series.seriesId) {
-        const allBookDocFirst = querySnapShot2.docs[0]
-        await deleteDoc(allBookDocFirst.ref)
-        //特定の本を削除
-        await deleteSpecificBookData(
-          user.uid,
-          prop.selectBookshelfId,
-          prop.series.seriesId,
-          book.bookId
-        )
-
-        if (prop.series.counter <= 0) {
-          // 本が0冊になったら
-          const seriesDocRef = doc(
-            firestore,
-            'users',
-            user.uid,
-            'bookshelves',
-            prop.selectBookshelfId,
-            'series',
-            prop.series.seriesId
-          )
-          await deleteDoc(seriesDocRef)
-          await deleteSeriesBooksData(user.uid, prop.selectBookshelfId, prop.series.seriesId)
-        }
-
-        await deleteRegisteredBook(user.uid, prop.selectBookshelfId, book.bookId);
-      }
+      await deleteBookItemFromAllBooksDB(book, user, prop.selectBookshelfId, seriesId);
     }
     selectedBooks.value.length = 0
     await getBooks()
@@ -151,6 +89,76 @@ const deleteBooks = async () => {
     console.error('Error deleting books:', e)
   }
 }
+
+const deleteBookItemFromBooksDB = async (book: BookItem, user: User, selectBookshelfId: string, seriesId: string) => {
+  const seriesBooksQuery = query(
+      collection(
+        firestore,
+        'users',
+        user.uid,
+        'bookshelves',
+        selectBookshelfId,
+        'series',
+        seriesId,
+        'books'
+      ) as CollectionReference<BookItem>,
+      where('bookId', '==', book.bookId)
+    )
+    const querySnapshot = await getDocs(seriesBooksQuery)
+
+    if (querySnapshot.empty) return;
+
+    const docFirst = querySnapshot.docs[0]
+    await deleteDoc(docFirst.ref)
+    
+    //本棚の件数減少させる
+    const bookshelvesRef = collection(firestore, 'users', user.uid, 'bookshelves')
+    const seriesRef = doc(
+      bookshelvesRef,
+      prop.selectBookshelfId,
+      'series',
+      prop.series.seriesId ?? ''
+    )
+
+    await decrementCounter(seriesRef)
+}
+
+const deleteBookItemFromAllBooksDB = async (book: BookItem, user: User, selectBookshelfId: string, seriesId: string) => {
+   //allBooksのDBの変更処理
+   const seriesAllBooksQuery = query(
+      collection(firestore, 'users', user.uid, 'bookshelves', prop.selectBookshelfId, 'allBooks'),
+      where('bookId', '==', book.bookId)
+    )
+    
+    const querySnapShot = await getDocs(seriesAllBooksQuery)
+
+    if (querySnapShot.empty) return;
+
+    const allBookDocFirst = querySnapShot.docs[0]
+    await deleteDoc(allBookDocFirst.ref)
+    //特定の本を削除
+    await deleteSpecificBookData(
+      user.uid,
+      selectBookshelfId,
+      seriesId,
+      book.bookId
+    )
+
+    if (prop.series.counter > 0) return;
+
+    console.log("149Line " + seriesId)
+    // 本が0冊になったら
+    const seriesDocRef = doc(
+      firestore,
+      'users',
+      user.uid,
+      'bookshelves',
+      prop.selectBookshelfId,
+      'series',
+      seriesId
+    )
+    await deleteDoc(seriesDocRef)
+  }
 </script>
 
 <template>
