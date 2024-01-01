@@ -72,14 +72,14 @@ onAuthStateChanged(firebaseAuth, (user) => {
       async (snapshot) => {
           snapshot.docChanges().forEach(async (change) => {
             const data = change.doc.data()
-            if (implementBookShelf(data)) {
-              if (change.type === 'added') {
-                const bookShelfData: BookShelf = { doc_id: change.doc.id, ...data } // doc_idを設定し直します
-                buttons.value.push(bookShelfData)
-              }
-            }
+            if (!implementBookShelf(data)) return;
+            if (change.type !== 'added') return;
+
+            const bookShelfData: BookShelf = { doc_id: change.doc.id, ...data } // doc_idを設定し直します
+            buttons.value.push(bookShelfData)
           })
-        })
+      }
+    )
   }
 })
 
