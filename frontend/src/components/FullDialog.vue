@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { firestore, getCurrentUser } from '@/config/firebase'
 import { type BookItem, type Series } from '@/interface'
-import { CollectionReference, QuerySnapshot, collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore'
+import { CollectionReference, QuerySnapshot, collection, deleteDoc, doc, getDocs, query, where, orderBy, updateDoc } from 'firebase/firestore'
 import { ref } from 'vue'
 import BookListItem from '@/components/BookListItem.vue'
 import {
@@ -75,13 +75,18 @@ const deleteBooks = async () => {
       throw new Error('User not found')
     }
 
+    const seriesId: string = prop.series.seriesId ?? '';
     for (const book of selectedBooks.value) {
       //選択した本を削除
-      const seriesId: string = prop.series.seriesId ?? '';
+      
       await deleteBookItemFromBooksDB(book, user, prop.selectBookshelfId, seriesId);
 
       await deleteBookItemFromAllBooksDB(book, user, prop.selectBookshelfId, seriesId);
     }
+
+    //本棚に表示する表紙の変更があったら変更
+    await updateSeriesPic(user, prop.selectBookshelfId, seriesId);
+
     selectedBooks.value.length = 0
     await getBooks()
   } catch (e) {
@@ -89,9 +94,8 @@ const deleteBooks = async () => {
   }
 }
 
-const deleteBookItemFromBooksDB = async (book: BookItem, user: User, selectBookshelfId: string, seriesId: string) => {
-  const seriesBooksQuery = query(
-      collection(
+const bookItemCollection = (user: User, selectBookshelfId: string, seriesId: string): CollectionReference<BookItem> => {
+  return collection(
         firestore,
         'users',
         user.uid,
@@ -100,26 +104,53 @@ const deleteBookItemFromBooksDB = async (book: BookItem, user: User, selectBooks
         'series',
         seriesId,
         'books'
-      ) as CollectionReference<BookItem>,
-      where('bookId', '==', book.bookId)
-    )
-    const querySnapshot = await getDocs(seriesBooksQuery)
+  ) as CollectionReference<BookItem>
+}
 
-    if (querySnapshot.empty) return;
+const deleteBookItemFromBooksDB = async (book: BookItem, user: User, selectBookshelfId: string, seriesId: string) => {
+  const seriesBooksQuery = query(
+    bookItemCollection(user, selectBookshelfId, seriesId),
+    where('bookId', '==', book.bookId)
+  )
+  const querySnapshot = await getDocs(seriesBooksQuery)
 
-    const docFirst = querySnapshot.docs[0]
-    await deleteDoc(docFirst.ref)
-    
-    //本棚の件数減少させる
-    const bookshelvesRef = collection(firestore, 'users', user.uid, 'bookshelves')
-    const seriesRef = doc(
-      bookshelvesRef,
-      prop.selectBookshelfId,
-      'series',
-      prop.series.seriesId ?? ''
-    )
+  if (querySnapshot.empty) return;
 
-    await decrementCounter(seriesRef)
+  const docFirst = querySnapshot.docs[0]
+  await deleteDoc(docFirst.ref)
+  
+  //本棚の件数減少させる
+  const bookshelvesRef = collection(firestore, 'users', user.uid, 'bookshelves')
+  const seriesRef = doc(
+    bookshelvesRef,
+    prop.selectBookshelfId,
+    'series',
+    prop.series.seriesId ?? ''
+  )
+
+  await decrementCounter(seriesRef)
+
+}
+
+const updateSeriesPic = async (user: User, selectBookshelfId: string, seriesId: string) => {
+  const sortedQuery = query(
+    bookItemCollection(user, selectBookshelfId, seriesId),
+    orderBy("orderNumber", "desc")
+  );
+
+  const querySnapShot = await getDocs(sortedQuery);
+
+  if(querySnapShot.empty) return;
+
+  const updatePicItem = querySnapShot.docs[0].data() as BookItem;
+
+  const seriesDoc = doc(firestore, 'users', user.uid, 'bookshelves', selectBookshelfId, 'series',seriesId);
+
+  if (updatePicItem.image_url === undefined) return
+
+  await updateDoc(seriesDoc,
+    {'pic': updatePicItem.image_url}
+  )
 }
 
 const deleteBookItemFromAllBooksDB = async (book: BookItem, user: User, selectBookshelfId: string, seriesId: string) => {
