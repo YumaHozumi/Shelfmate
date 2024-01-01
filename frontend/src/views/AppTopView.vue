@@ -9,7 +9,6 @@ import { implementBookShelf, type BookShelf, type BookItem, type Series, Action 
 import { firestore, getCurrentUser } from '@/config/firebase'
 import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore'
 import { type User } from 'firebase/auth';
-import { fetchBookShelfNoSeries, fetchBookShelfSeries } from '@/function'
 import { onMounted } from 'vue'
 
 const onNavigate = (name: string): void => {

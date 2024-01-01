@@ -6,7 +6,6 @@ import { ref } from 'vue'
 import BookListItem from '@/components/BookListItem.vue'
 import {
   sort,
-  deleteSpecificBookData,
   decrementCounter,
   fetchSeries
 } from '@/function'
@@ -48,9 +47,10 @@ const getBooks = async () => {
 
 const pushBooks = (books: QuerySnapshot<BookItem>) => {
   bookList.value.length = 0;
+  console.log("pushBooks");
   books.docs.forEach((docSnapshot) => {
     const data = docSnapshot.data() as BookItem;
-
+    console.log(data);
     bookList.value.push(data);
   })
 }
@@ -136,13 +136,6 @@ const deleteBookItemFromAllBooksDB = async (book: BookItem, user: User, selectBo
 
     const allBookDocFirst = querySnapShot.docs[0]
     await deleteDoc(allBookDocFirst.ref)
-    //特定の本を削除
-    await deleteSpecificBookData(
-      user.uid,
-      selectBookshelfId,
-      seriesId,
-      book.bookId
-    )
 
     if (prop.series.counter > 0) return;
 

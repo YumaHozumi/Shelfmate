@@ -7,7 +7,7 @@ import { CollectionReference, QuerySnapshot, collection, onSnapshot } from 'fire
 import { firestore, firebaseAuth, getCurrentUser } from '@/config/firebase'
 import { onAuthStateChanged, type Unsubscribe } from 'firebase/auth'
 import { implementBookShelf } from '@/interface'
-import { setBookshelvesData, fetchBookshelves } from '@/function'
+import { fetchBookshelves } from '@/function'
 
 interface Emits {
   (event: 'clickLocalHeaderBtn', bookshelf: BookShelf): void
@@ -76,7 +76,6 @@ onAuthStateChanged(firebaseAuth, (user) => {
               if (change.type === 'added') {
                 const bookShelfData: BookShelf = { doc_id: change.doc.id, ...data } // doc_idを設定し直します
                 buttons.value.push(bookShelfData)
-                await setBookshelvesData(user.uid, buttons.value)
               }
             }
           })

@@ -31,7 +31,7 @@ import { incrementCounter, sort } from '@/function'
 import Pagination from '@/components/SearchBook/Pagination.vue'
 import SearchButton from '@/components/SearchButton.vue'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
-import { setBookshelvesData, transformApiResponseToBookItems } from '@/function'
+import { transformApiResponseToBookItems } from '@/function'
 
 //ナビゲーション処理
 const onNavigate = (name: string): void => {
@@ -261,7 +261,6 @@ onAuthStateChanged(firebaseAuth, (user) => {
               if (change.type === 'added') {
                 const bookShelfData: BookShelf = { doc_id: change.doc.id, ...data } // doc_idを設定し直します
                 buttons.value.push(bookShelfData)
-                await setBookshelvesData(user.uid, buttons.value)
               }
             }
           })

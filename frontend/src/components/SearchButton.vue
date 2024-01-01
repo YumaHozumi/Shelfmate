@@ -31,10 +31,9 @@ import { firebaseAuth, firestore, getCurrentUser } from '@/config/firebase'
 import { onUnmounted } from 'vue'
 import SearchResult from '@/components/SearchBook/SearchResult.vue'
 import DropdownMenu from './DropdownMenu.vue'
-import { addSeriesDataItem, incrementCounter, addSeriesBooksData } from '@/function'
+import { incrementCounter } from '@/function'
 import { rules } from '@/validation'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
-import { setBookshelvesData, getBookshelvesData } from '@/function'
 
 const dialog = ref(false)
 const inputText = ref('')
@@ -44,53 +43,23 @@ const selectedRadio = ref('one')
 const errorMsg = ref('')
 
 let unsubscribe: Unsubscribe
-let isInitialLoad = true
 
 onAuthStateChanged(firebaseAuth, (user) => {
   if (user) {
     unsubscribe = onSnapshot(
-      collection(firestore, 'users', user.uid, 'bookshelves'),
+      collection(firestore, 'users', user.uid, 'bookshelves') as CollectionReference<BookShelf>,
       {includeMetadataChanges: true},
       async (snapshot) => {
-        if (isInitialLoad) {
-          isInitialLoad = false
-          const localCache = await getBookshelvesData(user.uid)
-          if (!localCache) {
-            //ローカルキャッシュがない場合、Firestoreからデータを取得
-            buttons.value = snapshot.docs
-              .map((doc) => {
-                const data = doc.data()
-                if (implementBookShelf(data)) {
-                  const bookShelfData: BookShelf = { doc_id: doc.id, ...data }
-                  return bookShelfData
-                }
-                return undefined
-              })
-              .filter((item): item is BookShelf => item !== undefined)
-
-            await setBookshelvesData(user.uid, buttons.value)
-          } else {
-            //ある場合
-            buttons.value = localCache
-          }
-        } else {
           snapshot.docChanges().forEach(async (change) => {
             const data = change.doc.data()
             if (implementBookShelf(data)) {
               if (change.type === 'added') {
                 const bookShelfData: BookShelf = { doc_id: change.doc.id, ...data } // doc_idを設定し直します
                 buttons.value.push(bookShelfData)
-                await setBookshelvesData(user.uid, buttons.value)
               }
             }
           })
-        }
-
-        if (selectedBookshelf.value === undefined) {
-          selectedBookshelf.value = buttons.value?.[0]
-        }
-      }
-    )
+        })
   }
 })
 
@@ -245,7 +214,6 @@ const submit = async () => {
     if (!(await duplicateCheck(noSeriesBookCollection, book.bookId))) {
       //重複していないとき
       await addDoc(noSeriesBookCollection, noSeriesBook)
-      await addSeriesDataItem(user.uid, selectedBookshelfId, book)
     }
   } else {
     // シリーズもの
@@ -303,7 +271,6 @@ const submit = async () => {
 
       await addDoc(booksCollection, book)
       await incrementCounter(seriesRef)
-      await addSeriesBooksData(user.uid, selectedBookshelfId, selectItem.value.seriesId, book)
 
       selectItem.value = undefined
       selectedRadio.value = 'one'

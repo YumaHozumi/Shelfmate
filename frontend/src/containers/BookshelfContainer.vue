@@ -111,7 +111,6 @@ const pushBookShelfNoSeries = async (noSeriesSnapshot: QuerySnapshot<BookItem>) 
     if (data.isbn) {
       data.isbn = Number(data.isbn);
     }
-    console.log(data)
     items.value.push(data); // 更新したデータを配列に追加
   });
 }
@@ -120,7 +119,6 @@ const pushBookShelfNoSeries = async (noSeriesSnapshot: QuerySnapshot<BookItem>) 
 const pushBookShelfSeries = async (seriesSnapshot: QuerySnapshot<Series>) => {
   seriesSnapshot.docs.forEach((docSnapshot) => {
     const data = docSnapshot.data() as Series;
-    console.log(data)
     items.value.push(data);
   })
 }
