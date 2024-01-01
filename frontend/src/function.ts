@@ -10,6 +10,7 @@ import {
   getDocsFromCache,
   CollectionReference,
   QuerySnapshot,
+  getDocsFromServer,
 } from 'firebase/firestore'
 import {type User} from 'firebase/auth';
 import { isSeries, type BookItem, type BookShelf, type Series } from './interface'
@@ -361,6 +362,14 @@ const transformApiResponseToBookItems = (apiResponse: any): BookItem[] => {
   return books;
 }
 
+const fetchDocs = async <T>(collection: CollectionReference<T>): Promise<QuerySnapshot<T>> => {
+  const docs = await getDocsFromCache(collection);
+
+  if (docs.size === 0) return await getDocsFromServer(collection);
+
+  return docs;
+}
+
 const fetchBookShelfNoSeries = async (user: User, doc_id: string): Promise<QuerySnapshot<BookItem>> => {
   const noSeriesBookCollection = collection(
       firestore,
@@ -371,15 +380,7 @@ const fetchBookShelfNoSeries = async (user: User, doc_id: string): Promise<Query
       'books'
   ) as CollectionReference<BookItem>
     
-  try {
-    const docs = await getDocsFromCache(noSeriesBookCollection);
-    console.log('キャッシュからデータを取得しました。'); // キャッシュからの取得をログに記録
-    return docs;
-  } catch (error) {
-    const docs = await getDocs(noSeriesBookCollection);
-    console.log('キャッシュが使用できないため、サーバーからデータを取得しました。'); // サーバーからの取得をログに記録
-    return docs;
-  }
+  return await fetchDocs(noSeriesBookCollection);
 };
 
 
@@ -393,11 +394,7 @@ const fetchBookShelfSeries = async (user: User, doc_id: string): Promise<QuerySn
     'series'
   ) as CollectionReference<Series>
 
-  try{
-    return await getDocsFromCache(seriesCollection);
-  }catch (error) {
-    return await getDocs(seriesCollection)
-  }
+  return await fetchDocs(seriesCollection);
 };
 
 const fetchSeries = async (user: User, selectedBookshelfId: string, seriesId: string): Promise<QuerySnapshot<BookItem>> => {
@@ -412,15 +409,7 @@ const fetchSeries = async (user: User, selectedBookshelfId: string, seriesId: st
     'books'
   ) as CollectionReference<BookItem>
 
-  try {
-    const docs = await getDocsFromCache(booksCollection);
-    console.log('キャッシュからデータを取得しました。'); // キャッシュからの取得をログに記録
-    return docs;
-  } catch (error) {
-    const docs = await getDocs(booksCollection);
-    console.log('キャッシュが使用できないため、サーバーからデータを取得しました。'); // サーバーからの取得をログに記録
-    return docs;
-  }
+  return await fetchDocs(booksCollection);
 }
 
 const fetchBookshelves = async (user: User): Promise<QuerySnapshot<BookShelf>> => {
@@ -431,11 +420,7 @@ const fetchBookshelves = async (user: User): Promise<QuerySnapshot<BookShelf>> =
     'bookshelves'
   ) as CollectionReference<BookShelf>
 
-  try {
-    return await getDocsFromCache(bookshelvesCollction);
-  } catch (error) {
-    return await getDocs(bookshelvesCollction);
-  }
+  return await fetchDocs(bookshelvesCollction);
 }
 
 export {

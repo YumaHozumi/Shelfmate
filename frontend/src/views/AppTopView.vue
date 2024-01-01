@@ -10,10 +10,15 @@ import { firestore, getCurrentUser } from '@/config/firebase'
 import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore'
 import { type User } from 'firebase/auth';
 import { fetchBookShelfNoSeries, fetchBookShelfSeries } from '@/function'
+import { onMounted } from 'vue'
 
 const onNavigate = (name: string): void => {
   router.push({ name: name })
 }
+
+onMounted(async () => {
+  await initializeSelectedBookshelf();
+})
 
 const items = ref<(Series | BookItem)[]>([])
 
@@ -42,24 +47,10 @@ const initializeSelectedBookshelf = async () => {
         selectedBookshelf.value = bookShelfData
       }
     }
-
-    const seriesSnap = await fetchBookShelfSeries(user, firstDoc.id )
-    seriesSnap.docs.forEach((docSnap) => {
-      const data = docSnap.data() as Series;
-      items.value.push(data);
-    })
-
-    const noseriesSnap = await fetchBookShelfNoSeries(user, firstDoc.id )
-    noseriesSnap.docs.forEach((docSnap) => {
-      const data = docSnap.data() as BookItem;
-      items.value.push(data);
-    })
   } catch (e) {
     console.log(e)
   }
 }
-
-initializeSelectedBookshelf() // 関数を呼び出し、selectedBookshelfを初期化
 const isEdit = ref(false)
 
 const clickBtn = (editMode: boolean) => {
