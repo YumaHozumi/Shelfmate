@@ -100,9 +100,9 @@ const deleteBook = async () => {
 
     const bookshelfId = selectedBookshelf.value?.doc_id || ''
 
-    deleteBookItems(user, bookshelfId);
+    await deleteBookItems(user, bookshelfId);
 
-    deleteSeries(user, bookshelfId);
+    await deleteSeries(user, bookshelfId);
     
     listBookItem.value.length = 0
     listSeries.value.length = 0

@@ -50,7 +50,6 @@ const pushBooks = (books: QuerySnapshot<BookItem>) => {
   console.log("pushBooks");
   books.docs.forEach((docSnapshot) => {
     const data = docSnapshot.data() as BookItem;
-    console.log(data);
     bookList.value.push(data);
   })
 }

@@ -2,7 +2,7 @@
 import type { BookItem, BookShelf } from '@/interface'
 import { ref, watch, toRef } from 'vue'
 import { onMounted } from 'vue'
-import { collection, CollectionReference, getDocs, onSnapshot, QuerySnapshot} from 'firebase/firestore'
+import { collection, CollectionReference, onSnapshot, QuerySnapshot} from 'firebase/firestore'
 import { firebaseAuth, firestore, getCurrentUser } from '@/config/firebase'
 import { type Series, isSeries, isBookItem, Action } from '@/interface'
 import BookComp from '@/components/Bookshelf/BookComp.vue'
