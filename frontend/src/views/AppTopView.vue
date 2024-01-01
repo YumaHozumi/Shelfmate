@@ -9,6 +9,7 @@ import { implementBookShelf, type BookShelf, type BookItem, type Series, Action 
 import { firestore, getCurrentUser } from '@/config/firebase'
 import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore'
 import { deleteRegisteredBook, deleteSeriesBooksData, deleteSeriesDataItem } from '@/function'
+import { type User } from 'firebase/auth';
 
 const onNavigate = (name: string): void => {
   router.push({ name: name })
@@ -93,19 +94,29 @@ const deleteBook = async () => {
   try {
     const user = await getCurrentUser()
 
-    if (!user) {
-      throw new Error('User not found')
-    }
+    if (!user) throw new Error('User not found');
 
-    const uid = user.uid
     const bookshelfId = selectedBookshelf.value?.doc_id || ''
 
-    // listBookItemの各アイテムを削除
-    for (const item of listBookItem.value) {
+    deleteBookItems(user, bookshelfId);
+
+    deleteSeries(user, bookshelfId);
+    
+    listBookItem.value.length = 0
+    listSeries.value.length = 0
+  } catch (e) {
+    console.error('Error deleting books:', e)
+  }
+}
+
+const deleteBookItems = async (user: User, bookshelfId: string) => {
+     // listBookItemの各アイテムを削除
+     for (const item of listBookItem.value) {
+      //books以下に格納してある本の情報を削除
       const bookCollection = collection(
         firestore,
         'users',
-        uid,
+        user.uid,
         'bookshelves',
         bookshelfId,
         'books'
@@ -118,10 +129,11 @@ const deleteBook = async () => {
         await deleteDoc(docFirst.ref)
       }
 
+      //allBooks以下に格納してある本の情報を削除
       const allBooksCollection = collection(
         firestore,
         'users',
-        uid,
+        user.uid,
         'bookshelves',
         bookshelfId,
         'allBooks'
@@ -132,20 +144,19 @@ const deleteBook = async () => {
       if (!querySnapshot.empty) {
         const docFirst = querySnapshot.docs[0]
         await deleteDoc(docFirst.ref)
-
-        await deleteSeriesDataItem(uid, bookshelfId, item)
-        await deleteRegisteredBook(uid, bookshelfId, item.bookId);
       }
     }
+}
 
-    // listSeriesの各シリーズ下の全てのbooksを削除
-    for (const series of listSeries.value) {
+const deleteSeries = async (user: User, bookshelfId: string) => {
+   // listSeriesの各シリーズ下の全てのbooksを削除
+   for (const series of listSeries.value) {
       if (!series.seriesId) continue
       const seriesBooksQuery = query(
         collection(
           firestore,
           'users',
-          uid,
+          user.uid,
           'bookshelves',
           bookshelfId,
           'series',
@@ -161,7 +172,7 @@ const deleteBook = async () => {
         const allBooksCollection = collection(
           firestore,
           'users',
-          uid,
+          user.uid,
           'bookshelves',
           bookshelfId,
           'allBooks'
@@ -172,31 +183,22 @@ const deleteBook = async () => {
         if (!querySnapshot.empty) {
           const docFirst = querySnapshot.docs[0]
           await deleteDoc(docFirst.ref)
-          // Firestoreから削除した後にキャッシュを更新
-          await deleteSeriesDataItem(uid, bookshelfId, series)
-          await deleteSeriesBooksData(uid, bookshelfId, series.seriesId)
         }
         
         await deleteDoc(docSnapshot.ref)
-        await deleteRegisteredBook(uid, bookshelfId, bookData.bookId);
       }
 
       // After deleting all books in the series, delete the series itself
       const seriesDocRef = doc(
         firestore,
         'users',
-        uid,
+        user.uid,
         'bookshelves',
         bookshelfId,
         'series',
         series.seriesId
       )
       await deleteDoc(seriesDocRef)
-    }
-    listBookItem.value.length = 0
-    listSeries.value.length = 0
-  } catch (e) {
-    console.error('Error deleting books:', e)
   }
 }
 

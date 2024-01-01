@@ -2,7 +2,7 @@
 import type { BookItem, BookShelf } from '@/interface'
 import { ref, watch, toRef } from 'vue'
 import { onMounted } from 'vue'
-import { collection, getDocs, onSnapshot, QuerySnapshot} from 'firebase/firestore'
+import { collection, CollectionReference, getDocs, onSnapshot, QuerySnapshot} from 'firebase/firestore'
 import { firebaseAuth, firestore, getCurrentUser } from '@/config/firebase'
 import { type Series, isSeries, isBookItem, Action } from '@/interface'
 import BookComp from '@/components/Bookshelf/BookComp.vue'
@@ -37,7 +37,7 @@ let unsubSeries: Unsubscribe
 
 const setUnsubs = (user: User, doc_id: string) => {
   unsubBook = onSnapshot(
-    collection(firestore, 'users', user.uid, 'bookshelves', doc_id, 'books'),
+    collection(firestore, 'users', user.uid, 'bookshelves', doc_id, 'books') as CollectionReference<BookItem>,
     {includeMetadataChanges: true},
     (snapshot) => {
       snapshot.docChanges().forEach((change) => {
@@ -56,7 +56,7 @@ const setUnsubs = (user: User, doc_id: string) => {
   )
 
   unsubSeries = onSnapshot(
-    collection(firestore, 'users', user.uid, 'bookshelves', doc_id, 'series'),
+    collection(firestore, 'users', user.uid, 'bookshelves', doc_id, 'series') as CollectionReference<Series>,
     {includeMetadataChanges: true},
     (snapshot) => {
       snapshot.docChanges().forEach((change) => {
