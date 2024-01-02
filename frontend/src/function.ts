@@ -14,6 +14,8 @@ import {
   getDocFromCache,
   DocumentSnapshot,
   getDocFromServer,
+  query,
+  QueryConstraint
 } from 'firebase/firestore'
 import {type User} from 'firebase/auth';
 import { type BookItem, type BookShelf, type Series } from './interface'
@@ -133,15 +135,23 @@ const fetchDocWithCache = async <T>(docRef: DocumentReference<T>): Promise<Docum
 }
 
 //getDocsFromCacheはキャッシュが見つからないと空の配列を返す
-const fetchDocs = async <T>(collection: CollectionReference<T>): Promise<QuerySnapshot<T>> => {
-  const docs = await getDocsFromCache(collection);
+const fetchDocs = async <T>(
+  collection: CollectionReference<T>,
+  queryConstraints: QueryConstraint[] = [] // フィルタリングのための条件を追加
+): Promise<QuerySnapshot<T>> => {
+  const queryWithConstraints = query(collection, ...queryConstraints);
+  const docs = await getDocsFromCache(queryWithConstraints);
 
-  if (docs.size === 0) return await getDocsFromServer(collection);
+  if (docs.size === 0) return await getDocsFromServer(queryWithConstraints);
 
   return docs;
 }
 
-const fetchBookShelfNoSeries = async (user: User, doc_id: string): Promise<QuerySnapshot<BookItem>> => {
+const fetchBookShelfNoSeries = async (
+  user: User, 
+  doc_id: string, 
+  queryConstraints: QueryConstraint[] = [] // フィルタリングのための条件を追加
+): Promise<QuerySnapshot<BookItem>> => {
   const noSeriesBookCollection = collection(
       firestore,
       'users',
@@ -151,11 +161,14 @@ const fetchBookShelfNoSeries = async (user: User, doc_id: string): Promise<Query
       'books'
   ) as CollectionReference<BookItem>
     
-  return await fetchDocs(noSeriesBookCollection);
+  return await fetchDocs(noSeriesBookCollection, queryConstraints);
 };
 
-
-const fetchBookShelfSeries = async (user: User, doc_id: string): Promise<QuerySnapshot<Series>> => {
+const fetchBookShelfSeries = async (
+  user: User, 
+  doc_id: string, 
+  queryConstraints: QueryConstraint[] = [] // フィルタリングのための条件を追加
+): Promise<QuerySnapshot<Series>> => {
   const seriesCollection = collection(
     firestore,
     'users',
@@ -165,10 +178,15 @@ const fetchBookShelfSeries = async (user: User, doc_id: string): Promise<QuerySn
     'series'
   ) as CollectionReference<Series>
 
-  return await fetchDocs(seriesCollection);
+  return await fetchDocs(seriesCollection, queryConstraints);
 };
 
-const fetchSeries = async (user: User, selectedBookshelfId: string, seriesId: string): Promise<QuerySnapshot<BookItem>> => {
+const fetchSeries = async (
+  user: User, 
+  selectedBookshelfId: string, 
+  seriesId: string, 
+  queryConstraints: QueryConstraint[] = [] // フィルタリングのための条件を追加
+): Promise<QuerySnapshot<BookItem>> => {
   const booksCollection = collection(
     firestore,
     'users',
@@ -180,31 +198,38 @@ const fetchSeries = async (user: User, selectedBookshelfId: string, seriesId: st
     'books'
   ) as CollectionReference<BookItem>
 
-  return await fetchDocs(booksCollection);
+  return await fetchDocs(booksCollection, queryConstraints);
 }
 
-const fetchBookshelves = async (user: User): Promise<QuerySnapshot<BookShelf>> => {
-  const bookshelvesCollction =  collection(
+const fetchBookshelves = async (
+  user: User, 
+  queryConstraints: QueryConstraint[] = [] // フィルタリングのための条件を追加
+): Promise<QuerySnapshot<BookShelf>> => {
+  const bookshelvesCollection =  collection(
     firestore, 
     'users', 
     user.uid, 
     'bookshelves'
   ) as CollectionReference<BookShelf>
 
-  return await fetchDocs(bookshelvesCollction);
+  return await fetchDocs(bookshelvesCollection, queryConstraints);
 }
 
-const fetchAllBooks = async (user: User, selectedBookshelfId: string): Promise<QuerySnapshot<BookItem>> => {
-  const allBooksCollction =  collection(
+const fetchAllBooks = async (
+  user: User, 
+  selectedBookshelfId: string, 
+  queryConstraints: QueryConstraint[] = [] // フィルタリングのための条件を追加
+): Promise<QuerySnapshot<BookItem>> => {
+  const allBooksCollection = collection(
     firestore, 
     'users', 
     user.uid, 
     'bookshelves',
     selectedBookshelfId,
     'allBooks'
-  ) as CollectionReference<BookItem>
+  ) as CollectionReference<BookItem>;
   
-  return await fetchDocs(allBooksCollction);
+  return await fetchDocs(allBooksCollection, queryConstraints);
 }
 
 export {
