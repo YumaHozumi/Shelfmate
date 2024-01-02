@@ -47,7 +47,6 @@ const getBooks = async () => {
 
 const pushBooks = (books: QuerySnapshot<BookItem>) => {
   bookList.value.length = 0;
-  console.log("pushBooks");
   books.docs.forEach((docSnapshot) => {
     const data = docSnapshot.data() as BookItem;
     bookList.value.push(data);

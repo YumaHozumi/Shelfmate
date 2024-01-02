@@ -128,7 +128,6 @@ const getSeries = async () => {
   // 本棚のシリーズコレクションへの参照を取得
   const doc_id = prop.selectedBookshelf?.doc_id
   if(!doc_id) return;
-  console.log("Now getSeries")
   let noSeriesSnapshot: QuerySnapshot<BookItem> = await fetchBookShelfNoSeries(user, doc_id);
   pushBookShelfNoSeries(noSeriesSnapshot);
 
