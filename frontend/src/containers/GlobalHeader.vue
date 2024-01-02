@@ -77,7 +77,7 @@ const logout = async () => {
       新規登録
     </v-btn>
     
-    <UserIcon class="icon" @clickUserIcon="logout" v-if="!isShow"></UserIcon>
+    <UserIcon class="icon" @clickLogout="logout" v-if="!isShow"></UserIcon>
 
     <MyDialog
       color="green"

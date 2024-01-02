@@ -1,12 +1,12 @@
 <script setup lang="ts">
 interface Emits {
-  (event: "clickUserIcon"): void;
+  (event: "clickLogout"): void;
 }
 
 const emits = defineEmits<Emits>();
 
-const clickUserIcon = (): void => {
-  emits("clickUserIcon");
+const clickLogout = (): void => {
+  emits("clickLogout");
 }
 </script>
 
@@ -19,8 +19,9 @@ const clickUserIcon = (): void => {
         </button>
       </template>
       <v-list>
-        <v-list-item link @click="clickUserIcon">
+        <v-list-item link @click="clickLogout">
           <v-list-item-title>
+            <v-icon>mdi-logout</v-icon>
             ログアウト
           </v-list-item-title>
         </v-list-item>

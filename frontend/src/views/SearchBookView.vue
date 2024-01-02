@@ -12,43 +12,38 @@ import {
   addDoc,
   collection,
   doc,
-  getDoc,
-  getDocs,
   onSnapshot,
-  query,
   setDoc,
   updateDoc,
   where,
-  type Unsubscribe
+  type Unsubscribe,
+  CollectionReference
 } from 'firebase/firestore'
-import imageURL from '@/assets/no-image.png'
-import { onAuthStateChanged } from 'firebase/auth'
+
+import { onAuthStateChanged, type User } from 'firebase/auth'
 import { implementBookShelf, type BookItemNoSeries } from '@/interface'
 import { onUnmounted, computed } from 'vue'
 import router from '@/router'
-import { incrementCounter, sort, addSeriesDataItem, addSeriesBooksData, getRegisteredBooksData, setRegisteredBooksData } from '@/function'
-import { Timestamp } from 'firebase/firestore'
+import { incrementCounter, sort } from '@/function'
 import Pagination from '@/components/SearchBook/Pagination.vue'
 import SearchButton from '@/components/SearchButton.vue'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
-import { setBookshelvesData, getBookshelvesData } from '@/function'
+import { transformApiResponseToBookItems, fetchDocWithCache, fetchAllBooks, addDocSeriesBookAfterCacheCheck } from '@/function'
 
+//ナビゲーション処理
 const onNavigate = (name: string): void => {
   router.push({ name: name })
 }
 
-const itemsInit: BookItem[] = []
-const items = ref(itemsInit)
-const isLoading = ref(false)
-const errorMsg = ref('')
-
-//Google Books APIに検索クエリ投げる
-const search = async (searchText: string): Promise<BookItem[]> => {
+//エンコード済みのクエリ付きURLを組み立てる 
+//ex) https://www.googleapis.com/books/v1/volumes?q=hogehoge+helloworld
+const assembleURL = (searchText: string): string =>  {
   const baseURL = 'https://www.googleapis.com/books/v1/volumes'
-  const replaceText = searchText.replace(/[\s\u3000]/g, '+')
+  //半角 or 全角 → 「+」 に変換
+  const blankReplaceText = searchText.replace(/[\s\u3000]/g, '+')
 
   const params: Record<string, string> = {
-    q: replaceText,
+    q: blankReplaceText,
     printType: 'books',
     filter: 'ebooks',
     maxResults: '5',
@@ -63,35 +58,32 @@ const search = async (searchText: string): Promise<BookItem[]> => {
     .join('&')
 
   const completedURL = `${baseURL}?${queryString}`
+  return completedURL
+}
 
+const itemsInit: BookItem[] = []
+const items    =  ref(itemsInit)
+const isLoading = ref(false)
+const errorMsg  = ref('')
+
+//Google Books APIに検索クエリ投げる
+const search = async (searchText: string): Promise<BookItem[]> => {
+  const API_URL = assembleURL(searchText);
   let books: BookItem[] = []
 
   try {
     errorMsg.value = ''
-    const res = await axios.get(completedURL)
-    const apiItems = res.data.items
+    const res = await axios.get(API_URL)
+    books = transformApiResponseToBookItems(res.data.items)
 
-    if (!apiItems || apiItems.length === 0) {
+    if (!books || books.length === 0) {
       errorMsg.value = '本が見つかりませんでした' // 404エラーメッセージを設定
-      return books // 空の本の配列を返す
+      return [] // 空の本の配列を返す
     }
 
-    books = apiItems.map((item: any) => ({
-      bookId: item.id,
-      isbn: item.volumeInfo?.industryIdentifiers?.[1]?.identifier ?? 0,
-      title: item.volumeInfo?.title ?? '',
-      image_url: item.volumeInfo?.imageLinks?.thumbnail ?? imageURL,
-      author: item.volumeInfo?.authors?.[0] ?? '',
-      detail: item.searchInfo?.textSnippet ?? '',
-      public_date: Timestamp.fromDate(new Date(item.volumeInfo?.publishedDate || 0)),
-      seriesId: item.volumeInfo?.seriesInfo?.volumeSeries?.[0]?.seriesId ?? '',
-      orderNumber: item.volumeInfo?.seriesInfo?.volumeSeries?.[0]?.orderNumber ?? 0
-    }))
-
     books.forEach((book) => {
-      if (book.isbn !== undefined && book.image_url === undefined) {
-        book.image_url = 'https://iss.ndl.go.jp/thumbnail/' + book.isbn
-      }
+      if (book.isbn === undefined || book.image_url !== undefined) return;
+      book.image_url = 'https://iss.ndl.go.jp/thumbnail/' + book.isbn
     })
   } catch (error) {
     console.log(error)
@@ -117,16 +109,7 @@ const searchClick = async (searchText: string) => {
 
 const menu = ['発売日が新しい順', '発売日が古い順', '作品名順', '作者名順']
 
-// 既存の関数に追加
-const updateRegisteredBooksCache = async (uid: string, bookShelfId: string, newBook: BookItem) => {
-  const cachedData = await getRegisteredBooksData(uid, bookShelfId);
-  if (cachedData) {
-    cachedData.push(newBook);
-    await setRegisteredBooksData(uid, bookShelfId, cachedData);
-  }
-}
-
-// 既存の関数を改善
+// 本を登録
 const registerBookId = async (bookShelfId: string, book: BookItem): Promise<boolean> => {
   try {
     const user = await getCurrentUser();
@@ -138,16 +121,13 @@ const registerBookId = async (bookShelfId: string, book: BookItem): Promise<bool
       bookShelfId,
       'allBooks'
     );
-    const q = query(bookshelvesRef, where('bookId', '==', book.bookId));
-    const querySnapshot = await getDocs(q);
+    const condition = where('bookId', '==', book.bookId);
+    const querySnapshot = await fetchAllBooks(user, bookShelfId, [condition])
 
     if (querySnapshot.docs.length > 0) {
       return false;
     } else {
       await addDoc(bookshelvesRef, book);
-
-      // キャッシュを更新
-      await updateRegisteredBooksCache(user.uid, bookShelfId, book);
 
       return true;
     }
@@ -159,31 +139,15 @@ const registerBookId = async (bookShelfId: string, book: BookItem): Promise<bool
 
 const registeredBooks = ref<BookItem[]>([])
 
+//検索結果表示時にボタンで登録済みかそうでないかを表示するのに必要
 const setRegisteredBooks = async () => {
   const user = await getCurrentUser();
   const selectedBookshelfId = selectedBookshelf.value?.doc_id || '';
-  
-  // キャッシュからデータを取得
-  const cachedData = await getRegisteredBooksData(user.uid, selectedBookshelfId);
-  if (cachedData) {
-    registeredBooks.value = cachedData;
-    return;
-  }
 
-  const bookshelvesRef = collection(
-    firestore,
-    'users',
-    user.uid,
-    'bookshelves',
-    selectedBookshelfId,
-    'allBooks'
-  );
-  const booksSnapshot = await getDocs(bookshelvesRef);
+  const booksSnapshot = await fetchAllBooks(user, selectedBookshelfId);
 
   registeredBooks.value = booksSnapshot.docs.map((doc) => doc.data() as BookItem);
 
-  // データをキャッシュに保存
-  await setRegisteredBooksData(user.uid, selectedBookshelfId, registeredBooks.value);
 }
 
 //シリーズの部分のテキストだけを抽出する正規表現
@@ -191,6 +155,19 @@ const extractSeriesTitle = (str: string): string => {
   const regex = /^(.*?)(?:\s*\d+)?(?:\s*（[^）]+）)?(?:\s*【[^】]+】)?\s*$/
   const match = str.match(regex)
   return match ? match[1].trim() : ''
+}
+
+const addNoSeries = async (book: BookItem, user: User, selectedBookshelfId: string ) => {
+  const noSeriesBookCollection = collection(
+        firestore,
+        'users',
+        user.uid,
+        'bookshelves',
+        selectedBookshelfId,
+        'books'
+      )
+      const noSeriesBook: BookItemNoSeries = convertToBookItemWithoutSeries(book)
+      await addDoc(noSeriesBookCollection, noSeriesBook)
 }
 
 const registerBook = async (book: BookItem) => {
@@ -202,26 +179,15 @@ const registerBook = async (book: BookItem) => {
     const isAddBook = await registerBookId(selectedBookshelfId, book)
 
     if (!isAddBook) return
-    await setRegisteredBooks()
+    await setRegisteredBooks();
 
     //シリーズものじゃないとき
     if (seriesId === '') {
-      const noSeriesBookCollection = collection(
-        firestore,
-        'users',
-        user.uid,
-        'bookshelves',
-        selectedBookshelfId,
-        'books'
-      )
-      const noSeriesBook: BookItemNoSeries = convertToBookItemWithoutSeries(book)
-      await addDoc(noSeriesBookCollection, noSeriesBook)
-      await addSeriesDataItem(user.uid, selectedBookshelfId, book)
+      await addNoSeries(book, user, selectedBookshelfId);
     } else {
       //シリーズもの
       const seriesRef = doc(bookshelvesRef, selectedBookshelfId, 'series', seriesId)
-      const seriesSnap = await getDoc(seriesRef)
-
+      const seriesSnap = await fetchDocWithCache(seriesRef)
       if (seriesSnap.exists()) {
         const seriesData = seriesSnap.data()
 
@@ -249,20 +215,8 @@ const registerBook = async (book: BookItem) => {
         })
       }
 
-      const booksCollection = collection(
-        firestore,
-        'users',
-        user.uid,
-        'bookshelves',
-        selectedBookshelfId,
-        'series',
-        seriesId,
-        'books'
-      )
-      await addDoc(booksCollection, book)
+      await addDocSeriesBookAfterCacheCheck(user, book, selectedBookshelfId, seriesId);
       await incrementCounter(seriesRef)
-      // 新しいシリーズアイテムをIndexedDBに追加
-      await addSeriesBooksData(user.uid, selectedBookshelfId, seriesId, book)
     }
   } catch (error) {
     console.log(error)
@@ -271,55 +225,28 @@ const registerBook = async (book: BookItem) => {
 
 const buttons = ref<BookShelf[]>([])
 
-let isInitialLoad = true
-
 let unsubscribe: Unsubscribe
 
 onAuthStateChanged(firebaseAuth, (user) => {
   if (user) {
     unsubscribe = onSnapshot(
-      collection(firestore, 'users', user.uid, 'bookshelves'),
+      collection(firestore, 'users', user.uid, 'bookshelves') as CollectionReference<BookShelf>,
+      {includeMetadataChanges: true},
       async (snapshot) => {
-        if (isInitialLoad) {
-          isInitialLoad = false
-          const localCache = await getBookshelvesData(user.uid)
-          if (!localCache) {
-            //ローカルキャッシュがない場合、Firestoreからデータを取得
-            buttons.value = snapshot.docs
-              .map((doc) => {
-                const data = doc.data()
-                if (implementBookShelf(data)) {
-                  const bookShelfData: BookShelf = { doc_id: doc.id, ...data }
-                  return bookShelfData
-                }
-                return undefined
-              })
-              .filter((item): item is BookShelf => item !== undefined)
-
-            await setBookshelvesData(user.uid, buttons.value)
-          } else {
-            //ある場合
-            //ローカルキャッシュからデータを取得
-            buttons.value = localCache
-          }
-        } else {
           snapshot.docChanges().forEach(async (change) => {
             const data = change.doc.data()
             if (implementBookShelf(data)) {
               if (change.type === 'added') {
                 const bookShelfData: BookShelf = { doc_id: change.doc.id, ...data } // doc_idを設定し直します
                 buttons.value.push(bookShelfData)
-                await setBookshelvesData(user.uid, buttons.value)
               }
             }
           })
-        }
 
-        if (selectedBookshelf.value === undefined) {
-          selectedBookshelf.value = buttons.value?.[0]
-        }
-      }
-    )
+          if(selectedBookshelf.value !== undefined) return
+
+          selectedBookshelf.value = buttons.value?.[0];
+        })
   }
 })
 

@@ -3,11 +3,11 @@ import LocalHeaderButton from '@/components/LocalHeaderButton.vue'
 import { ref, onMounted, onUnmounted, watchEffect } from 'vue'
 import MoreMenu from '@/components/MoreMenu.vue'
 import type { BookShelf } from '@/interface'
-import { collection, onSnapshot } from 'firebase/firestore'
-import { firestore, firebaseAuth } from '@/config/firebase'
+import { CollectionReference, QuerySnapshot, collection, onSnapshot } from 'firebase/firestore'
+import { firestore, firebaseAuth, getCurrentUser } from '@/config/firebase'
 import { onAuthStateChanged, type Unsubscribe } from 'firebase/auth'
 import { implementBookShelf } from '@/interface'
-import { setBookshelvesData, getBookshelvesData } from '@/function'
+import { fetchBookshelves } from '@/function'
 
 interface Emits {
   (event: 'clickLocalHeaderBtn', bookshelf: BookShelf): void
@@ -41,55 +41,43 @@ const updateWidth = () => {
 
 onMounted(() => {
   window.addEventListener('resize', updateWidth)
+  initBookshelf();
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', updateWidth)
 })
 
-let isInitialLoad = true
+const initBookshelf = async () => {
+  const user = await getCurrentUser()
+
+  const bookshelvesSnap: QuerySnapshot<BookShelf> = await fetchBookshelves(user);
+  buttons.value.length = 0;
+  bookshelvesSnap.docs.forEach((snapshot) => {
+    const data = snapshot.data();
+    if(!implementBookShelf(data)) return;
+    //初期状態ではdoc_idが設定されていないので，設定しておく
+    const bookShelfData: BookShelf = {doc_id: snapshot.id, ...data}
+    buttons.value.push(bookShelfData);
+  })
+}
+
 let unsubscribe: Unsubscribe
 
 onAuthStateChanged(firebaseAuth, (user) => {
   if (user) {
     unsubscribe = onSnapshot(
-      collection(firestore, 'users', user.uid, 'bookshelves'),
+      collection(firestore, 'users', user.uid, 'bookshelves') as CollectionReference<BookShelf>,
+      {includeMetadataChanges: true},
       async (snapshot) => {
-        if (isInitialLoad) {
-          isInitialLoad = false
-          const localCache = await getBookshelvesData(user.uid)
-          if (!localCache) {
-            //ローカルキャッシュがない場合、Firestoreからデータを取得
-            buttons.value = snapshot.docs
-              .map((doc) => {
-                const data = doc.data()
-                if (implementBookShelf(data)) {
-                  const bookShelfData: BookShelf = { doc_id: doc.id, ...data }
-                  return bookShelfData
-                }
-                return undefined
-              })
-              .filter((item): item is BookShelf => item !== undefined)
-
-            // 取得したデータをIndexDBに保存
-            await setBookshelvesData(user.uid, buttons.value)
-          } else {
-            //ある場合
-            //ローカルキャッシュからデータを取得
-            buttons.value = localCache
-          }
-        } else {
           snapshot.docChanges().forEach(async (change) => {
             const data = change.doc.data()
-            if (implementBookShelf(data)) {
-              if (change.type === 'added') {
-                const bookShelfData: BookShelf = { doc_id: change.doc.id, ...data } // doc_idを設定し直します
-                buttons.value.push(bookShelfData)
-                await setBookshelvesData(user.uid, buttons.value)
-              }
-            }
+            if (!implementBookShelf(data)) return;
+            if (change.type !== 'added') return;
+
+            const bookShelfData: BookShelf = { doc_id: change.doc.id, ...data } // doc_idを設定し直します
+            buttons.value.push(bookShelfData)
           })
-        }
       }
     )
   }
