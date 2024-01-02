@@ -7,7 +7,7 @@ import router from '@/router'
 import { ref } from 'vue'
 import { implementBookShelf, type BookShelf, type BookItem, type Series, Action } from '@/interface'
 import { firestore, getCurrentUser } from '@/config/firebase'
-import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore'
+import { collection, deleteDoc, doc, getDocs, where } from 'firebase/firestore'
 import { type User } from 'firebase/auth';
 import { onMounted } from 'vue'
 import { fetchAllBooks, fetchBookShelfNoSeries, fetchSeries } from '@/function'
