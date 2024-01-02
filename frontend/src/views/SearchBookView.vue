@@ -31,7 +31,7 @@ import { incrementCounter, sort } from '@/function'
 import Pagination from '@/components/SearchBook/Pagination.vue'
 import SearchButton from '@/components/SearchButton.vue'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
-import { transformApiResponseToBookItems } from '@/function'
+import { transformApiResponseToBookItems, fetchDocWithCache } from '@/function'
 
 //ナビゲーション処理
 const onNavigate = (name: string): void => {
@@ -198,8 +198,7 @@ const registerBook = async (book: BookItem) => {
     } else {
       //シリーズもの
       const seriesRef = doc(bookshelvesRef, selectedBookshelfId, 'series', seriesId)
-      const seriesSnap = await getDoc(seriesRef)
-
+      const seriesSnap = await fetchDocWithCache(seriesRef)
       if (seriesSnap.exists()) {
         const seriesData = seriesSnap.data()
 

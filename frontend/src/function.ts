@@ -11,6 +11,9 @@ import {
   CollectionReference,
   QuerySnapshot,
   getDocsFromServer,
+  getDocFromCache,
+  DocumentSnapshot,
+  getDocFromServer,
 } from 'firebase/firestore'
 import {type User} from 'firebase/auth';
 import { type BookItem, type BookShelf, type Series } from './interface'
@@ -119,6 +122,17 @@ const transformApiResponseToBookItems = (apiResponse: any): BookItem[] => {
   return books;
 }
 
+
+//getDocFromCacheはキャッシュが見つからないとエラーを返す
+const fetchDocWithCache = async <T>(docRef: DocumentReference<T>): Promise<DocumentSnapshot<T>> => {
+  try {
+    return await getDocFromCache(docRef);
+  } catch (error) {
+    return await getDocFromServer(docRef)
+  }
+}
+
+//getDocsFromCacheはキャッシュが見つからないと空の配列を返す
 const fetchDocs = async <T>(collection: CollectionReference<T>): Promise<QuerySnapshot<T>> => {
   const docs = await getDocsFromCache(collection);
 
@@ -190,5 +204,6 @@ export {
   fetchBookShelfNoSeries,
   fetchBookShelfSeries,
   fetchSeries,
-  fetchBookshelves
+  fetchBookshelves,
+  fetchDocWithCache
 }
