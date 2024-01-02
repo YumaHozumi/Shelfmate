@@ -141,7 +141,7 @@ const fetchDocs = async <T>(
 ): Promise<QuerySnapshot<T>> => {
   const queryWithConstraints = query(collection, ...queryConstraints);
   const docs = await getDocsFromCache(queryWithConstraints);
-
+  
   if (docs.size === 0) return await getDocsFromServer(queryWithConstraints);
 
   return docs;
