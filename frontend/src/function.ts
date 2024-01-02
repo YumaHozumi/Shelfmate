@@ -194,6 +194,19 @@ const fetchBookshelves = async (user: User): Promise<QuerySnapshot<BookShelf>> =
   return await fetchDocs(bookshelvesCollction);
 }
 
+const fetchAllBooks = async (user: User, selectedBookshelfId: string): Promise<QuerySnapshot<BookItem>> => {
+  const allBooksCollction =  collection(
+    firestore, 
+    'users', 
+    user.uid, 
+    'bookshelves',
+    selectedBookshelfId,
+    'allBooks'
+  ) as CollectionReference<BookItem>
+  
+  return await fetchDocs(allBooksCollction);
+}
+
 export {
   firebaseErrorMessage,
   incrementCounter,
@@ -205,5 +218,6 @@ export {
   fetchBookShelfSeries,
   fetchSeries,
   fetchBookshelves,
-  fetchDocWithCache
+  fetchDocWithCache,
+  fetchAllBooks
 }

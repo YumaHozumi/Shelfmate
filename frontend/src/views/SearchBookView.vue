@@ -31,7 +31,7 @@ import { incrementCounter, sort } from '@/function'
 import Pagination from '@/components/SearchBook/Pagination.vue'
 import SearchButton from '@/components/SearchButton.vue'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
-import { transformApiResponseToBookItems, fetchDocWithCache } from '@/function'
+import { transformApiResponseToBookItems, fetchDocWithCache, fetchAllBooks } from '@/function'
 
 //ナビゲーション処理
 const onNavigate = (name: string): void => {
@@ -147,15 +147,7 @@ const setRegisteredBooks = async () => {
   const user = await getCurrentUser();
   const selectedBookshelfId = selectedBookshelf.value?.doc_id || '';
 
-  const bookshelvesRef = collection(
-    firestore,
-    'users',
-    user.uid,
-    'bookshelves',
-    selectedBookshelfId,
-    'allBooks'
-  );
-  const booksSnapshot = await getDocs(bookshelvesRef);
+  const booksSnapshot = await fetchAllBooks(user, selectedBookshelfId);
 
   registeredBooks.value = booksSnapshot.docs.map((doc) => doc.data() as BookItem);
 
