@@ -30,7 +30,7 @@ import { incrementCounter, sort } from '@/function'
 import Pagination from '@/components/SearchBook/Pagination.vue'
 import SearchButton from '@/components/SearchButton.vue'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
-import { transformApiResponseToBookItems, fetchDocWithCache, fetchAllBooks } from '@/function'
+import { transformApiResponseToBookItems, fetchDocWithCache, fetchAllBooks, addDocSeriesBookAfterCacheCheck } from '@/function'
 
 //ナビゲーション処理
 const onNavigate = (name: string): void => {
@@ -123,8 +123,8 @@ const registerBookId = async (bookShelfId: string, book: BookItem): Promise<bool
       bookShelfId,
       'allBooks'
     );
-    const q = query(bookshelvesRef, where('bookId', '==', book.bookId));
-    const querySnapshot = await getDocs(q);
+    const condition = where('bookId', '==', book.bookId);
+    const querySnapshot = await fetchAllBooks(user, bookShelfId, [condition])
 
     if (querySnapshot.docs.length > 0) {
       return false;
@@ -217,17 +217,7 @@ const registerBook = async (book: BookItem) => {
         })
       }
 
-      const booksCollection = collection(
-        firestore,
-        'users',
-        user.uid,
-        'bookshelves',
-        selectedBookshelfId,
-        'series',
-        seriesId,
-        'books'
-      )
-      await addDoc(booksCollection, book)
+      await addDocSeriesBookAfterCacheCheck(user, book, selectedBookshelfId, seriesId);
       await incrementCounter(seriesRef)
     }
   } catch (error) {

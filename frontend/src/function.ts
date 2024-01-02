@@ -232,6 +232,39 @@ const fetchAllBooks = async (
   return await fetchDocs(allBooksCollection, queryConstraints);
 }
 
+ const addDocAfterCacheCheck = async <T>(
+    collectRef: CollectionReference<T>,
+    item: T
+  ) => {
+
+  //キャッシュ空の状態で追加してしまわないようにする
+  //空の状態だったらサーバから読みこみ，そのデータがキャッシュされる
+  await fetchDocs(collectRef);
+  
+  await addDoc(collectRef, item);
+}
+
+const addDocSeriesBookAfterCacheCheck = async (
+  user: User,
+  book: BookItem,
+  selectedBookshelfId: string,
+  seriesId: string
+) => {
+  const booksCollection = collection(
+    firestore, 
+    'users',
+    user.uid,
+    'bookshelves',
+    selectedBookshelfId,
+    'series',
+    seriesId,
+    'books'
+  )
+
+  await addDocAfterCacheCheck(booksCollection, book);
+}
+
+
 export {
   firebaseErrorMessage,
   incrementCounter,
@@ -244,5 +277,6 @@ export {
   fetchSeries,
   fetchBookshelves,
   fetchDocWithCache,
-  fetchAllBooks
+  fetchAllBooks,
+  addDocSeriesBookAfterCacheCheck
 }

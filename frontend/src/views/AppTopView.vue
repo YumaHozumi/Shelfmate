@@ -10,6 +10,7 @@ import { firestore, getCurrentUser } from '@/config/firebase'
 import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore'
 import { type User } from 'firebase/auth';
 import { onMounted } from 'vue'
+import { fetchAllBooks, fetchBookShelfNoSeries, fetchSeries } from '@/function'
 
 const onNavigate = (name: string): void => {
   router.push({ name: name })
@@ -115,16 +116,8 @@ const deleteBookItems = async (user: User, bookshelfId: string) => {
      // listBookItemの各アイテムを削除
      for (const item of listBookItem.value) {
       //books以下に格納してある本の情報を削除
-      const bookCollection = collection(
-        firestore,
-        'users',
-        user.uid,
-        'bookshelves',
-        bookshelfId,
-        'books'
-      )
-      const qBook = query(bookCollection, where('bookId', '==', item.bookId))
-      const querySnapshotBook = await getDocs(qBook)
+      const bookIdEQ = where('bookId', '==', item.bookId)
+      const querySnapshotBook = await fetchBookShelfNoSeries(user, bookshelfId, [bookIdEQ]);
 
       if (!querySnapshotBook.empty) {
         const docFirst = querySnapshotBook.docs[0]
@@ -132,16 +125,7 @@ const deleteBookItems = async (user: User, bookshelfId: string) => {
       }
 
       //allBooks以下に格納してある本の情報を削除
-      const allBooksCollection = collection(
-        firestore,
-        'users',
-        user.uid,
-        'bookshelves',
-        bookshelfId,
-        'allBooks'
-      )
-      const q = query(allBooksCollection, where('bookId', '==', item.bookId))
-      const querySnapshot = await getDocs(q)
+      const querySnapshot = await fetchAllBooks(user, bookshelfId, [bookIdEQ])
 
       if (!querySnapshot.empty) {
         const docFirst = querySnapshot.docs[0]
@@ -153,34 +137,14 @@ const deleteBookItems = async (user: User, bookshelfId: string) => {
 const deleteSeries = async (user: User, bookshelfId: string) => {
    // listSeriesの各シリーズ下の全てのbooksを削除
    for (const series of listSeries.value) {
-      if (!series.seriesId) continue
-      const seriesBooksQuery = query(
-        collection(
-          firestore,
-          'users',
-          user.uid,
-          'bookshelves',
-          bookshelfId,
-          'series',
-          series.seriesId,
-          'books'
-        )
-      )
+      if (!series.seriesId) continue;
 
-      const seriesBooksSnapshot = await getDocs(seriesBooksQuery)
+      const seriesBooksSnapshot = await fetchSeries(user, bookshelfId, series.seriesId)
       for (const docSnapshot of seriesBooksSnapshot.docs) {
         const bookData = docSnapshot.data() as BookItem
 
-        const allBooksCollection = collection(
-          firestore,
-          'users',
-          user.uid,
-          'bookshelves',
-          bookshelfId,
-          'allBooks'
-        )
-        const q = query(allBooksCollection, where('bookId', '==', bookData.bookId))
-        const querySnapshot = await getDocs(q)
+        const condition = where('bookId', '==', bookData.bookId);
+        const querySnapshot = await fetchAllBooks(user, bookshelfId, [condition])
 
         if (!querySnapshot.empty) {
           const docFirst = querySnapshot.docs[0]
