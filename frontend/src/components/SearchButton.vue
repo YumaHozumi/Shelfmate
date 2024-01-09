@@ -2,7 +2,7 @@
 import SearchBar from '@/basic/SearchBar.vue'
 import axios from 'axios'
 import { watch } from 'vue'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import {
   implementBookShelf,
   type BookItem,
@@ -58,6 +58,10 @@ onAuthStateChanged(firebaseAuth, (user) => {
             const bookShelfData: BookShelf = { doc_id: change.doc.id, ...data } // doc_idを設定し直します
             buttons.value.push(bookShelfData)
           })
+
+          if(selectedBookshelf.value !== undefined) return
+
+          selectedBookshelf.value = buttons.value?.[0];
       }
     )
   }
