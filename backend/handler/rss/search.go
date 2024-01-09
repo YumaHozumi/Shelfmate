@@ -19,16 +19,13 @@ import (
 // @Router /api/books/search [get]
 func (h *handler) Search(w http.ResponseWriter, r *http.Request) {
 	isbn := r.URL.Query().Get("isbn")
-	fmt.Println("1")
 	if err := validateISBN(isbn); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	ctx := r.Context()
-	fmt.Println("2")
 	rss, err := h.rr.SearchBooks(ctx, isbn)
 	if err != nil {
-		fmt.Println("3")
 		fmt.Println(err)
 		if errors.Is(err, object.ErrBookNotFound) {
 			http.Error(w, err.Error(), http.StatusNotFound)
@@ -37,7 +34,7 @@ func (h *handler) Search(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	fmt.Println("4")
+
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(rss); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

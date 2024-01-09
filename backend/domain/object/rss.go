@@ -6,6 +6,7 @@ import (
 	"math/big"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type RSS struct {
@@ -55,10 +56,18 @@ func (item *Item) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 			case "identifier":
 				for _, attr := range t.Attr {
 					if attr.Name.Local == "type" && attr.Value == "dcndl:ISBN" {
-						var isbn int64
-						if err := d.DecodeElement(&isbn, &t); err != nil {
+						var isbn_s string
+						if err := d.DecodeElement(&isbn_s, &t); err != nil {
 							return err
 						}
+						isbn_s = strings.ReplaceAll(isbn_s, "-", "")
+
+						//ISBNを数値に変換
+						isbn, err := strconv.ParseInt(isbn_s, 10, 64)
+						if err != nil {
+							return err
+						}
+
 						item.ISBNIdentifier = isbn
 
 						num := big.NewInt(isbn)

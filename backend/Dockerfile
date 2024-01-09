@@ -1,8 +1,8 @@
 FROM golang:1.20 AS build
 WORKDIR /app
-COPY backend/go.mod backend/go.sum ./
+COPY ./go.mod ./go.sum ./
 RUN go mod download
-COPY backend/ ./
+COPY ./ ./
 RUN go build -o main .
 
 FROM debian:buster-slim

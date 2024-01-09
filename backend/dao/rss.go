@@ -5,6 +5,7 @@ import (
 	"bookshelf/domain/repository"
 	"context"
 	"encoding/xml"
+	"fmt"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -29,15 +30,18 @@ func (r *rss) SearchBooks(ctx context.Context, isbn string) (*object.RSS, error)
 
 	res, err := http.Get(baseURL.String())
 	if err != nil {
+		fmt.Println(1)
 		return nil, err
 	}
 
 	var rss *object.RSS
 	if err := xml.NewDecoder(res.Body).Decode(&rss); err != nil {
+		fmt.Println(2)
 		return nil, err
 	}
 
 	if rss == nil || len(rss.Channel.Items) == 0 {
+		fmt.Println(3)
 		return nil, object.ErrBookNotFound
 	}
 
