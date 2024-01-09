@@ -2,13 +2,14 @@
 import SearchBar from '@/basic/SearchBar.vue'
 import axios from 'axios'
 import { watch } from 'vue'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import {
   implementBookShelf,
   type BookItem,
   type BookShelf,
   type SelectSeriesItem,
-  type BookItemNoSeries
+  type BookItemNoSeries,
+type Series
 } from '@/interface'
 import {
   Timestamp,
@@ -23,7 +24,8 @@ import {
   setDoc,
   query,
   where,
-  CollectionReference
+  CollectionReference,
+  QuerySnapshot
 } from 'firebase/firestore'
 import imageURL from '@/assets/no-image.png'
 import { onAuthStateChanged } from 'firebase/auth'
@@ -31,9 +33,10 @@ import { firebaseAuth, firestore, getCurrentUser } from '@/config/firebase'
 import { onUnmounted } from 'vue'
 import SearchResult from '@/components/SearchBook/SearchResult.vue'
 import DropdownMenu from './DropdownMenu.vue'
-import { incrementCounter } from '@/function'
+import { fetchBookShelfSeries, incrementCounter } from '@/function'
 import { rules } from '@/validation'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
+import type OptionContainerVue from '@/containers/OptionContainer.vue'
 
 const dialog = ref(false)
 const inputText = ref('')
@@ -141,27 +144,23 @@ watch(selectedBookshelf, async (newVal) => {
 
   const selectedBookshelfId = selectedBookshelf.value?.doc_id
 
-  if (selectedBookshelfId !== undefined) {
-    const seriesCollection = collection(
-      firestore,
-      'users',
-      user.uid,
-      'bookshelves',
-      selectedBookshelfId,
-      'series'
-    )
-    await getDocs(seriesCollection).then((snapshot) => {
-      snapshot.forEach((series) => {
-        const data = series.data()
-        const item: SelectSeriesItem = {
-          seriesId: data.seriesId,
-          pic: data.pic,
-          seriesTitle: data.seriesTitle
-        }
-        seriesList.value.push(item)
-      })
-    })
+  if (selectedBookshelfId === undefined) return;
+
+  const seriesSnap: QuerySnapshot<Series> = await fetchBookShelfSeries(user, selectedBookshelfId);
+  
+  if(seriesSnap.empty) return;
+
+  for(const docSnapshot of seriesSnap.docs) {
+    const seriesData = docSnapshot.data() as Series;
+    if(!seriesData.seriesId) continue
+    const item: SelectSeriesItem = {
+      seriesId: seriesData.seriesId,
+      pic: seriesData.pic,
+      seriesTitle: seriesData.seriesTitle
+    }
+    seriesList.value.push(item)
   }
+
 })
 
 const selectItem = ref<SelectSeriesItem | undefined>(undefined)
