@@ -278,5 +278,7 @@ export {
   fetchBookshelves,
   fetchDocWithCache,
   fetchAllBooks,
-  addDocSeriesBookAfterCacheCheck
+  addDocSeriesBookAfterCacheCheck,
+  fetchDocs,
+  addDocAfterCacheCheck
 }

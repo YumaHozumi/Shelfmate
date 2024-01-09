@@ -16,13 +16,9 @@ import {
   collection,
   onSnapshot,
   type Unsubscribe,
-  getDocs,
-  addDoc,
   doc,
-  getDoc,
   updateDoc,
   setDoc,
-  query,
   where,
   CollectionReference,
   QuerySnapshot
@@ -33,10 +29,9 @@ import { firebaseAuth, firestore, getCurrentUser } from '@/config/firebase'
 import { onUnmounted } from 'vue'
 import SearchResult from '@/components/SearchBook/SearchResult.vue'
 import DropdownMenu from './DropdownMenu.vue'
-import { fetchBookShelfSeries, incrementCounter } from '@/function'
+import { fetchBookShelfSeries, incrementCounter, fetchDocs, addDocAfterCacheCheck, fetchDocWithCache } from '@/function'
 import { rules } from '@/validation'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
-import type OptionContainerVue from '@/containers/OptionContainer.vue'
 
 const dialog = ref(false)
 const inputText = ref('')
@@ -178,8 +173,9 @@ const registerBook = async (book: BookItem) => {
 
 const duplicateCheck = async (colref: CollectionReference, bookId: string) => {
   //重複判定
-  const q = query(colref, where('bookId', '==', bookId))
-  const querySnapshot = await getDocs(q)
+  const condition = where('bookId', '==', bookId)
+
+  const querySnapshot = await fetchDocs(colref, [condition]);
   return querySnapshot.docs.length > 0
 }
 
@@ -207,7 +203,7 @@ const submit = async () => {
   if (book !== undefined) {
     //所持している本一覧に追加
     if (!(await duplicateCheck(allBookCollection, book.bookId))) {
-      await addDoc(allBookCollection, book)
+      await addDocAfterCacheCheck(allBookCollection, book)
     } else return //重複していたらだめ
   }
 
@@ -216,68 +212,69 @@ const submit = async () => {
     const noSeriesBook: BookItemNoSeries = convertToBookItemWithoutSeries(book)
     if (!(await duplicateCheck(noSeriesBookCollection, book.bookId))) {
       //重複していないとき
-      await addDoc(noSeriesBookCollection, noSeriesBook)
+      await addDocAfterCacheCheck(noSeriesBookCollection, noSeriesBook)
     }
   } else {
     // シリーズもの
+    
+    if (selectItem.value === undefined || book === undefined) return
 
-    if (selectItem.value !== undefined && book !== undefined) {
-      const booksCollection = collection(
-        firestore,
-        'users',
-        user.uid,
-        'bookshelves',
-        selectedBookshelfId,
-        'series',
-        selectItem.value.seriesId,
-        'books'
-      )
-      if (await duplicateCheck(booksCollection, book.bookId)) return
+    const booksCollection = collection(
+      firestore,
+      'users',
+      user.uid,
+      'bookshelves',
+      selectedBookshelfId,
+      'series',
+      selectItem.value.seriesId,
+      'books'
+    )
 
-      const bookshelvesRef = collection(firestore, 'users', user.uid, 'bookshelves')
-      const seriesRef = doc(
-        bookshelvesRef,
-        selectedBookshelfId,
-        'series',
-        selectItem.value.seriesId
-      )
-      const seriesSnap = await getDoc(seriesRef)
+    if (await duplicateCheck(booksCollection, book.bookId)) return
 
-      if (seriesSnap.exists()) {
-        const seriesData = seriesSnap.data()
-        const shouldUpdatePic =
-          book &&
-          (((book.orderNumber ?? 0) > (seriesData?.picOrder ?? 0) && book.image_url !== '') ||
-            ((book.orderNumber ?? 0) < (seriesData?.picOrder ?? 0) && seriesData?.pic === ''))
+    const bookshelvesRef = collection(firestore, 'users', user.uid, 'bookshelves')
+    const seriesRef = doc(
+      bookshelvesRef,
+      selectedBookshelfId,
+      'series',
+      selectItem.value.seriesId
+    )
+    const seriesSnap = await fetchDocWithCache(seriesRef)
 
-        if (shouldUpdatePic) {
-          await updateDoc(seriesRef, {
-            pic: book?.image_url,
-            picOrder: book?.orderNumber ?? 0
-          })
-        }
-      } else {
-        // ドキュメントが存在しない場合、画像とカウンターを設定
-        const seriesTitle = extractSeriesTitle(book.title)
+    if (seriesSnap.exists()) {
+      const seriesData = seriesSnap.data()
+      const shouldUpdatePic =
+        book &&
+        (((book.orderNumber ?? 0) > (seriesData?.picOrder ?? 0) && book.image_url !== '') ||
+          ((book.orderNumber ?? 0) < (seriesData?.picOrder ?? 0) && seriesData?.pic === ''))
 
-        await setDoc(seriesRef, {
-          seriesId: selectItem.value.seriesId,
-          pic: book?.image_url ?? '',
-          counter: 0,
-          picOrder: book?.orderNumber ?? 0,
-          seriesTitle: seriesTitle
+      if (shouldUpdatePic) {
+        await updateDoc(seriesRef, {
+          pic: book?.image_url,
+          picOrder: book?.orderNumber ?? 0
         })
       }
+    } else {
+      // ドキュメントが存在しない場合、画像とカウンターを設定
+      const seriesTitle = extractSeriesTitle(book.title)
 
-      //API経由で取得したやつにはシリーズIDないためここで設定
-      book.seriesId = selectItem.value.seriesId
-
-      await addDoc(booksCollection, book)
-      await incrementCounter(seriesRef)
-
-      selectItem.value = undefined
-      selectedRadio.value = 'one'
+      await setDoc(seriesRef, {
+        seriesId: selectItem.value.seriesId,
+        pic: book?.image_url ?? '',
+        counter: 0,
+        picOrder: book?.orderNumber ?? 0,
+        seriesTitle: seriesTitle
+      })
     }
+
+    //API経由で取得したやつにはシリーズIDないためここで設定
+    book.seriesId = selectItem.value.seriesId
+
+    await addDocAfterCacheCheck(booksCollection, book)
+    await incrementCounter(seriesRef)
+
+    selectItem.value = undefined
+    selectedRadio.value = 'one'
   }
 }
 
