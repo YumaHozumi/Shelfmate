@@ -1,6 +1,5 @@
 # Shelfmate
-書籍管理アプリです。
-
+![banner](images/banner_app.png)
 「この本、もう持ってたっけ…？」となったときにすぐに所持している本一覧を確認できるようになります。
 
 PWA対応、レスポンシブ対応済みなので、スマホからでもネイティブアプリのように使えます。
@@ -13,16 +12,15 @@ PWA対応、レスポンシブ対応済みなので、スマホからでもネ�
 メールアドレスの場合、登録したアドレスに確認メールが送られてくるので、それを確認した後、新規登録完了となります。
 
 # 使用技術
-- フロントエンド
-  - Vue.js
-- バックエンド
-  - Go
-- その他
-  - Firebase Authentication
-  - Cloud Firestore
-  - Google Books API
-  - 国立国会図書館API
-  - Docker
+
+| カテゴリ | 技術 |
+| --- | --- |
+| フロントエンド | Vue.js |
+| バックエンド | Go |
+| データベース | Cloud Firestore |
+| 認証 | Firebase Authentication |
+| API | Google Books API, 国立国会図書館API |
+| その他 | Docker |
 
 # 構成図
 ![構成図](images/shelfmate.drawio.png)
