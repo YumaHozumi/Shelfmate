@@ -9,7 +9,8 @@ import ErrorMessage from '@/basic/ErrorMessage.vue'
 import { firebaseErrorMessage } from '@/function'
 import { firebaseAuth } from '@/config/firebase'
 import { rules } from '@/validation'
-import { googleLogin } from '@/auth' 
+import { handleLogin, googleLogin } from '@/auth' 
+import { initBookshelf } from '@/function'
 
 interface Emits {
   (event: 'navigate', name: string): void
@@ -39,9 +40,12 @@ const submitButton = async () => {
   }
 }
 
+/**
+ * Googleログインボタンがクリックされたときの処理
+ */
 const clickGoogleButton = async () => {
   try {
-    await googleLogin()
+    await handleLogin(googleLogin, initBookshelf, onClickLogin)
   } catch (e) {
     if (e instanceof FirebaseError) {
       errorMessage.value = firebaseErrorMessage(e)
