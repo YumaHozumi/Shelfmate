@@ -2,13 +2,14 @@
 import SubmitButton from '@/basic//Login/SubmitButton.vue'
 import GoogleButton from '@/basic/Login/GoogleButton.vue'
 import Link from '@/basic/Login/Link.vue'
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect } from 'firebase/auth'
+import { signInWithEmailAndPassword } from 'firebase/auth'
 import { ref, watch, computed } from 'vue'
 import { FirebaseError } from 'firebase/app'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
 import { firebaseErrorMessage } from '@/function'
 import { firebaseAuth } from '@/config/firebase'
 import { rules } from '@/validation'
+import { googleLogin } from '@/auth' 
 
 interface Emits {
   (event: 'navigate', name: string): void
@@ -39,9 +40,8 @@ const submitButton = async () => {
 }
 
 const clickGoogleButton = async () => {
-  const provider = new GoogleAuthProvider()
   try {
-    await signInWithRedirect(firebaseAuth, provider)
+    await googleLogin()
   } catch (e) {
     if (e instanceof FirebaseError) {
       errorMessage.value = firebaseErrorMessage(e)
