@@ -264,6 +264,19 @@ const addDocSeriesBookAfterCacheCheck = async (
   await addDocAfterCacheCheck(booksCollection, book);
 }
 
+/**
+ * 初回ログイン時に本棚を初期化する
+ * @param user ユーザ情報
+ */
+const initBookshelf = async (user: User) => {
+  const bookShelfCollection = collection(firestore, 'users', user.uid, 'bookshelves')
+  // コレクションからドキュメントをクエリ
+  const querySnapshot = await getDocs(bookShelfCollection)
+  // クエリが空の場合、ドキュメントを追加
+  if (querySnapshot.empty) {
+    await addDoc(bookShelfCollection, { shelf_name: '始まりの本棚' })
+  }
+}
 
 export {
   firebaseErrorMessage,
@@ -280,5 +293,6 @@ export {
   fetchAllBooks,
   addDocSeriesBookAfterCacheCheck,
   fetchDocs,
-  addDocAfterCacheCheck
+  addDocAfterCacheCheck,
+  initBookshelf
 }

@@ -7,16 +7,15 @@ import {
   sendEmailVerification,
   fetchSignInMethodsForEmail,
   EmailAuthProvider,
-  getAdditionalUserInfo,
-  type User
+  getAdditionalUserInfo
 } from 'firebase/auth'
 import { FirebaseError } from 'firebase/app'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
 import { firebaseErrorMessage } from '@/function'
-import { firebaseAuth, firestore } from '@/config/firebase'
+import { firebaseAuth } from '@/config/firebase'
 import { watch, computed } from 'vue'
 import { rules } from '@/validation'
-import { addDoc, collection, getDocs } from 'firebase/firestore'
+import { initBookshelf } from '@/function'
 
 interface Emits {
   (event: 'submitButton'): void
@@ -30,16 +29,6 @@ const emailError = ref('')
 const password = ref('')
 const passwordError = ref('')
 const errorMessage = ref('')
-
-const initBookshelf = async (user: User) => {
-  const bookShelfCollection = collection(firestore, 'users', user.uid, 'bookshelves')
-  // コレクションからドキュメントをクエリ
-  const querySnapshot = await getDocs(bookShelfCollection)
-  // クエリが空の場合、ドキュメントを追加
-  if (querySnapshot.empty) {
-    await addDoc(bookShelfCollection, { shelf_name: '始まりの本棚' })
-  }
-}
 
 const submitButton = async () => {
   emit('updateLoading', true)
