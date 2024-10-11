@@ -4,15 +4,13 @@ import ProgressBar from '@/containers/ProgressBar.vue'
 import RegisterStep1 from '@/containers/Form/RegisterStep1.vue'
 import RegisterStep2 from '@/containers/Form/RegisterStep2.vue'
 import router from '@/router'
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import GoogleButton from '@/basic/Login/GoogleButton.vue'
-import { getRedirectResult, GoogleAuthProvider, signInWithRedirect } from 'firebase/auth'
 import { FirebaseError } from 'firebase/app'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
 import { firebaseErrorMessage } from '@/function'
-import { firebaseAuth } from '@/config/firebase'
-import LoadingContainer from '@/containers/LoadingContainer.vue'
 import { onInitBookshelf } from '@/function'
+import { googleLogin, handleLogin } from '@/auth'
 
 const onNavigate = (name: string): void => {
   router.push({ name: name })
@@ -33,39 +31,25 @@ const back = (): void => {
   currentCompIndex.value--
 }
 
+// ロード中かの判定用フラグを追加
+const isLoading = ref(true)
+
 const clickGoogleButton = async () => {
-  const provider = new GoogleAuthProvider()
   errorMessage.value = ''
 
   try {
-    await signInWithRedirect(firebaseAuth, provider)
+    isLoading.value = true
+    await handleLogin(googleLogin, onInitBookshelf, () => {
+      onNavigate('AppTop')
+    })
   } catch (e) {
     if (e instanceof FirebaseError) {
       errorMessage.value = firebaseErrorMessage(e)
     }
   }
-}
 
-// レンダリングフラグを追加
-const isLoading = ref(true)
-
-onMounted(async () => {
-  try {
-    isLoading.value = true
-    const result = await getRedirectResult(firebaseAuth)
-    if (result?.user) {
-      // ユーザーは正常に認証されました
-      //const user = result.user;
-      // userを使用して何かしらの処理を行います
-      await onInitBookshelf()
-      onNavigate('AppTop')
-    }
-  } catch (error) {
-    console.error(error)
-  }
-  // リダイレクト処理が終わったらレンダリングを許可
   isLoading.value = false
-})
+}
 
 const updateLoading = (flag: boolean) => {
   isLoading.value = flag
@@ -73,37 +57,34 @@ const updateLoading = (flag: boolean) => {
 </script>
 
 <template>
-  <LoadingContainer :isLoading="isLoading"></LoadingContainer>
-  <div v-show="!isLoading">
-    <Header @navigate="onNavigate"></Header>
-    <v-sheet width="500" class="mx-auto form px-10 py-3 mt-5 no-radius-bottom">
-      <ProgressBar :currentStep="currentCompIndex"></ProgressBar>
-      <ErrorMessage :errorMessage="errorMessage" class="mx-4"></ErrorMessage>
-      <RegisterStep1
-        v-if="currentCompIndex == 0"
-        @submitButton="switchComp"
-        @updateLoading="updateLoading"
-      ></RegisterStep1>
-      <RegisterStep2
-        v-if="currentCompIndex == 1"
-        @back="back"
-        @navigate="onNavigate"
-      ></RegisterStep2>
-    </v-sheet>
-    <v-sheet width="500" class="mx-auto form px-14 pt-3 pb-5 no-radius-top">
-      <v-row>
-        <v-col cols="12">
-          <p>他サービスで新規登録</p>
-        </v-col>
-        <v-col cols="12">
-          <GoogleButton
-            text="Googleで新規登録する"
-            @clickGoogleButton="clickGoogleButton"
-          ></GoogleButton>
-        </v-col>
-      </v-row>
-    </v-sheet>
-  </div>
+  <Header @navigate="onNavigate"></Header>
+  <v-sheet width="500" class="mx-auto form px-10 py-3 mt-5 no-radius-bottom">
+    <ProgressBar :currentStep="currentCompIndex"></ProgressBar>
+    <ErrorMessage :errorMessage="errorMessage" class="mx-4"></ErrorMessage>
+    <RegisterStep1
+      v-if="currentCompIndex == 0"
+      @submitButton="switchComp"
+      @updateLoading="updateLoading"
+    ></RegisterStep1>
+    <RegisterStep2
+      v-if="currentCompIndex == 1"
+      @back="back"
+      @navigate="onNavigate"
+    ></RegisterStep2>
+  </v-sheet>
+  <v-sheet width="500" class="mx-auto form px-14 pt-3 pb-5 no-radius-top">
+    <v-row>
+      <v-col cols="12">
+        <p>他サービスで新規登録</p>
+      </v-col>
+      <v-col cols="12">
+        <GoogleButton
+          text="Googleで新規登録する"
+          @clickGoogleButton="clickGoogleButton"
+        ></GoogleButton>
+      </v-col>
+    </v-row>
+  </v-sheet>
 </template>
 
 <style scoped lang="scss">
