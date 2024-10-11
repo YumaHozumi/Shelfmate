@@ -1,4 +1,4 @@
-import { GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo, type UserCredential } from 'firebase/auth'
+import { GoogleAuthProvider, signInWithPopup, getAdditionalUserInfo} from 'firebase/auth'
 import { firebaseAuth } from '@/config/firebase'
 import {type User} from 'firebase/auth';
 
