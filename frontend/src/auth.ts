@@ -20,14 +20,16 @@ const googleLogin = async () => {
 const handleLogin = async (
   loginMethod: () => Promise<any>,
   onFirstLogin: (user: User) => Promise<void>,
-  onLogin: () => void
+  onLogin?: () => Promise<void> | void
 ) => {
   const cred = await loginMethod()
   if (cred?.user) {
     const isNewUser = getAdditionalUserInfo(cred)?.isNewUser
     if (isNewUser) await onFirstLogin(cred.user)
-    onLogin()
+    if (onLogin) await onLogin()
   }
+
+  return cred
 }
 
 export { googleLogin, handleLogin }

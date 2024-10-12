@@ -7,7 +7,6 @@ import {
   sendEmailVerification,
   fetchSignInMethodsForEmail,
   EmailAuthProvider,
-  getAdditionalUserInfo
 } from 'firebase/auth'
 import { FirebaseError } from 'firebase/app'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
@@ -16,6 +15,7 @@ import { firebaseAuth } from '@/config/firebase'
 import { watch, computed } from 'vue'
 import { rules } from '@/validation'
 import { initBookshelf } from '@/function'
+import { handleLogin } from '@/auth'
 
 interface Emits {
   (event: 'submitButton'): void
@@ -40,24 +40,25 @@ const submitButton = async () => {
       errorMessage.value = 'すでに登録されています'
       return
     }
-    const cred = await createUserWithEmailAndPassword(firebaseAuth, email.value, password.value)
+    //const cred = await createUserWithEmailAndPassword(firebaseAuth, email.value, password.value)
     const actionCodeSettings = {
-      url: 'http://shelfmate.hzmintech.com/login', // replace this with the URL of your top page
-      //url: 'http://localhost/login',
+      //url: 'http://shelfmate.hzmintech.com/login', // replace this with the URL of your top page
+      url: 'http://localhost/login',
       handleCodeInApp: true
     }
 
-    const isNewUser = getAdditionalUserInfo(cred)?.isNewUser //新しく登録された？
-
-    if (isNewUser) await initBookshelf(cred.user) //始まりの本棚を作成
-
+    const cred = await handleLogin(async () => {
+      return await createUserWithEmailAndPassword(firebaseAuth, email.value, password.value)
+    }, initBookshelf)
+    
     await sendEmailVerification(cred.user, actionCodeSettings)
-    emit('updateLoading', false)
+
     emit('submitButton')
   } catch (e) {
     if (e instanceof FirebaseError) {
       errorMessage.value = firebaseErrorMessage(e)
     }
+  }finally {
     emit('updateLoading', false)
   }
 }
