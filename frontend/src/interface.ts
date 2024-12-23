@@ -4,7 +4,7 @@ interface BookItem {
   bookId: string
   isbn?: number
   title: string
-  image_url: string | undefined
+  imageURL: string | undefined
   author: string
   detail: string
   public_date: Timestamp

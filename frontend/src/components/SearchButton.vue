@@ -97,7 +97,7 @@ const searchClick = async (searchText: string) => {
           bookId: item.bookId,
           isbn: item.isbn ?? 0,
           title: item.title,
-          image_url: item.image_url && item.image_url.trim() !== '' ? item.image_url : imageURL,
+          imageURL: item.imageURL && item.imageURL.trim() !== '' ? item.imageURL : imageURL,
           author: item.author,
           detail: output,
           public_date: Timestamp.fromDate(new Date(item.public_date)),
@@ -245,12 +245,12 @@ const submit = async () => {
       const seriesData = seriesSnap.data()
       const shouldUpdatePic =
         book &&
-        (((book.orderNumber ?? 0) > (seriesData?.picOrder ?? 0) && book.image_url !== '') ||
+        (((book.orderNumber ?? 0) > (seriesData?.picOrder ?? 0) && book.imageURL !== '') ||
           ((book.orderNumber ?? 0) < (seriesData?.picOrder ?? 0) && seriesData?.pic === ''))
 
       if (shouldUpdatePic) {
         await updateDoc(seriesRef, {
-          pic: book?.image_url,
+          pic: book?.imageURL,
           picOrder: book?.orderNumber ?? 0
         })
       }
@@ -260,7 +260,7 @@ const submit = async () => {
 
       await setDoc(seriesRef, {
         seriesId: selectItem.value.seriesId,
-        pic: book?.image_url ?? '',
+        pic: book?.imageURL ?? '',
         counter: 0,
         picOrder: book?.orderNumber ?? 0,
         seriesTitle: seriesTitle
