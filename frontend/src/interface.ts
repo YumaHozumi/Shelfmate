@@ -47,7 +47,7 @@ const isBookItem = (obj: any): obj is BookItem => {
     typeof obj.bookId === 'string' &&
     (typeof obj.isbn === 'number' || obj.isbn === undefined) &&
     typeof obj.title === 'string' &&
-    (typeof obj.image_url === 'string' || obj.image_url === undefined) &&
+    (typeof obj.imageURL === 'string' || obj.imageURL === undefined) &&
     typeof obj.author === 'string' &&
     typeof obj.detail === 'string' &&
     (typeof obj.seriesId === 'string' || obj.seriesId === undefined) &&

@@ -113,7 +113,7 @@ const transformApiResponseToBookItems = (apiResponse: any): BookItem[] => {
       bookId: item.id,
       isbn: isbn ?? 0,
       title: volumeInfo.title ?? '',
-      image_url: volumeInfo.imageLinks?.thumbnail ?? NO_IMAGE,
+      imageURL: volumeInfo.imageLinks?.thumbnail ?? NO_IMAGE,
       author: volumeInfo.authors?.[0] ?? '',
       detail: item.searchInfo?.textSnippet ?? '',
       public_date: Timestamp.fromDate(new Date(volumeInfo.publishedDate || 0)),
