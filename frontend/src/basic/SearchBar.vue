@@ -40,18 +40,16 @@ const allValid = computed(() => {
 </script>
 
 <template>
-  <!-- <v-toolbar class="px-4 pt-6 pb-2 search-bar">
-  </v-toolbar> -->
-    <v-text-field
-      v-model="inputText"
-      @keyup.enter="searchClick"
-      :label="label"
-      :rules="rules"
-      @input="() => (valid = allValid)"
-    ></v-text-field>
-    <v-btn :disabled="!valid" icon @click="searchClick" class="btn-pos">
-      <v-icon>mdi-magnify</v-icon>
-    </v-btn>
+  <v-text-field
+    v-model="inputText"
+    @keyup.enter="searchClick"
+    :label="label"
+    :rules="rules"
+    @input="() => (valid = allValid)"
+  ></v-text-field>
+  <v-btn :disabled="!valid" icon @click="searchClick" class="btn-pos">
+    <v-icon>mdi-magnify</v-icon>
+  </v-btn>
 
 </template>
 
