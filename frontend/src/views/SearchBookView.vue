@@ -310,7 +310,10 @@ watch(selectedBookshelf, async () => {
     class="select"
   >
   </v-select>
-  <SearchBar @search="searchClick" class="mt-4 mb-4" :rules="[]"></SearchBar>
+    
+  <v-toolbar class="px-4 pt-6 pb-2 search-bar mb-4">
+    <SearchBar @search="searchClick" :rules="[]"></SearchBar>
+  </v-toolbar>
   <ErrorMessage :errorMessage="errorMsg"></ErrorMessage>
   <div class="menu-container">
     <SearchButton></SearchButton>
@@ -355,6 +358,11 @@ watch(selectedBookshelf, async () => {
   .menu {
     background-color: white;
   }
+}
+
+.search-bar {
+  max-width: 80%;
+  margin: auto;
 }
 
 .error {
