@@ -92,7 +92,6 @@ const searchClick = async (searchText: string) => {
           return output
         }
         const output = removeTagsAndAddNewLines(item.detail)
-
         book.value = {
           bookId: item.bookId,
           isbn: item.isbn ?? 0,
