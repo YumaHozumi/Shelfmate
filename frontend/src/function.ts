@@ -15,7 +15,8 @@ import {
   DocumentSnapshot,
   getDocFromServer,
   query,
-  QueryConstraint
+  QueryConstraint,
+  where
 } from 'firebase/firestore'
 import {type User} from 'firebase/auth';
 import { type BookItem, type BookShelf, type Series } from './interface'
@@ -278,6 +279,40 @@ const initBookshelf = async (user: User) => {
   }
 }
 
+/**
+ * 本の検索をfirebaseから行う
+ * @param user ログインユーザ情報
+ * @param searchWord 検索ワード
+ * @param bookshelfId 本棚のdocID
+ * @returns 
+ */
+const onSearch = async (user: User, searchWord: string, bookshelfId: string): Promise<BookItem[]> => {
+  const allBooks: BookItem[] = [];
+
+  // Fetch books from 'books' collection
+  const booksSnapshot = await fetchBookShelfNoSeries(user, bookshelfId);
+  allBooks.push(...booksSnapshot.docs.map(doc => doc.data()));
+
+  // Fetch series
+  const seriesSnapshot = await fetchBookShelfSeries(user, bookshelfId);
+  for (const seriesDoc of seriesSnapshot.docs) {
+    const seriesId = seriesDoc.id;
+    const seriesBooksSnapshot = await fetchSeries(user, bookshelfId, seriesId);
+    const seriesBooks = seriesBooksSnapshot.docs.map(doc => doc.data());
+    allBooks.push(...seriesBooks);
+  }
+
+  // Now, filter the books with searchWord (case-insensitive search)
+  const searchLower = searchWord.toLowerCase();
+
+  const filteredBooks = allBooks.filter(book => {
+    const titleLower = book.title ? book.title.toLowerCase() : '';
+    const authorLower = book.author ? book.author.toLowerCase() : '';
+    return titleLower.includes(searchLower) || authorLower.includes(searchLower);
+  });
+
+  return filteredBooks;
+};
 export {
   firebaseErrorMessage,
   incrementCounter,
@@ -294,5 +329,6 @@ export {
   addDocSeriesBookAfterCacheCheck,
   fetchDocs,
   addDocAfterCacheCheck,
-  initBookshelf
+  initBookshelf,
+  onSearch
 }

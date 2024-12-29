@@ -29,7 +29,23 @@ interface Emits {
 
 const emit = defineEmits<Emits>()
 
-const items = ref<(Series | BookItem)[]>([])
+// Initialize `items` with a copy of `propItems`
+const items = ref<(Series | BookItem)[]>([...prop.propItems])
+
+// Create a reactive reference to `propItems`
+const propItemsRef = toRef(prop, 'propItems')
+
+// Watch for changes in `propItems` and update `items` accordingly
+watch(
+  propItemsRef,
+  (newPropItems) => {
+    // Avoid unnecessary updates if the arrays are the same
+    if (items.value !== newPropItems) {
+      items.value = [...newPropItems]
+    }
+  },
+  { immediate: true, deep: true }
+)
 
 let unsubBook: Unsubscribe
 let unsubSeries: Unsubscribe

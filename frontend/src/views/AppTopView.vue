@@ -4,13 +4,13 @@ import LocalHeader from '@/containers/LocalHeader.vue'
 import BookshelfContainer from '@/containers/BookshelfContainer.vue'
 import OptionContainer from '@/containers/OptionContainer.vue'
 import router from '@/router'
-import { ref } from 'vue'
+import { nextTick, ref } from 'vue'
 import { implementBookShelf, type BookShelf, type BookItem, type Series, Action } from '@/interface'
 import { firestore, getCurrentUser } from '@/config/firebase'
 import { collection, deleteDoc, doc, getDocs, where } from 'firebase/firestore'
 import { type User } from 'firebase/auth';
 import { onMounted } from 'vue'
-import { fetchAllBooks, fetchBookShelfNoSeries, fetchSeries } from '@/function'
+import { fetchAllBooks, fetchBookShelfNoSeries, fetchSeries, onSearch } from '@/function'
 
 const onNavigate = (name: string): void => {
   router.push({ name: name })
@@ -57,6 +57,7 @@ const clickBtn = (editMode: boolean) => {
   isEdit.value = editMode
 }
 
+//削除したい本を詰め込む
 const listBookItem = ref<BookItem[]>([])
 const listSeries = ref<Series[]>([])
 
@@ -181,10 +182,22 @@ const selectMenu = (selectedMenu: string): void => {
 const initComp = (): void => {
   selectMenu('作品名順')
 }
+
+/**
+ * 本の検索を行う
+ * @param searchWord 検索ワード
+ */
+const search = async (searchWord: string): Promise<void> => {
+  const user = await getCurrentUser()
+  const bookshelfId = selectedBookshelf.value?.doc_id || ''
+
+  const searchedBooksDatas = await onSearch(user, searchWord, bookshelfId)
+  items.value = searchedBooksDatas;
+}
 </script>
 
 <template>
-  <Header @navigate="onNavigate"></Header>
+  <Header @navigate="onNavigate" @search="search"></Header>
   <LocalHeader @clickLocalHeaderBtn="clickLocalHeaderBtn"></LocalHeader>
   <OptionContainer :count="num" @clickBtn="clickBtn" @optionClick="selectMenu"></OptionContainer>
   <BookshelfContainer
