@@ -16,7 +16,6 @@ import {
   getDocFromServer,
   query,
   QueryConstraint,
-  where
 } from 'firebase/firestore'
 import {type User} from 'firebase/auth';
 import { type BookItem, type BookShelf, type Series } from './interface'
@@ -286,33 +285,46 @@ const initBookshelf = async (user: User) => {
  * @param bookshelfId 本棚のdocID
  * @returns 
  */
-const onSearch = async (user: User, searchWord: string, bookshelfId: string): Promise<BookItem[]> => {
-  const allBooks: BookItem[] = [];
+const onSearch = async (user: User, searchWord: string, bookshelfId: string): Promise<(BookItem | Series)[]> => {
+  const allItems: (BookItem | Series)[] = [];
 
   // Fetch books from 'books' collection
   const booksSnapshot = await fetchBookShelfNoSeries(user, bookshelfId);
-  allBooks.push(...booksSnapshot.docs.map(doc => doc.data()));
+  allItems.push(...booksSnapshot.docs.map(doc => doc.data()));
 
   // Fetch series
   const seriesSnapshot = await fetchBookShelfSeries(user, bookshelfId);
+  const seriesList = seriesSnapshot.docs.map(doc => doc.data() as Series);
+  allItems.push(...seriesList);
+
   for (const seriesDoc of seriesSnapshot.docs) {
     const seriesId = seriesDoc.id;
     const seriesBooksSnapshot = await fetchSeries(user, bookshelfId, seriesId);
     const seriesBooks = seriesBooksSnapshot.docs.map(doc => doc.data());
-    allBooks.push(...seriesBooks);
+    allItems.push(...seriesBooks);
   }
 
   // Now, filter the books with searchWord (case-insensitive search)
   const searchLower = searchWord.toLowerCase();
-
-  const filteredBooks = allBooks.filter(book => {
-    const titleLower = book.title ? book.title.toLowerCase() : '';
-    const authorLower = book.author ? book.author.toLowerCase() : '';
-    return titleLower.includes(searchLower) || authorLower.includes(searchLower);
+  const filteredItems = allItems.filter(item => {
+    if ('title' in item && item.title) {
+      // It's a BookItem
+      const titleLower = item.title.toLowerCase();
+      const authorLower = item.author ? item.author.toLowerCase() : '';
+      return (
+        titleLower.includes(searchLower) || authorLower.includes(searchLower)
+      );
+    } else if ('seriesTitle' in item && item.seriesTitle) {
+      // It's a Series
+      const seriesTitleLower = item.seriesTitle.toLowerCase();
+      return seriesTitleLower.includes(searchLower);
+    }
+    return false;
   });
 
-  return filteredBooks;
+  return filteredItems;
 };
+
 export {
   firebaseErrorMessage,
   incrementCounter,
