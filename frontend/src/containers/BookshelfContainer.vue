@@ -30,7 +30,7 @@ interface Emits {
 const emit = defineEmits<Emits>()
 
 // Initialize `items` with a copy of `propItems`
-const items = ref<(Series | BookItem)[]>([...prop.propItems])
+const items = ref<(Series | BookItem)[]>([])
 
 // Create a reactive reference to `propItems`
 const propItemsRef = toRef(prop, 'propItems')
