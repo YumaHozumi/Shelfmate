@@ -334,11 +334,14 @@ const closeDialog = () => {
           class="select-btn"
         >
         </v-select>
-        <SearchBar
+        <v-toolbar class="px-4 pt-6 pb-2 search-bar mb-4">
+          <SearchBar
           label="ISBN(13桁または10桁) ※ハイフンなし"
           @search="searchClick"
           :rules="localRules"
-        ></SearchBar>
+          ></SearchBar>
+        </v-toolbar>
+
         <ErrorMessage :errorMessage="errorMsg"></ErrorMessage>
         <SearchResult
           :book="book"
@@ -407,5 +410,10 @@ const closeDialog = () => {
 
 .error {
   margin-left: 10%;
+}
+
+.search-bar {
+  max-width: 80%;
+  margin: auto;
 }
 </style>
