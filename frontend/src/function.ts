@@ -297,13 +297,6 @@ const onSearch = async (user: User, searchWord: string, bookshelfId: string): Pr
   const seriesList = seriesSnapshot.docs.map(doc => doc.data() as Series);
   allItems.push(...seriesList);
 
-  for (const seriesDoc of seriesSnapshot.docs) {
-    const seriesId = seriesDoc.id;
-    const seriesBooksSnapshot = await fetchSeries(user, bookshelfId, seriesId);
-    const seriesBooks = seriesBooksSnapshot.docs.map(doc => doc.data());
-    allItems.push(...seriesBooks);
-  }
-
   // Now, filter the books with searchWord (case-insensitive search)
   const searchLower = searchWord.toLowerCase();
   const filteredItems = allItems.filter(item => {
