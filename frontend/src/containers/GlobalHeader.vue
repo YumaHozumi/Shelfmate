@@ -8,11 +8,9 @@ import { getCurrentUser, firebaseAuth, firestore } from '@/config/firebase'
 import { collection, addDoc } from 'firebase/firestore'
 import { onUnmounted } from 'vue'
 import UserIcon from "@/components/UserIcon.vue"
-import HeaderSearchBar from './HeaderSearchBar.vue'
 
 interface Emits {
   (event: 'navigate', name: string): void,
-  (event: 'search', value: string): void
 }
 
 const emit = defineEmits<Emits>()
@@ -29,11 +27,6 @@ const onClickSiteLogo = (): void => {
 
 const onClickRegisterButton = (): void => {
   emit('navigate', 'Register')
-}
-
-// 検索ボタンが押されたときの処理
-const search = (value: string): void => {
-  emit("search", value);
 }
 
 const isShow = ref(true)
@@ -78,7 +71,6 @@ const logout = async () => {
 <template>
   <v-app-bar color="white" flat class="header-border">
     <SiteTitle @click="onClickSiteLogo" class="green"></SiteTitle>
-    <HeaderSearchBar v-show="!isShow" placeholder="本棚から本を探す" @search="search"></HeaderSearchBar>
     <LoginButton @clickLoginButton="onClickLoginButton" v-show="isShow"></LoginButton>
     <v-btn class="button register ml-3" @click="onClickRegisterButton" v-show="isShow">
       <v-icon>mdi-account-plus-outline</v-icon>

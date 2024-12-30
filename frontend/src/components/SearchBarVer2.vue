@@ -57,9 +57,7 @@ watch(searchQuery, (newValue) => {
     border: 1px solid #ccc;
     border-radius: 5px;
     padding: 5px;
-    width: 30%;
     margin-right: 1%;
-    height: 60%;
     background-color: #ebebeb;
 }
 

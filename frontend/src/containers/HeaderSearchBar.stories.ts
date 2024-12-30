@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
-import HeaderSearchBar from './HeaderSearchBar.vue';
+import HeaderSearchBar from '../components/SearchBarVer2.vue';
 
 const meta: Meta<typeof HeaderSearchBar> = {
   title: 'Components/HeaderSearchBar',

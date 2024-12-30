@@ -4,13 +4,14 @@ import LocalHeader from '@/containers/LocalHeader.vue'
 import BookshelfContainer from '@/containers/BookshelfContainer.vue'
 import OptionContainer from '@/containers/OptionContainer.vue'
 import router from '@/router'
-import { nextTick, ref } from 'vue'
+import { onBeforeUnmount, ref } from 'vue'
 import { implementBookShelf, type BookShelf, type BookItem, type Series, Action } from '@/interface'
 import { firestore, getCurrentUser } from '@/config/firebase'
 import { collection, deleteDoc, doc, getDocs, where } from 'firebase/firestore'
 import { type User } from 'firebase/auth';
 import { onMounted } from 'vue'
 import { fetchAllBooks, fetchBookShelfNoSeries, fetchSeries, onSearch } from '@/function'
+import SearchBarVer2 from '@/components/SearchBarVer2.vue'
 
 const onNavigate = (name: string): void => {
   router.push({ name: name })
@@ -194,12 +195,28 @@ const search = async (searchWord: string): Promise<void> => {
   const searchedBooksDatas = await onSearch(user, searchWord, bookshelfId)
   items.value = searchedBooksDatas;
 }
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
+
+const handleScroll = () => {
+  console.log(window.scrollY)
+}
 </script>
 
 <template>
   <Header @navigate="onNavigate" @search="search"></Header>
   <LocalHeader @clickLocalHeaderBtn="clickLocalHeaderBtn"></LocalHeader>
   <OptionContainer :count="num" @clickBtn="clickBtn" @optionClick="selectMenu"></OptionContainer>
+  <div class="search-bar-container">
+    <SearchBarVer2 @search="search" placeholder="本を検索"></SearchBarVer2>  
+  </div>
+ 
   <BookshelfContainer
     :selectedBookshelf="selectedBookshelf"
     v-if="selectedBookshelf"
@@ -228,6 +245,15 @@ const search = async (searchWord: string): Promise<void> => {
   .btn {
     font-size: 14px;
     font-weight: bolder;
+  }
+}
+
+.search-bar-container {
+  display: flex;
+  justify-content: center;
+  
+  .search-bar {
+    width: 80%;
   }
 }
 </style>
