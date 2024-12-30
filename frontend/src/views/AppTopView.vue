@@ -4,7 +4,7 @@ import LocalHeader from '@/containers/LocalHeader.vue'
 import BookshelfContainer from '@/containers/BookshelfContainer.vue'
 import OptionContainer from '@/containers/OptionContainer.vue'
 import router from '@/router'
-import { onBeforeUnmount, ref } from 'vue'
+import { ref } from 'vue'
 import { implementBookShelf, type BookShelf, type BookItem, type Series, Action } from '@/interface'
 import { firestore, getCurrentUser } from '@/config/firebase'
 import { collection, deleteDoc, doc, getDocs, where } from 'firebase/firestore'
@@ -19,6 +19,11 @@ const onNavigate = (name: string): void => {
 
 onMounted(async () => {
   await initializeSelectedBookshelf();
+
+  const searchBarElement = document.querySelector('.search-bar-container');
+  if (searchBarElement) {
+    searchBarElement.scrollIntoView({ behavior: 'smooth' });
+  }
 })
 
 const items = ref<(Series | BookItem)[]>([])
@@ -196,24 +201,15 @@ const search = async (searchWord: string): Promise<void> => {
   items.value = searchedBooksDatas;
 }
 
-onMounted(() => {
-  window.addEventListener('scroll', handleScroll)
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener('scroll', handleScroll)
-})
-
-const handleScroll = () => {
-  console.log(window.scrollY)
-}
 </script>
 
 <template>
   <Header @navigate="onNavigate" @search="search"></Header>
   <LocalHeader @clickLocalHeaderBtn="clickLocalHeaderBtn"></LocalHeader>
   <OptionContainer :count="num" @clickBtn="clickBtn" @optionClick="selectMenu"></OptionContainer>
-  <div class="search-bar-container">
+  <div 
+    class="search-bar-container"
+  >
     <SearchBarVer2 @search="search" placeholder="本を検索"></SearchBarVer2>  
   </div>
  
@@ -227,6 +223,7 @@ const handleScroll = () => {
     @initComp="initComp"
     :isEdit="isEdit"
     v-model:propItems="items"
+    class="bookshelf-container"
   ></BookshelfContainer>
   <v-footer fixed dark class="footer" v-show="isEdit">
     <v-col class="text-center">
@@ -251,9 +248,14 @@ const handleScroll = () => {
 .search-bar-container {
   display: flex;
   justify-content: center;
-  
+  transition: opacity 0.5s ease-in-out;
+
   .search-bar {
     width: 80%;
   }
+}
+
+.bookshelf-container {
+  height: 100%;
 }
 </style>
