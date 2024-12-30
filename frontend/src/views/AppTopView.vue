@@ -32,12 +32,6 @@ const clickLocalHeaderBtn = (bookshelf: BookShelf): void => {
   selectedBookshelf.value = bookshelf
 }
 
-const num = ref(0)
-
-const getCount = (count: number): void => {
-  num.value = count
-}
-
 const selectedBookshelf = ref<BookShelf | undefined>()
 
 const initializeSelectedBookshelf = async () => {
@@ -206,7 +200,7 @@ const search = async (searchWord: string): Promise<void> => {
 <template>
   <Header @navigate="onNavigate" @search="search"></Header>
   <LocalHeader @clickLocalHeaderBtn="clickLocalHeaderBtn"></LocalHeader>
-  <OptionContainer :count="num" @clickBtn="clickBtn" @optionClick="selectMenu"></OptionContainer>
+  <OptionContainer :count="items.length" @clickBtn="clickBtn" @optionClick="selectMenu"></OptionContainer>
   <div 
     class="search-bar-container"
   >
@@ -216,7 +210,6 @@ const search = async (searchWord: string): Promise<void> => {
   <BookshelfContainer
     :selectedBookshelf="selectedBookshelf"
     v-if="selectedBookshelf"
-    @count="getCount"
     @clearList="clearList"
     @clickBookItem="clickBookItem"
     @clickSeries="clickSeries"

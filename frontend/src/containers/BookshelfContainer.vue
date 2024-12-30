@@ -19,7 +19,6 @@ interface Props {
 const prop = defineProps<Props>()
 
 interface Emits {
-  (event: 'count', count: number): void
   (event: 'clickBookItem', item: BookItem, action: Action): void
   (event: 'clickSeries', series: Series, action: Action): void
   (event: 'clearList'): void
@@ -63,7 +62,6 @@ const setUnsubs = (user: User, doc_id: string) => {
             if (isBookItem(item)) return item.bookId !== data.bookId
             return true // この行を追加
           })
-          emit('count', items.value.length)
           emit('update:propItems', items.value)
         }
       })
@@ -82,7 +80,6 @@ const setUnsubs = (user: User, doc_id: string) => {
             if (isSeries(item)) return item.seriesId !== data.seriesId
             return true
           })
-          emit('count', items.value.length)
           emit('update:propItems', items.value)
         } else if (change.type === 'modified') {
           const newData = change.doc.data() as Series // 新しいデータを取得します
@@ -94,7 +91,6 @@ const setUnsubs = (user: User, doc_id: string) => {
             items.value[index] = newData // シリーズを新しいデータで更新します
           }
 
-          emit('count', items.value.length)
           emit('update:propItems', items.value)
         }
       })
@@ -150,7 +146,6 @@ const getSeries = async () => {
   let seriesSnapshot: QuerySnapshot<Series> = await fetchBookShelfSeries(user, doc_id);
   pushBookShelfSeries(seriesSnapshot);
 
-  emit('count', items.value.length)
   emit('update:propItems', items.value)
   emit('initComp')
   
