@@ -9,7 +9,6 @@ import {
   type BookShelf,
   type SelectSeriesItem,
   type BookItemNoSeries,
-type Series
 } from '@/interface'
 import {
   Timestamp,
@@ -21,7 +20,6 @@ import {
   setDoc,
   where,
   CollectionReference,
-  QuerySnapshot
 } from 'firebase/firestore'
 import imageURL from '@/assets/no-image.png'
 import { onAuthStateChanged } from 'firebase/auth'
@@ -29,7 +27,7 @@ import { firebaseAuth, firestore, getCurrentUser } from '@/config/firebase'
 import { onUnmounted } from 'vue'
 import SearchResult from '@/components/SearchBook/SearchResult.vue'
 import DropdownMenu from './DropdownMenu.vue'
-import { fetchBookShelfSeries, incrementCounter, fetchDocs, addDocAfterCacheCheck, fetchDocWithCache, fetchSeriesList } from '@/function'
+import { incrementCounter, fetchDocs, addDocAfterCacheCheck, fetchDocWithCache, fetchSeriesList } from '@/function'
 import { rules } from '@/validation'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
 

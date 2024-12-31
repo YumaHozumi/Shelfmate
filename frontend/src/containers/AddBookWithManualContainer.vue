@@ -3,11 +3,7 @@ import { ref } from 'vue';
 import InputField from '@/components/FormComp/InputField.vue';
 import type { BookItem } from '@/interface';
 import { Timestamp } from 'firebase/firestore';
-import type { User } from 'firebase/auth'
-import { fetchBookShelfSeries } from '@/function';
-import type { Series } from '@/interface';
-import type { SelectSeriesItem } from '@/interface';
-import type { QuerySnapshot } from 'firebase/firestore'
+
 
 const book = ref<BookItem>({
   bookId: '',
