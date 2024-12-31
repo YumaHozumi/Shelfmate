@@ -18,7 +18,7 @@ import {
   QueryConstraint,
 } from 'firebase/firestore'
 import {type User} from 'firebase/auth';
-import { type BookItem, type BookShelf, type Series } from './interface'
+import { type BookItem, type BookShelf, type Series, type SelectSeriesItem } from './interface'
 import { firestore, getCurrentUser } from './config/firebase'
 import { Timestamp } from 'firebase/firestore'
 import NO_IMAGE from '@/assets/no-image.png'
@@ -318,6 +318,26 @@ const onSearch = async (user: User, searchWord: string, bookshelfId: string): Pr
   return filteredItems;
 };
 
+/**
+ * Fetches the list of series for a given bookshelf.
+ *
+ * @param {User} user - The user object containing user details.
+ * @param {string} bookshelfId - The ID of the bookshelf to fetch series from.
+ * @returns {Promise<SelectSeriesItem[]>} - A promise that resolves to an array of SelectSeriesItem objects.
+ *
+ * @throws {Error} If the bookshelfId is not provided.
+ */
+const fetchSeriesList = async (user: User, bookshelfId: string): Promise<SelectSeriesItem[]> => {
+  if (!bookshelfId) return []
+
+  const seriesSnap: QuerySnapshot<Series> = await fetchBookShelfSeries(user, bookshelfId)
+  if (seriesSnap.empty) return []
+
+  return seriesSnap.docs.map((docSnapshot) => {
+    return docSnapshot.data() as SelectSeriesItem
+  })
+}
+
 export {
   firebaseErrorMessage,
   incrementCounter,
@@ -335,5 +355,6 @@ export {
   fetchDocs,
   addDocAfterCacheCheck,
   initBookshelf,
-  onSearch
+  onSearch,
+  fetchSeriesList
 }

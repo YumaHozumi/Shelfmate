@@ -4,7 +4,7 @@ import { computed, watch, defineProps, defineEmits } from 'vue';
 interface Props {
   label: string;
   type?: string;
-  value?: string;
+  value?: string | number;
   placeholder?: string;
   width?: string;
   errorMessage?: string;
@@ -18,6 +18,10 @@ const emit = defineEmits<{
 }>();
 
 const hasError = computed(() => {
+  //errorMessageがpropsに渡されていないときはエラーがないと判断
+  if (!props.errorMessage) {
+    return false;
+  }
   return props.errorMessage !== '';
 });
 

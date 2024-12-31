@@ -29,7 +29,7 @@ import { firebaseAuth, firestore, getCurrentUser } from '@/config/firebase'
 import { onUnmounted } from 'vue'
 import SearchResult from '@/components/SearchBook/SearchResult.vue'
 import DropdownMenu from './DropdownMenu.vue'
-import { fetchBookShelfSeries, incrementCounter, fetchDocs, addDocAfterCacheCheck, fetchDocWithCache } from '@/function'
+import { fetchBookShelfSeries, incrementCounter, fetchDocs, addDocAfterCacheCheck, fetchDocWithCache, fetchSeriesList } from '@/function'
 import { rules } from '@/validation'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
 
@@ -140,21 +140,7 @@ watch(selectedBookshelf, async (newVal) => {
 
   if (selectedBookshelfId === undefined) return;
 
-  const seriesSnap: QuerySnapshot<Series> = await fetchBookShelfSeries(user, selectedBookshelfId);
-  
-  if(seriesSnap.empty) return;
-
-  for(const docSnapshot of seriesSnap.docs) {
-    const seriesData = docSnapshot.data() as Series;
-    if(!seriesData.seriesId) continue
-    const item: SelectSeriesItem = {
-      seriesId: seriesData.seriesId,
-      pic: seriesData.pic,
-      seriesTitle: seriesData.seriesTitle
-    }
-    seriesList.value.push(item)
-  }
-
+  seriesList.value = await fetchSeriesList(user, selectedBookshelfId);
 })
 
 const selectItem = ref<SelectSeriesItem | undefined>(undefined)
