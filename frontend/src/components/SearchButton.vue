@@ -249,6 +249,7 @@ const submit = async () => {
     await incrementCounter(seriesRef)
 
     selectedRadio.value = 'one'
+    
   }
 }
 
@@ -267,6 +268,14 @@ const extractSeriesTitle = (str: string): string => {
 }
 
 const nestDialog = ref(false)
+
+watch(nestDialog, (newVal, oldVal) => {
+  // false から true に変わったとき
+  if (newVal && !oldVal) {
+    selectedRadio.value = 'one'
+    selectedSeriesId.value = ''
+  }
+})
 
 //text-fieldのバリデーション定義
 const localRules = ref([rules.hyphen, rules.zenkaku, rules.isbn])

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import InputField from '@/components/FormComp/InputField.vue';
-import type { BookItem } from '@/interface';
+import type { BookItem, SelectSeriesItem } from '@/interface';
 import { Timestamp } from 'firebase/firestore';
-
+import DropdownMenu from '@/components/DropdownMenu.vue'
 
 const book = ref<BookItem>({
   bookId: '',
@@ -17,7 +17,10 @@ const book = ref<BookItem>({
   orderNumber: 0
 });
 
+const selectedRadio = ref<string>('one');
+const seriesList = ref<SelectSeriesItem[]>([])
 
+const selectedSeriesId = ref<string>('')
 
 </script>
 
@@ -48,4 +51,14 @@ const book = ref<BookItem>({
         type="number"
     >
     </InputField>
+
+    <v-radio-group v-model="selectedRadio">
+          <v-radio label="単体で登録" value="one"></v-radio>
+          <v-radio label="シリーズもので登録" value="series"></v-radio>
+        </v-radio-group>
+    <DropdownMenu
+        :seriesList="seriesList"
+        :isDisabled="selectedRadio === 'one'"
+        v-model:selected-series-id="selectedSeriesId"
+    ></DropdownMenu>
 </template>
