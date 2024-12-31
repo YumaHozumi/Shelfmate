@@ -21,44 +21,62 @@ const selectedRadio = ref<string>('one');
 const seriesList = ref<SelectSeriesItem[]>([])
 
 const selectedSeriesId = ref<string>('')
-
 </script>
 
 <template>
-    <InputField
+    <div class="my-form">
+        <InputField
         v-model:value="book.title"
-        label="Title"
+        label="書籍名"
         placeholder="Enter title"
         type="text"
-    ></InputField>
-    <InputField
-        v-model:value="book.author"
-        label="Author"
-        placeholder="Enter author"
-        type="text">
-    </InputField>
-    <InputField
-        v-model:value="book.detail"
-        label="Detail"
-        placeholder="Enter detail"
-        type="text"
-    >
-    </InputField>
-    <InputField
-        v-model:value="book.orderNumber"
-        label="Order Number"
-        placeholder="Enter order number"
-        type="number"
-    >
-    </InputField>
+        ></InputField>
+        <InputField
+            v-model:value="book.author"
+            label="著者"
+            placeholder="Enter author"
+            type="text">
+        </InputField>
+        <InputField
+            v-model:value="book.detail"
+            label="詳細"
+            placeholder="Enter detail"
+            type="text"
+        >
+        </InputField>
+        <InputField
+            v-model:value="book.orderNumber"
+            label="巻の番号"
+            placeholder="Enter order number"
+            type="number"
+        >
+        </InputField>
 
-    <v-radio-group v-model="selectedRadio">
-          <v-radio label="単体で登録" value="one"></v-radio>
-          <v-radio label="シリーズもので登録" value="series"></v-radio>
+        <v-radio-group v-model="selectedRadio">
+            <v-radio label="単体で登録" value="one"></v-radio>
+            <v-radio label="シリーズもので登録" value="series"></v-radio>
         </v-radio-group>
-    <DropdownMenu
-        :seriesList="seriesList"
-        :isDisabled="selectedRadio === 'one'"
-        v-model:selected-series-id="selectedSeriesId"
-    ></DropdownMenu>
+        <DropdownMenu
+            :seriesList="seriesList"
+            :isDisabled="selectedRadio === 'one'"
+            v-model:selected-series-id="selectedSeriesId"
+            class="dropdown"
+        ></DropdownMenu>
+    </div>
+    
 </template>
+
+<style scoped>
+.dropdown {
+    
+}
+
+.my-form {
+    width: 80%;
+    margin: 0 auto;
+    
+    @media (min-width: 1024px) {
+        width: 50%;
+    }
+}
+</style>

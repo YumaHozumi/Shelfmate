@@ -11,6 +11,7 @@ export default {
     placeholder: { control: 'text' },
     width: { control: 'text' },
     errorMessage: { control: 'text' },
+    required: { control: 'boolean' },
   },
 };
 

@@ -8,9 +8,12 @@ interface Props {
   placeholder?: string;
   width?: string;
   errorMessage?: string;
+  required?: boolean;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+  required: false,
+});
 
 const emit = defineEmits<{
   (e: 'update:value', value: string): void;
@@ -33,7 +36,10 @@ watch(hasError, (flag) => {
 
 <template>
   <div class="input-field" :style="{ width: props.width }">
-    <label class="input-label">{{ props.label }}</label>
+    <label class="input-label">
+      {{ props.label }}
+      <span v-if="props.required" class="required-asterisk">*</span>
+    </label>
     <input
       :type="props.type"
       :value="props.value"
@@ -46,7 +52,7 @@ watch(hasError, (flag) => {
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .input-field {
   margin-bottom: 1rem;
 }
@@ -56,6 +62,11 @@ watch(hasError, (flag) => {
   margin-bottom: 0.5rem;
   font-weight: bold;
   color: #333;
+
+  .required-asterisk {
+    color: red;
+    margin-left: 0.25rem;
+  }
 }
 
 .input-control {
