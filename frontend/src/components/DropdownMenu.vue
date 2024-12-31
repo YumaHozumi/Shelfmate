@@ -6,12 +6,13 @@ import { watch } from 'vue'
 interface Props {
   seriesList: SelectSeriesItem[]
   isDisabled: boolean
+  selectedSeriesId: string
 }
 
 const prop = defineProps<Props>()
 
 interface Emits {
-  (event: 'selectItem', item: SelectSeriesItem): void
+  (event: 'update:selectedSeriesId', seriesId: string): void
 }
 
 const emit = defineEmits<Emits>()
@@ -33,11 +34,11 @@ const toggleDropdown = () => {
   isOpen.value = !isOpen.value
 }
 
-const selectItem = (item: SelectSeriesItem) => {
+const selectSeriesItem = (item: SelectSeriesItem) => {
   if (prop.isDisabled) return // isDisabledがtrueなら操作を無効にする
   selected.value = item
   isOpen.value = false
-  emit('selectItem', item)
+  emit('update:selectedSeriesId', item.seriesId)
 }
 </script>
 
@@ -53,7 +54,7 @@ const selectItem = (item: SelectSeriesItem) => {
           class="dropdown-item"
           v-for="item in seriesList"
           :key="item.seriesId"
-          @click="selectItem(item)"
+          @click="selectSeriesItem(item)"
         >
           <img :src="item.pic" alt="" class="item-image" />
           <span class="item-title">{{ item.seriesTitle }}</span>

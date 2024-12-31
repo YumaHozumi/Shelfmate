@@ -141,14 +141,8 @@ watch(selectedBookshelf, async (newVal) => {
   seriesList.value = await fetchSeriesList(user, selectedBookshelfId);
 })
 
-const selectItem = ref<SelectSeriesItem | undefined>(undefined)
-
-const updateSelectItem = (item: SelectSeriesItem): void => {
-  selectItem.value = item
-}
-
 const nowBook = ref<BookItem | undefined>(undefined)
-
+//本を追加ボタンを押したとき
 const registerBook = async (book: BookItem) => {
   nestDialog.value = true
   nowBook.value = book
@@ -183,15 +177,15 @@ const submit = async () => {
     selectedBookshelfId,
     'books'
   )
-  if (book !== undefined) {
-    //所持している本一覧に追加
-    if (!(await duplicateCheck(allBookCollection, book.bookId))) {
-      await addDocAfterCacheCheck(allBookCollection, book)
-    } else return //重複していたらだめ
-  }
+  if(book === undefined) return
 
+  //所持している本一覧に追加
+  if (!(await duplicateCheck(allBookCollection, book.bookId))) {
+    await addDocAfterCacheCheck(allBookCollection, book)
+  } 
+  
   // シリーズものじゃないとき
-  if (selectedRadio.value === 'one' && book !== undefined) {
+  if (selectedRadio.value === 'one') {
     const noSeriesBook: BookItemNoSeries = convertToBookItemWithoutSeries(book)
     if (!(await duplicateCheck(noSeriesBookCollection, book.bookId))) {
       //重複していないとき
@@ -199,9 +193,7 @@ const submit = async () => {
     }
   } else {
     // シリーズもの
-    
-    if (selectItem.value === undefined || book === undefined) return
-
+    if (selectedSeriesId.value === "") return
     const booksCollection = collection(
       firestore,
       'users',
@@ -209,7 +201,7 @@ const submit = async () => {
       'bookshelves',
       selectedBookshelfId,
       'series',
-      selectItem.value.seriesId,
+      selectedSeriesId.value,
       'books'
     )
 
@@ -220,7 +212,7 @@ const submit = async () => {
       bookshelvesRef,
       selectedBookshelfId,
       'series',
-      selectItem.value.seriesId
+      selectedSeriesId.value
     )
     const seriesSnap = await fetchDocWithCache(seriesRef)
 
@@ -242,7 +234,7 @@ const submit = async () => {
       const seriesTitle = extractSeriesTitle(book.title)
 
       await setDoc(seriesRef, {
-        seriesId: selectItem.value.seriesId,
+        seriesId: selectedSeriesId.value,
         pic: book?.imageURL ?? '',
         counter: 0,
         picOrder: book?.orderNumber ?? 0,
@@ -251,12 +243,11 @@ const submit = async () => {
     }
 
     //API経由で取得したやつにはシリーズIDないためここで設定
-    book.seriesId = selectItem.value.seriesId
+    book.seriesId = selectedSeriesId.value
 
     await addDocAfterCacheCheck(booksCollection, book)
     await incrementCounter(seriesRef)
 
-    selectItem.value = undefined
     selectedRadio.value = 'one'
   }
 }
@@ -283,9 +274,11 @@ const localRules = ref([rules.hyphen, rules.zenkaku, rules.isbn])
 const closeDialog = () => {
   dialog.value = false
   book.value = undefined
-  // selectItem.value = undefined
-  // selectedRadio.value = "one"
+  selectedRadio.value = "one"
+  selectedSeriesId.value = ""
 }
+
+const selectedSeriesId = ref('')
 </script>
 
 <template>
@@ -347,7 +340,7 @@ const closeDialog = () => {
         <DropdownMenu
           :seriesList="seriesList"
           :isDisabled="selectedRadio === 'one'"
-          @selectItem="updateSelectItem"
+          v-model:selected-series-id="selectedSeriesId"
         ></DropdownMenu>
       </v-card-text>
       <v-card-actions>
@@ -355,7 +348,7 @@ const closeDialog = () => {
         <v-btn
           class="registerBtn"
           @click="submit"
-          :disabled="selectedRadio === 'series' && !selectItem"
+          :disabled="selectedRadio === 'series' && selectedSeriesId === ''"
           >登録</v-btn
         >
       </v-card-actions>
