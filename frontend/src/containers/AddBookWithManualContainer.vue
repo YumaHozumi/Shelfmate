@@ -67,10 +67,6 @@ const selectedSeriesId = ref<string>('')
 </template>
 
 <style scoped>
-.dropdown {
-    
-}
-
 .my-form {
     width: 80%;
     margin: 0 auto;
