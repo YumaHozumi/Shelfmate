@@ -71,8 +71,6 @@ watch(hasError, (flag) => {
     >
     <span v-if="hasError" class="error-message">{{ errorMessage }}</span>
   </div>
-
-  <p>{{ hasError }}</p>
 </template>
 
 <style lang="scss" scoped>
