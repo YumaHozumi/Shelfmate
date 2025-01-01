@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, defineProps, defineEmits } from 'vue';
+import { ref, computed, watch, defineProps, defineEmits, onMounted } from 'vue';
 import type { ValidationRule } from '@/interface';
 
 interface Props {
@@ -51,7 +51,12 @@ const hasError = computed(() => errorMessage.value.length > 0);
 watch(() => props.value, validate);
 // hasErrorの値が変わるたびにerrorイベントを発火
 watch(hasError, (flag) => {
-  emit('error', !flag);
+  console.log('hasError', "props.label", props.label, flag);
+  emit('error', flag);
+});
+
+onMounted(() => {
+  validate();
 });
 </script>
 

@@ -1,4 +1,5 @@
 import * as yup from 'yup'
+import type { ValidationRule } from '@/interface'
 
 const validateWithYup = (schema: yup.StringSchema, value: string) => {
   try {
@@ -105,4 +106,21 @@ const validateISBN = (isbn: string): boolean => {
   return false
 }
 
-export { rules }
+const createTextLengthRule = (maxLength: number): ValidationRule => {
+  return {
+    validate: (val: string | number) => val.toString().length <= maxLength,
+    message: `${maxLength}文字以内で入力してください。`
+  };
+};
+
+const textNumberRule: ValidationRule = {
+  validate: (val: string | number) => !isNaN(Number(val)),
+  message: '数字で入力してください。'
+};
+
+const positiveNumberRule: ValidationRule = {
+  validate: (val: string | number) => Number(val) > 0,
+  message: '正の数で入力してください。'
+};
+
+export { rules, createTextLengthRule, textNumberRule, positiveNumberRule }
