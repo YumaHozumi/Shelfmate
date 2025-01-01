@@ -65,5 +65,10 @@ const isSeries = (obj: any): obj is Series => {
   )
 }
 
-export type { BookItem, BookShelf, Series, BookItemNoSeries, SelectSeriesItem }
+interface ValidationRule {
+  validate: (value: string | number) => boolean;
+  message: string;
+}
+
+export type { BookItem, BookShelf, Series, BookItemNoSeries, SelectSeriesItem, ValidationRule }
 export { implementBookShelf, isBookItem, isSeries, Action }

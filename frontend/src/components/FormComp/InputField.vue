@@ -1,18 +1,24 @@
 <script setup lang="ts">
-import { computed, watch, defineProps, defineEmits } from 'vue';
+import { ref, computed, watch, defineProps, defineEmits } from 'vue';
+import type { ValidationRule } from '@/interface';
 
 interface Props {
   label: string;
   type?: string;
-  value?: string | number;
+  value: string | number;
   placeholder?: string;
   width?: string;
-  errorMessage?: string;
+  rules: ValidationRule[];
   required?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   required: false,
+  rules: () => [],
+  value: '',
+  type: 'text',
+  placeholder: '',
+  width: '100%',
 });
 
 const emit = defineEmits<{
@@ -20,14 +26,29 @@ const emit = defineEmits<{
   (e: 'error', isValid: boolean): void;
 }>();
 
-const hasError = computed(() => {
-  //errorMessageがpropsに渡されていないときはエラーがないと判断
-  if (!props.errorMessage) {
-    return false;
-  }
-  return props.errorMessage !== '';
-});
+const errorMessage = ref<string>("");
 
+const validate = () => {
+  // 必須チェック
+  if (props.required && !props.value) {
+    errorMessage.value = 'この項目は必須です';
+    return;
+  }
+
+  // ルールによるバリデーション
+  for (const rule of props.rules) {
+    if (!rule.validate(props.value)) {
+      errorMessage.value = rule.message;
+      return;
+    }
+  }
+
+  errorMessage.value = '';
+};
+// エラーがあるかどうかのフラグ
+const hasError = computed(() => errorMessage.value.length > 0);
+
+watch(() => props.value, validate);
 // hasErrorの値が変わるたびにerrorイベントを発火
 watch(hasError, (flag) => {
   emit('error', !flag);
@@ -48,8 +69,10 @@ watch(hasError, (flag) => {
       class="input-control"
       :class="{ 'input-error': hasError }"
     >
-    <span v-if="hasError" class="error-message">{{ props.errorMessage }}</span>
+    <span v-if="hasError" class="error-message">{{ errorMessage }}</span>
   </div>
+
+  <p>{{ hasError }}</p>
 </template>
 
 <style lang="scss" scoped>
