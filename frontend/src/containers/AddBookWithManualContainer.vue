@@ -7,6 +7,10 @@ import DropdownMenu from '@/components/DropdownMenu.vue'
 import TextAreaField from '@/components/FormComp/TextAreaField.vue'
 import { createTextLengthRule, textNumberRule, positiveNumberRule } from '@/validation';
 
+const props = defineProps<{
+  createBook: (book: BookItem) => void;
+}>();
+
 const book = ref<BookItem>({
   bookId: '',
   isbn: 0,
@@ -57,9 +61,11 @@ watch(() => selectedRadio.value, (newValue) => {
 // 送信処理
 const submit = async () => {
   if (!isFormValid.value) {
-    console.error('フォームにエラーがあります');
+    alert('フォームにエラーがあります');
     return;
   }
+
+  props.createBook(book.value);
 };
 
 const detailErrorMessage = ref('');
@@ -136,11 +142,6 @@ watch(
 
 <style scoped lang="scss">
 .my-form {
-    width: 80%;
     margin: 0 auto;
-    
-    @media (min-width: 1024px) {
-        width: 50%;
-    }
 }
 </style>

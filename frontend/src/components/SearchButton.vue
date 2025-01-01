@@ -30,6 +30,8 @@ import DropdownMenu from './DropdownMenu.vue'
 import { incrementCounter, fetchDocs, addDocAfterCacheCheck, fetchDocWithCache, fetchSeriesList } from '@/function'
 import { rules } from '@/validation'
 import ErrorMessage from '@/basic/ErrorMessage.vue'
+import DialogContainer from '@/containers/DialogContainer.vue'
+import AddBookWithManualContainer from '@/containers/AddBookWithManualContainer.vue'
 
 const dialog = ref(false)
 const inputText = ref('')
@@ -141,7 +143,14 @@ watch(selectedBookshelf, async (newVal) => {
   seriesList.value = await fetchSeriesList(user, selectedBookshelfId);
 })
 
-const nowBook = ref<BookItem | undefined>(undefined)
+const nowBook = ref<BookItem>(
+  {
+    bookId: '',
+    isbn: 0,
+    title: '',
+    imageURL: '',
+  } as BookItem
+)
 //本を追加ボタンを押したとき
 const registerBook = async (book: BookItem) => {
   nestDialog.value = true
@@ -156,11 +165,13 @@ const duplicateCheck = async (colref: CollectionReference, bookId: string) => {
   return querySnapshot.docs.length > 0
 }
 
-const submit = async () => {
+
+//TODO: selectedRadio.value === 'one'とかを引数で受け取るようにする
+const submit = async (book: BookItem) => {
   nestDialog.value = false
   const user = await getCurrentUser()
   const selectedBookshelfId = selectedBookshelf.value?.doc_id || ''
-  const book = nowBook.value
+
   const allBookCollection = collection(
     firestore,
     'users',
@@ -288,6 +299,12 @@ const closeDialog = () => {
 }
 
 const selectedSeriesId = ref('')
+
+const test = () => {
+  console.log('test')
+}
+
+const addBookDialog = ref(false)
 </script>
 
 <template>
@@ -356,13 +373,18 @@ const selectedSeriesId = ref('')
         <v-spacer></v-spacer>
         <v-btn
           class="registerBtn"
-          @click="submit"
+          @click="submit(nowBook)"
           :disabled="selectedRadio === 'series' && selectedSeriesId === ''"
           >登録</v-btn
         >
       </v-card-actions>
     </v-card>
   </v-dialog>
+
+  <v-btn @click="addBookDialog = true"></v-btn>
+  <DialogContainer v-model:modelValue="addBookDialog" title="手動で本を追加">
+    <AddBookWithManualContainer :create-book="test"></AddBookWithManualContainer>
+  </DialogContainer>
 </template>
 
 <style scoped>
