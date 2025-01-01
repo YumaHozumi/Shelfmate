@@ -51,7 +51,6 @@ const hasError = computed(() => errorMessage.value.length > 0);
 watch(() => props.value, validate);
 // hasErrorの値が変わるたびにerrorイベントを発火
 watch(hasError, (flag) => {
-  console.log('hasError', "props.label", props.label, flag);
   emit('error', flag);
 });
 
