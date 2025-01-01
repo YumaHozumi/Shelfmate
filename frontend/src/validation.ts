@@ -106,6 +106,13 @@ const validateISBN = (isbn: string): boolean => {
   return false
 }
 
+/**
+ * Creates a validation rule that checks if the length of a given string or number
+ * is less than or equal to the specified maximum length.
+ *
+ * @param maxLength - The maximum allowed length for the input value.
+ * @returns A validation rule object containing a validate function and an error message.
+ */
 const createTextLengthRule = (maxLength: number): ValidationRule => {
   return {
     validate: (val: string | number) => val.toString().length <= maxLength,
