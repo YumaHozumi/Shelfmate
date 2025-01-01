@@ -26,7 +26,6 @@ const selectedSeriesId = ref<string>('')
 
 const textLengthRule = createTextLengthRule(100);
 
-
 // エラー状態の管理
 const hasError = reactive<Record<string, boolean>>({
   title: true,      // 必須項目
@@ -79,8 +78,6 @@ watch(
 </script>
 
 <template>
-    <p>{{ hasError }}</p>
-    <p>{{ isFormValid ? 'Form is valid' : 'Form is invalid' }}</p>
     <div class="my-form">
         <InputField
             v-model:value="book.title"
