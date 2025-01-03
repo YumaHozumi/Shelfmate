@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, defineProps, defineEmits, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import type { ValidationRule } from '@/interface';
 
 interface Props {

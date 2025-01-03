@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch, defineProps, defineEmits, withDefaults } from 'vue';
+import { computed, watch } from 'vue';
 
 interface Props {
   label: string;
