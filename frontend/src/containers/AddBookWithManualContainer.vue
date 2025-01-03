@@ -5,7 +5,8 @@ import type { BookItem, SelectSeriesItem } from '@/interface';
 import { Timestamp } from 'firebase/firestore';
 import DropdownMenu from '@/components/DropdownMenu.vue'
 import TextAreaField from '@/components/FormComp/TextAreaField.vue'
-import { createTextLengthRule, textNumberRule, positiveNumberRule } from '@/validation';
+import { createTextLengthRule, textNumberRule, positiveNumberRule, imageUrlRule } from '@/validation';
+import noImage from '@/assets/no-image.png';
 
 const props = defineProps<{
   createBook: (book: BookItem) => void;
@@ -28,14 +29,15 @@ const seriesList = ref<SelectSeriesItem[]>([])
 
 const selectedSeriesId = ref<string>('')
 
-const textLengthRule = createTextLengthRule(100);
+const textLengthRule = createTextLengthRule(10);
 
 // エラー状態の管理
 const hasError = reactive<Record<string, boolean>>({
   title: true,      // 必須項目
   author: false,    // 任意項目
   detail: false,    // 任意項目
-  orderNumber: false // シリーズ選択時のみ必須
+  orderNumber: false, // シリーズ選択時のみ必須
+  imageURL: false   // 画像URLのバリデーション
 });
 
 // フォーム全体の有効性確認
@@ -60,6 +62,16 @@ watch(() => selectedRadio.value, (newValue) => {
 
 // 送信処理
 const submit = async () => {
+    // URLのバリデーション
+  if (book.value.imageURL && book.value.imageURL.trim() !== '') {
+    try {
+      new URL(book.value.imageURL);
+    } catch {
+      alert('画像URLが無効です');
+      return;
+    }
+  }
+
   if (!isFormValid.value) {
     alert('フォームにエラーがあります');
     return;
@@ -81,9 +93,18 @@ watch(
   }
 );
 
+// プレビュー用のURL
+const previewImageURL = computed(() => {
+  // エラーがある場合は noImage
+  if (hasError.imageURL || !book.value.imageURL?.trim()) {
+    return noImage;
+  }
+  return book.value.imageURL;
+});
 </script>
 
 <template>
+  <p>{{ hasError }}</p>
     <div class="my-form">
         <InputField
             v-model:value="book.title"
@@ -94,6 +115,19 @@ watch(
             :rules="[textLengthRule]"
             @error="(isValid) => updateErrorState('title', isValid)"
         ></InputField>
+        <InputField
+          v-model:value="book.imageURL"
+          label="画像URL"
+          placeholder="https://example.com/image.jpg"
+          type="text"
+          :rules="[createTextLengthRule(1000), imageUrlRule]"
+          @error="(isValid) => updateErrorState('imageURL', isValid)"
+        >        
+        </InputField>
+        <div v-if="book.imageURL && book.imageURL.trim() !== '' && !hasError.imageURL" class="image-preview">
+          <img :src="previewImageURL" alt="Book Image Preview" />
+        </div>
+
         <InputField
             v-model:value="book.author"
             label="著者"
@@ -143,5 +177,16 @@ watch(
 <style scoped lang="scss">
 .my-form {
     margin: 0 auto;
+}
+
+.image-preview {
+  text-align: center;
+  margin: 20px 0;
+
+  img {
+    max-width: 200px;
+    max-height: 300px;
+    object-fit: cover;
+  }
 }
 </style>

@@ -130,4 +130,27 @@ const positiveNumberRule: ValidationRule = {
   message: '正の数で入力してください。'
 };
 
-export { rules, createTextLengthRule, textNumberRule, positiveNumberRule }
+// 画像URL検証のカスタムルール作成
+// 非同期で HEAD リクエストを行う場合は、InputField 側が非同期バリデーションに対応している必要があります。
+const imageUrlRule: ValidationRule = {
+  validate: async (val: string | number) => {
+    // 入力が空の場合はOKとする
+    if (!val || typeof val !== 'string' || !val.trim()) {
+      return true;
+    }
+    const imageUrlPattern = /^https?:\/\/.*\.(?:jpe?g|png|gif|bmp|webp|svg)(\?.*)?$/i;
+    if (!imageUrlPattern.test(val.trim())) {
+      return false;
+    }
+
+    try {
+      await fetch(val.trim(), { method: 'HEAD' });
+      return true;
+    } catch {
+      return false;
+    }
+  },
+  message: '画像URLが無効です。'
+};
+
+export { rules, createTextLengthRule, textNumberRule, positiveNumberRule, imageUrlRule }

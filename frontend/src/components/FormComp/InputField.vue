@@ -28,7 +28,7 @@ const emit = defineEmits<{
 
 const errorMessage = ref<string>("");
 
-const validate = () => {
+const validate = async () => {
   // 必須チェック
   if (props.required && !props.value) {
     errorMessage.value = 'この項目は必須です';
@@ -37,7 +37,9 @@ const validate = () => {
 
   // ルールによるバリデーション
   for (const rule of props.rules) {
-    if (!rule.validate(props.value)) {
+    const isValid = await rule.validate(props.value);
+    
+    if (!isValid) {
       errorMessage.value = rule.message;
       return;
     }

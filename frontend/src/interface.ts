@@ -66,7 +66,7 @@ const isSeries = (obj: any): obj is Series => {
 }
 
 interface ValidationRule {
-  validate: (value: string | number) => boolean;
+  validate: (value: string | number) => boolean | Promise<boolean>;
   message: string;
 }
 
