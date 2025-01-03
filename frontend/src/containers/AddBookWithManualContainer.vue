@@ -171,7 +171,7 @@ const previewImageURL = computed(() => {
             class="dropdown"
         ></DropdownMenu>
 
-        <v-btn color="primary" @click="submit" :disabled="!isFormValid" class="mt-5">登録</v-btn>
+        <v-btn color="green" @click="submit" :disabled="!isFormValid" class="mt-5" width="100%">登録</v-btn>
     </div>
     
 </template>
