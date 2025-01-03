@@ -9,7 +9,8 @@ import { createTextLengthRule, textNumberRule, positiveNumberRule, imageUrlRule 
 import noImage from '@/assets/no-image.png';
 
 const props = defineProps<{
-  createBook: (book: BookItem) => void;
+  submit: (book: BookItem, selectedRadio: string, selectedSeriesId: string) => void;
+  seriesList: SelectSeriesItem[];
 }>();
 
 const book = ref<BookItem>({
@@ -25,7 +26,6 @@ const book = ref<BookItem>({
 });
 
 const selectedRadio = ref<string>('one');
-const seriesList = ref<SelectSeriesItem[]>([])
 
 const selectedSeriesId = ref<string>('')
 
@@ -62,6 +62,9 @@ watch(() => selectedRadio.value, (newValue) => {
 
 // 送信処理
 const submit = async () => {
+  //bookIdはランダムな文字列を生成
+  book.value.bookId = Math.random().toString(32).substring(2);
+
     // URLのバリデーション
   if (book.value.imageURL && book.value.imageURL.trim() !== '') {
     try {
@@ -77,7 +80,7 @@ const submit = async () => {
     return;
   }
 
-  props.createBook(book.value);
+  props.submit(book.value, selectedRadio.value, selectedSeriesId.value);
 };
 
 const detailErrorMessage = ref('');
@@ -104,7 +107,6 @@ const previewImageURL = computed(() => {
 </script>
 
 <template>
-  <p>{{ hasError }}</p>
     <div class="my-form">
         <InputField
             v-model:value="book.title"

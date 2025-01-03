@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
 import AddBookContainer from '@/containers/AddBookWithManualContainer.vue';
-import type { BookItem } from '@/interface';
+import type { BookItem, SelectSeriesItem } from '@/interface';
 
 const meta: Meta<typeof AddBookContainer> = {
     title: 'Containers/AddBookContainer',
@@ -9,6 +9,10 @@ const meta: Meta<typeof AddBookContainer> = {
         createBook: {
             action: 'createBook',
             description: '本を追加するときのイベント'
+        },
+        seriesList: {
+            control: 'array',
+            description: 'シリーズのリスト'
         }
     },
 };
@@ -19,6 +23,7 @@ type Story = StoryObj<typeof AddBookContainer>;
 
 interface Props {
     createBook: (book: BookItem) => void;
+    seriesList: SelectSeriesItem[];
 }
 
 export const Default: Story = {
@@ -33,6 +38,10 @@ export const Default: Story = {
         createBook: (book: BookItem) => {
             console.log("test")
             console.log(book);
-        }
+        },
+        seriesList: [
+            { seriesId: '1', pic: 'https://m.media-amazon.com/images/I/71rCvdkABYL._SY466_.jpg', seriesTitle: 'Series 1' },
+            { seriesId: '2', pic: 'https://m.media-amazon.com/images/I/71VwOPsrD4L._SY342_.jpg', seriesTitle: 'Series 2' }
+        ]
     }
 };

@@ -165,10 +165,7 @@ const duplicateCheck = async (colref: CollectionReference, bookId: string) => {
   return querySnapshot.docs.length > 0
 }
 
-
-//TODO: selectedRadio.value === 'one'とかを引数で受け取るようにする
-const submit = async (book: BookItem) => {
-  nestDialog.value = false
+const createBook = async (book: BookItem, selectedRadio: string, selectedSeriesId: string) => {
   const user = await getCurrentUser()
   const selectedBookshelfId = selectedBookshelf.value?.doc_id || ''
 
@@ -189,14 +186,13 @@ const submit = async (book: BookItem) => {
     'books'
   )
   if(book === undefined) return
-
   //所持している本一覧に追加
   if (!(await duplicateCheck(allBookCollection, book.bookId))) {
     await addDocAfterCacheCheck(allBookCollection, book)
   } 
   
   // シリーズものじゃないとき
-  if (selectedRadio.value === 'one') {
+  if (selectedRadio === 'one') {
     const noSeriesBook: BookItemNoSeries = convertToBookItemWithoutSeries(book)
     if (!(await duplicateCheck(noSeriesBookCollection, book.bookId))) {
       //重複していないとき
@@ -204,7 +200,7 @@ const submit = async (book: BookItem) => {
     }
   } else {
     // シリーズもの
-    if (selectedSeriesId.value === "") return
+    if (selectedSeriesId === "") return
     const booksCollection = collection(
       firestore,
       'users',
@@ -212,7 +208,7 @@ const submit = async (book: BookItem) => {
       'bookshelves',
       selectedBookshelfId,
       'series',
-      selectedSeriesId.value,
+      selectedSeriesId,
       'books'
     )
 
@@ -223,7 +219,7 @@ const submit = async (book: BookItem) => {
       bookshelvesRef,
       selectedBookshelfId,
       'series',
-      selectedSeriesId.value
+      selectedSeriesId
     )
     const seriesSnap = await fetchDocWithCache(seriesRef)
 
@@ -245,7 +241,7 @@ const submit = async (book: BookItem) => {
       const seriesTitle = extractSeriesTitle(book.title)
 
       await setDoc(seriesRef, {
-        seriesId: selectedSeriesId.value,
+        seriesId: selectedSeriesId,
         pic: book?.imageURL ?? '',
         counter: 0,
         picOrder: book?.orderNumber ?? 0,
@@ -254,13 +250,29 @@ const submit = async (book: BookItem) => {
     }
 
     //API経由で取得したやつにはシリーズIDないためここで設定
-    book.seriesId = selectedSeriesId.value
+    book.seriesId = selectedSeriesId
 
     await addDocAfterCacheCheck(booksCollection, book)
-    await incrementCounter(seriesRef)
+    await incrementCounter(seriesRef) 
+  }
+}
 
-    selectedRadio.value = 'one'
-    
+const handleSubmit = async () => {
+  try {
+    nestDialog.value = false
+    await createBook(nowBook.value, selectedRadio.value, selectedSeriesId.value)
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+//手動で本を追加するダイアログの場合
+const handleSubmitManualInput = async (nowBook: BookItem, selectedRadio: string, selectedSeriesId: string) => {
+  try {
+    addBookDialog.value = false
+    await createBook(nowBook, selectedRadio, selectedSeriesId)
+  } catch (error) {
+    console.error(error)
   }
 }
 
@@ -299,11 +311,6 @@ const closeDialog = () => {
 }
 
 const selectedSeriesId = ref('')
-
-const test = () => {
-  console.log('test')
-}
-
 const addBookDialog = ref(false)
 </script>
 
@@ -373,7 +380,7 @@ const addBookDialog = ref(false)
         <v-spacer></v-spacer>
         <v-btn
           class="registerBtn"
-          @click="submit(nowBook)"
+          @click="handleSubmit"
           :disabled="selectedRadio === 'series' && selectedSeriesId === ''"
           >登録</v-btn
         >
@@ -383,7 +390,7 @@ const addBookDialog = ref(false)
 
   <v-btn @click="addBookDialog = true"></v-btn>
   <DialogContainer v-model:modelValue="addBookDialog" title="手動で本を追加">
-    <AddBookWithManualContainer :create-book="test"></AddBookWithManualContainer>
+    <AddBookWithManualContainer :submit="handleSubmitManualInput" :series-list="seriesList"></AddBookWithManualContainer>
   </DialogContainer>
 </template>
 
