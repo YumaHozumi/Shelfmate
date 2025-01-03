@@ -4,7 +4,7 @@ interface BookItem {
   bookId: string
   isbn?: number
   title: string
-  imageURL: string | undefined
+  image_url: string | undefined
   author: string
   detail: string
   public_date: Timestamp
@@ -47,7 +47,7 @@ const isBookItem = (obj: any): obj is BookItem => {
     typeof obj.bookId === 'string' &&
     (typeof obj.isbn === 'number' || obj.isbn === undefined) &&
     typeof obj.title === 'string' &&
-    (typeof obj.imageURL === 'string' || obj.imageURL === undefined) &&
+    (typeof obj.image_url === 'string' || obj.image_url === undefined) &&
     typeof obj.author === 'string' &&
     typeof obj.detail === 'string' &&
     (typeof obj.seriesId === 'string' || obj.seriesId === undefined) &&

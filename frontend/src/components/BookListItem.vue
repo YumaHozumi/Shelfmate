@@ -10,7 +10,7 @@ defineProps<Props>()
 
 <template>
   <div class="book-item">
-    <img class="book-cover" :src="book.imageURL" alt="Book Cover" />
+    <img class="book-cover" :src="book.image_url" alt="Book Cover" />
     <div class="book-info">
       <h2 class="book-title">{{ book.title }}</h2>
       <p class="book-author">{{ book.author }}</p>

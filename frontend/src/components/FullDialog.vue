@@ -145,10 +145,10 @@ const updateSeriesPic = async (user: User, selectBookshelfId: string, seriesId: 
 
   const seriesDoc = doc(firestore, 'users', user.uid, 'bookshelves', selectBookshelfId, 'series',seriesId);
 
-  if (updatePicItem.imageURL === undefined) return
+  if (updatePicItem.image_url === undefined) return
 
   await updateDoc(seriesDoc,
-    {'pic': updatePicItem.imageURL}
+    {'pic': updatePicItem.image_url}
   )
 }
 

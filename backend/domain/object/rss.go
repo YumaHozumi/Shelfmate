@@ -25,7 +25,7 @@ type Item struct {
 	PublicDate     string `xml:"pubDate" json:"public_date"`
 	ISBNIdentifier int64  `json:"isbn"`
 	OrderNumber    int    `xml:"volume" json:"orderNumber"`
-	ImageURL       string `json:"imageURL"`
+	ImageURL       string `json:"image_url"`
 }
 
 func (item *Item) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {

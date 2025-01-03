@@ -82,8 +82,8 @@ const search = async (searchText: string): Promise<BookItem[]> => {
     }
 
     books.forEach((book) => {
-      if (book.isbn === undefined || book.imageURL !== undefined) return;
-      book.imageURL = 'https://iss.ndl.go.jp/thumbnail/' + book.isbn
+      if (book.isbn === undefined || book.image_url !== undefined) return;
+      book.image_url = 'https://iss.ndl.go.jp/thumbnail/' + book.isbn
     })
   } catch (error) {
     console.log(error)
@@ -193,12 +193,12 @@ const registerBook = async (book: BookItem) => {
 
         const shouldUpdatePic =
           book &&
-          (((book.orderNumber ?? 0) > (seriesData?.picOrder ?? 0) && book.imageURL !== '') ||
+          (((book.orderNumber ?? 0) > (seriesData?.picOrder ?? 0) && book.image_url !== '') ||
             ((book.orderNumber ?? 0) < (seriesData?.picOrder ?? 0) && seriesData?.pic === ''))
 
         if (shouldUpdatePic) {
           await updateDoc(seriesRef, {
-            pic: book?.imageURL,
+            pic: book?.image_url,
             picOrder: book?.orderNumber ?? 0
           })
         }
@@ -208,7 +208,7 @@ const registerBook = async (book: BookItem) => {
 
         await setDoc(seriesRef, {
           seriesId: seriesId,
-          pic: book?.imageURL ?? '',
+          pic: book?.image_url ?? '',
           counter: 0,
           picOrder: book?.orderNumber ?? 0,
           seriesTitle: seriesTitle

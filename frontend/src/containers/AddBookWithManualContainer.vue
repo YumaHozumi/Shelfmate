@@ -17,7 +17,7 @@ const book = ref<BookItem>({
   bookId: '',
   isbn: 0,
   title: '',
-  imageURL: '',
+  image_url: '',
   author: '',
   detail: '',
   public_date: Timestamp.now(),
@@ -37,7 +37,7 @@ const hasError = reactive<Record<string, boolean>>({
   author: false,    // 任意項目
   detail: false,    // 任意項目
   orderNumber: false, // シリーズ選択時のみ必須
-  imageURL: false   // 画像URLのバリデーション
+  image_url: false   // 画像URLのバリデーション
 });
 
 // フォーム全体の有効性確認
@@ -66,9 +66,9 @@ const submit = async () => {
   book.value.bookId = Math.random().toString(32).substring(2);
 
     // URLのバリデーション
-  if (book.value.imageURL && book.value.imageURL.trim() !== '') {
+  if (book.value.image_url && book.value.image_url.trim() !== '') {
     try {
-      new URL(book.value.imageURL);
+      new URL(book.value.image_url);
     } catch {
       alert('画像URLが無効です');
       return;
@@ -99,10 +99,10 @@ watch(
 // プレビュー用のURL
 const previewImageURL = computed(() => {
   // エラーがある場合は noImage
-  if (hasError.imageURL || !book.value.imageURL?.trim()) {
+  if (hasError.image_url || !book.value.image_url?.trim()) {
     return noImage;
   }
-  return book.value.imageURL;
+  return book.value.image_url;
 });
 </script>
 
@@ -118,15 +118,15 @@ const previewImageURL = computed(() => {
             @error="(isValid) => updateErrorState('title', isValid)"
         ></InputField>
         <InputField
-          v-model:value="book.imageURL"
+          v-model:value="book.image_url"
           label="画像URL"
           placeholder="https://example.com/image.jpg"
           type="text"
           :rules="[createTextLengthRule(1000), imageUrlRule]"
-          @error="(isValid) => updateErrorState('imageURL', isValid)"
+          @error="(isValid) => updateErrorState('image_url', isValid)"
         >        
         </InputField>
-        <div v-if="book.imageURL && book.imageURL.trim() !== '' && !hasError.imageURL" class="image-preview">
+        <div v-if="book.image_url && book.image_url.trim() !== '' && !hasError.imageURL" class="image-preview">
           <img :src="previewImageURL" alt="Book Image Preview" />
         </div>
 

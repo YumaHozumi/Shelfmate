@@ -21,7 +21,7 @@ import {
   where,
   CollectionReference,
 } from 'firebase/firestore'
-import imageURL from '@/assets/no-image.png'
+import NO_IMAGE from '@/assets/no-image.png'
 import { onAuthStateChanged } from 'firebase/auth'
 import { firebaseAuth, firestore, getCurrentUser } from '@/config/firebase'
 import { onUnmounted } from 'vue'
@@ -96,7 +96,7 @@ const searchClick = async (searchText: string) => {
           bookId: item.bookId,
           isbn: item.isbn ?? 0,
           title: item.title,
-          imageURL: item.imageURL && item.imageURL.trim() !== '' ? item.imageURL : imageURL,
+          image_url: item.image_url && item.image_url.trim() !== '' ? item.image_url : NO_IMAGE,
           author: item.author,
           detail: output,
           public_date: Timestamp.fromDate(new Date(item.public_date)),
@@ -148,7 +148,7 @@ const nowBook = ref<BookItem>(
     bookId: '',
     isbn: 0,
     title: '',
-    imageURL: '',
+    image_url: '',
   } as BookItem
 )
 //本を追加ボタンを押したとき
@@ -227,12 +227,12 @@ const createBook = async (book: BookItem, selectedRadio: string, selectedSeriesI
       const seriesData = seriesSnap.data()
       const shouldUpdatePic =
         book &&
-        (((book.orderNumber ?? 0) > (seriesData?.picOrder ?? 0) && book.imageURL !== '') ||
+        (((book.orderNumber ?? 0) > (seriesData?.picOrder ?? 0) && book.image_url !== '') ||
           ((book.orderNumber ?? 0) < (seriesData?.picOrder ?? 0) && seriesData?.pic === ''))
 
       if (shouldUpdatePic) {
         await updateDoc(seriesRef, {
-          pic: book?.imageURL,
+          pic: book?.image_url,
           picOrder: book?.orderNumber ?? 0
         })
       }
@@ -242,7 +242,7 @@ const createBook = async (book: BookItem, selectedRadio: string, selectedSeriesI
 
       await setDoc(seriesRef, {
         seriesId: selectedSeriesId,
-        pic: book?.imageURL ?? '',
+        pic: book?.image_url ?? '',
         counter: 0,
         picOrder: book?.orderNumber ?? 0,
         seriesTitle: seriesTitle
