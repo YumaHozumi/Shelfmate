@@ -55,8 +55,8 @@ export default defineConfig({
     host: true,
     proxy: {
       '/api': {
-        //target: 'http://shelfmate-back:8080',
-        target: 'http://localhost:8080',
+        target: 'http://shelfmate-back:8080',
+        //target: 'http://localhost:8080',
         changeOrigin: true,
       }
     }
