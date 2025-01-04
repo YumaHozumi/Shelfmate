@@ -310,14 +310,18 @@ watch(selectedBookshelf, async () => {
     class="select"
   >
   </v-select>
-    
+  
   <v-toolbar class="px-4 pt-6 pb-2 search-bar mb-4">
     <SearchBar @search="searchClick" :rules="[]"></SearchBar>
   </v-toolbar>
   <ErrorMessage :errorMessage="errorMsg"></ErrorMessage>
   <div class="menu-container">
-    <SearchButton></SearchButton>
-    <Menu :items="menu" icon="mdi-sort" class="menu" @selectItem="selectMenu"></Menu>
+    <div class="search-button-row">
+      <SearchButton></SearchButton>
+    </div>
+    <div class="menu-row">
+      <Menu :items="menu" icon="mdi-sort" class="menu" @selectItem="selectMenu"></Menu>
+    </div>
   </div>
   <Results
     :items="items"
@@ -368,4 +372,24 @@ watch(selectedBookshelf, async () => {
 .error {
   margin-left: 10%;
 }
+
+.menu-container {
+  display: flex;
+  flex-direction: column; /* 縦並びにする */
+  align-items: flex-end; /* 右寄せにする */
+  margin-right: 9%;
+
+  .search-button-row,
+  .menu-row {
+    width: 100%; /* 幅を親要素に合わせる */
+    display: flex;
+    justify-content: flex-end; /* 右寄せ */
+    margin-bottom: 10px; /* ボタン同士の間隔を設定 */
+  }
+
+  .menu {
+    background-color: white;
+  }
+}
+
 </style>

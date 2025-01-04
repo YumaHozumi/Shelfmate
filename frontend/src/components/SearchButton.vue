@@ -319,7 +319,7 @@ const addBookDialog = ref(false)
     <template v-slot:activator="{ props }">
       <v-btn v-bind="props" elevation="0" color="blue">
         <v-icon>mdi-magnify</v-icon>
-        本が見つからないとき
+        ISBN検索
       </v-btn>
     </template>
     <v-card>
@@ -388,7 +388,14 @@ const addBookDialog = ref(false)
     </v-card>
   </v-dialog>
 
-  <v-btn @click="addBookDialog = true"></v-btn>
+  <v-btn @click="addBookDialog = true"
+    color="blue"
+    elevation="0"
+    class="ml-3"
+  >
+    <v-icon>mdi-plus</v-icon>
+    手動で本を追加
+  </v-btn>
   <DialogContainer v-model:modelValue="addBookDialog" title="手動で本を追加">
     <AddBookWithManualContainer :submit="handleSubmitManualInput" :series-list="seriesList"></AddBookWithManualContainer>
   </DialogContainer>

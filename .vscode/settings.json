@@ -1,0 +1,15 @@
+{
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/**": true,
+        "**/.hg/store/**": true,
+        "**/dist/**": true,
+        "**/build/**": true,
+        "**/.venv/**": true,
+        "**/__pycache__/**": true,
+        "**/ENV/**": true,
+        "**/.nuxt/**": true,
+        "**/.output/**": true
+    }
+}
