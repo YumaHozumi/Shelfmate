@@ -29,7 +29,7 @@ const selectedRadio = ref<string>('one');
 
 const selectedSeriesId = ref<string>('')
 
-const textLengthRule = createTextLengthRule(10);
+const textLengthRule = createTextLengthRule(100);
 
 // エラー状態の管理
 const hasError = reactive<Record<string, boolean>>({
