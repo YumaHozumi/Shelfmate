@@ -29,4 +29,3 @@ coverage
 
 **/__pycache/__
 *.pyc
-*.conf
