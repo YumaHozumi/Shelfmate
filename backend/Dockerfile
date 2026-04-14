@@ -7,7 +7,7 @@ COPY ./ ./
 RUN CGO_ENABLED=0 GOOS=linux go build -o /main
 
 # Deploy stage
-FROM debian:buster-slim
+FROM debian:bookworm-slim
 WORKDIR /app
 RUN apt update && apt install -y ca-certificates
 COPY --from=build /main /main
