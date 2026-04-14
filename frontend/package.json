@@ -18,7 +18,7 @@
     "@storybook/vue3": "^8.3.5",
     "@types/xml2js": "^0.4.11",
     "@vee-validate/rules": "^4.11.3",
-    "axios": "^1.4.0",
+    "axios": "^1.15.0",
     "firebase": "^10.1.0",
     "idb": "^7.1.1",
     "lodash": "^4.17.21",
