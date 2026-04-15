@@ -41,3 +41,13 @@ jobs:
           IMAGE=${{ env.REGISTRY }}/${{ env.PROJECT_ID }}/${{ env.REPOSITORY }}/backend:latest
           docker build -t $IMAGE ./backend
           docker push $IMAGE
+
+      - name: Deploy to VM via SSH
+        run: |
+          VM_IP=$(gcloud compute instances describe ${{ secrets.GCP_INSTANCE_NAME }} --zone=${{ secrets.GCP_ZONE }} --format="value(networkInterfaces[0].accessConfigs[0].natIP)")
+          echo "VM IP: $VM_IP"
+          mkdir -p ~/.ssh
+          echo "${{ secrets.GCP_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H $VM_IP >> ~/.ssh/known_hosts 2>/dev/null
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no PC_User@$VM_IP "cd ~/websiteForPublic && docker-compose pull shelfmate-front shelfmate-back && docker-compose up -d shelfmate-front shelfmate-back && docker image prune -f"
